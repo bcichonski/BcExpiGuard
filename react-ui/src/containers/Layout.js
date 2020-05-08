@@ -17,8 +17,8 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import { appBarItemsPrimary, appBarItemsSecondary } from '../constants/appBarItems';
 import PropTypes from 'prop-types';
-import RouterSwitch from './RouterSwitch'
-import Copyright from './Copyright'
+import RouterSwitch from '../components/RouterSwitch'
+import Copyright from '../components/Copyright'
 
 const drawerWidth = 240;
 
