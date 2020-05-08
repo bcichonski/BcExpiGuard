@@ -1,6 +1,6 @@
 {
-  "name": "heroku-cra-node",
-  "description": "web app made of create-react-app UI + Node API",
+  "name": "BcExpiGuard",
+  "description": "Keep things from getting expired, learn React and stuff at the same time",
   "scripts": {
   },
   "env": {
