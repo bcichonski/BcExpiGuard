@@ -12,31 +12,13 @@ import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import Badge from '@material-ui/core/Badge';
 import Container from '@material-ui/core/Container';
-import Link from '@material-ui/core/Link';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
-import { mainListItems, secondaryListItems } from './listItems';
-import MainContent from './MainContent'
+import { appBarItemsPrimary, appBarItemsSecondary } from '../constants/appBarItems';
 import PropTypes from 'prop-types';
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route
-} from "react-router-dom";
-
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href="https://material-ui.com/">
-        Bartosz Cichonski
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
+import RouterSwitch from './RouterSwitch'
+import Copyright from './Copyright'
 
 const drawerWidth = 240;
 
@@ -157,14 +139,14 @@ function Layout(props) {
           </IconButton>
         </div>
         <Divider />
-        <List>{mainListItems}</List>
+        <List>{appBarItemsPrimary}</List>
         <Divider />
-        <List>{secondaryListItems}</List>
+        <List>{appBarItemsSecondary}</List>
       </Drawer>
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
-          <MainContent />
+          <RouterSwitch />
           <Box pt={4}>
             <Copyright />
           </Box>
@@ -175,7 +157,7 @@ function Layout(props) {
 }
 
 Layout.propTypes = {
-  isMobile : PropTypes.bool
+  isMobile: PropTypes.bool
 }
 
 export default Layout

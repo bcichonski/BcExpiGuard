@@ -1,14 +1,16 @@
 import React from 'react';
 import { useMediaQuery } from 'react-responsive'
 import Layout from './components/Layout'
-import './App.css';
+import { BrowserRouter as Router } from "react-router-dom"
 
 function App() {
-  const isMobile = useMediaQuery({maxDeviceWidth : 1000})
+  const isMobile = useMediaQuery({ maxDeviceWidth: 1000 })
 
   return (
     <div className="App">
-      <Layout isMobile={isMobile} />
+      <Router>
+        <Layout isMobile={isMobile} />
+      </Router>
     </div>
   );
 }
