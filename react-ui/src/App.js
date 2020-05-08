@@ -1,6 +1,6 @@
 import React from 'react';
 import { useMediaQuery } from 'react-responsive'
-import Dashboard from './components/Dashboard'
+import Layout from './components/Layout'
 import './App.css';
 
 function App() {
@@ -8,7 +8,7 @@ function App() {
 
   return (
     <div className="App">
-      <Dashboard isMobile={isMobile} />
+      <Layout isMobile={isMobile} />
     </div>
   );
 }
