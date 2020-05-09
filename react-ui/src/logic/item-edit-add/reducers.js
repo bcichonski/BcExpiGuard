@@ -31,6 +31,7 @@ const itemsAddEditReducer = (state = { state : types.ITEM_DIALOG_INACTIVE }, act
                 navigate('/item/add')
             }
             break;
+        case types.ITEM_DIALOG_OK:
         case types.ITEM_DIALOG_INACTIVE:
             newState = {
                 state : types.ITEM_DIALOG_INACTIVE

@@ -1,5 +1,6 @@
 import types from './types'
 import {format } from 'date-fns'
+import { itemActions } from '../item-list'
 
 const itemNameChanged = (newName) => ({
     type: types.ITEM_NAME_CHANGED,
@@ -25,9 +26,14 @@ const itemInCreation = ({
     type: types.ITEM_DIALOG_ADD
 })
 
-const itemToSave = ({
-    type: types.ITEM_DIALOG_OK
-})
+const itemToSave = () => (dispatch, getState) => {
+    const state = getState()
+    dispatch(itemActions.addItem({
+        name : state.itemEditReducer.name,
+        date : state.itemEditReducer.date
+    }))
+    dispatch({type: types.ITEM_DIALOG_OK})
+}
 
 export default {
     itemNameChanged,

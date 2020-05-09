@@ -8,13 +8,13 @@ import store from './common/store'
 import CssBaseline from '@material-ui/core/CssBaseline';
 
 ReactDOM.render(
-  <React.StrictMode>
+  /*<React.StrictMode>*/
     <Provider store={store}>
       <CssBaseline>
         <App />
       </CssBaseline>
     </Provider>
-  </React.StrictMode>,
+  /*</React.StrictMode>*/,
   document.getElementById('root')
 );
 

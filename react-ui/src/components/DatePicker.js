@@ -39,7 +39,7 @@ Datepicker.propTypes = {
     label: PropTypes.string,
     helperText: PropTypes.string,
     setDate: PropTypes.func,
-    selectedDate: PropTypes.date
+    selectedDate: PropTypes.object
 }
 
 Datepicker.defaultProps = {

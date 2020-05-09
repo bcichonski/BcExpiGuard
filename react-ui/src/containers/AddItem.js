@@ -21,16 +21,22 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 const mapStateToProps = (state /*, ownProps*/) => {
+    let date = new Date()
+    if (!!state.itemEditReducer.date) {
+        date = parseISO(state.itemEditReducer.date)
+    }
+
     return {
         name: state.itemEditReducer.name,
-        date: parseISO(state.itemEditReducer.date)
+        date
     }
 }
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
     setName: (value) => dispatch(itemEditActions.itemNameChanged(value)),
     setDate: (value) => dispatch(itemEditActions.itemExpirationDateChanged(value)),
-    handleCancelClick: () => dispatch(itemEditActions.itemAbandoned)
+    handleCancelClick: () => dispatch(itemEditActions.itemAbandoned),
+    handleAddItemClick: () => dispatch(itemEditActions.itemToSave)
 })
 
 function AddItem(props) {
@@ -50,7 +56,10 @@ function AddItem(props) {
                 <Grid item xs={12} sm={8} md={6} lg={4} xl={2}>
                     <Grid container justify="flex-end" direction='row'>
                         <Button variant='contained' className={classes.buttons} onClick={props.handleCancelClick}>Cancel</Button>
-                        <Button variant='contained' className={classes.buttons} color="primary">Add new item</Button>
+                        <Button variant='contained' className={classes.buttons} onClick={() => {
+                            props.handleAddItemClick()
+                            console.log('fired')
+                            }} color="primary">Add new item</Button>
                     </Grid>
                 </Grid>
             </Grid>

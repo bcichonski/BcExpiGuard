@@ -14,7 +14,7 @@ function Autocomplete(props) {
         props.setValue(newValue);
       }}
       options={props.options}
-      getOptionLabel={(option) => option.name}
+      getOptionLabel={(option) => option?.name ?? ''}
       renderInput={(params) => (
         <TextField {...params} label={props.label} margin="normal" />
       )}
