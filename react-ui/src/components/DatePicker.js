@@ -25,7 +25,7 @@ function Datepicker(props) {
                 variant="inline"
                 label={props.label}
                 value={props.selectedDate}
-                onChange={date => props.handleDateChange(date)}
+                onChange={date => props.setDate(date)}
                 helperText={props.helperText}
                 format={ISOdateformat}
                 minDate={today}
@@ -38,7 +38,8 @@ Datepicker.propTypes = {
     isMobile: PropTypes.bool,
     label: PropTypes.string,
     helperText: PropTypes.string,
-    handleDateChange: PropTypes.func,
+    setDate: PropTypes.func,
+    selectedDate: PropTypes.date
 }
 
 Datepicker.defaultProps = {

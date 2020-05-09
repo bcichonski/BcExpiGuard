@@ -10,9 +10,9 @@ function App() {
 
   return (
     <MuiPickersUtilsProvider utils={DateFnsUtils}>
-    <div className="App">
-      <Layout isMobile={isMobile} />
-    </div>
+      <div className="App">
+        <Layout isMobile={isMobile} />
+      </div>
     </MuiPickersUtilsProvider>
   );
 }

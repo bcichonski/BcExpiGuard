@@ -8,7 +8,8 @@ import Deposits from '../components/Deposits';
 import Orders from '../components/Orders';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
-import { Link } from '@reach/router'
+import { itemEditActions } from '../logic/item-edit-add'
+import { connect } from 'react-redux';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -29,7 +30,15 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default function MainContent() {
+const mapStateToProps = (state /*, ownProps*/) => {
+  return { }
+}
+
+const mapDispatchToProps = (dispatch, ownProps) => ({
+  handleAddNew : () => dispatch(itemEditActions.itemInCreation)
+})
+
+function MainContent(props) {
   const classes = useStyles();
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
@@ -55,11 +64,11 @@ export default function MainContent() {
           </Paper>
         </Grid>
       </Grid>
-      <Link to='/item/add'>
-        <Fab color="primary" aria-label="add" className={classes.floatRight}>
-          <AddIcon />
-        </Fab>
-      </Link>
+      <Fab color="primary" aria-label="add" className={classes.floatRight} onClick={props.handleAddNew}>
+        <AddIcon />
+      </Fab>
     </div>
   )
 }
+
+export default connect(mapStateToProps, mapDispatchToProps)(MainContent)

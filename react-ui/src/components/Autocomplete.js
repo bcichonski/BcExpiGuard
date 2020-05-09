@@ -8,6 +8,7 @@ import PropTypes from 'prop-types'
 function Autocomplete(props) {
   return (
     <LabAutocomplete
+      freeSolo
       value={props.value}
       onChange={(event, newValue) => {
         props.setValue(newValue);
@@ -39,7 +40,7 @@ Autocomplete.propTypes = {
   options : PropTypes.array,
   label : PropTypes.string,
   value : PropTypes.string,
-  setValue : PropTypes.func
+  setValue : PropTypes.func.isRequired
 }
 
 export default Autocomplete;

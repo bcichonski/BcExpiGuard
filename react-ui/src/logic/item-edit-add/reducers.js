@@ -1,4 +1,5 @@
 import types from './types'
+import { navigate } from "@reach/router"
 
 const itemsAddEditReducer = (state = { state : types.ITEM_DIALOG_INACTIVE }, action) => {
     let newState = {}
@@ -26,10 +27,16 @@ const itemsAddEditReducer = (state = { state : types.ITEM_DIALOG_INACTIVE }, act
                 name : '',
                 date : null
             }
+            if(state.state !== newState.state) {
+                navigate('/item/add')
+            }
             break;
         case types.ITEM_DIALOG_INACTIVE:
             newState = {
                 state : types.ITEM_DIALOG_INACTIVE
+            }
+            if(state.state !== newState.state) {
+                navigate('/')
             }
             break;
         default:

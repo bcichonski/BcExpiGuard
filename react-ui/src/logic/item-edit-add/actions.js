@@ -1,4 +1,5 @@
 import types from './types'
+import {format } from 'date-fns'
 
 const itemNameChanged = (newName) => ({
     type: types.ITEM_NAME_CHANGED,
@@ -7,7 +8,7 @@ const itemNameChanged = (newName) => ({
 
 const itemExpirationDateChanged = (newDate) => ({
     type: types.ITEM_EXPIRATION_DATE_CHANGED,
-    date: newDate
+    date: format(newDate, 'yyyy-MM-dd')
 })
 
 const itemInEdit = (item) => ({
@@ -16,23 +17,23 @@ const itemInEdit = (item) => ({
     date: item.date
 })
 
-const itemAbandoned = {
+const itemAbandoned = ({
     type: types.ITEM_DIALOG_INACTIVE
-}
+})
 
-const itemCreated = {
+const itemInCreation = ({
     type: types.ITEM_DIALOG_ADD
-}
+})
 
-const itemToSave = {
+const itemToSave = ({
     type: types.ITEM_DIALOG_OK
-}
+})
 
 export default {
     itemNameChanged,
     itemExpirationDateChanged,
     itemInEdit,
     itemAbandoned,
-    itemCreated,
+    itemInCreation,
     itemToSave
 }
