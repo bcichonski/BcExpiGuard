@@ -11,9 +11,9 @@ import LayersIcon from '@material-ui/icons/Layers';
 import AssignmentIcon from '@material-ui/icons/Assignment';
 import { Link } from '@reach/router'
 
-export const appBarItemsPrimary = (
+export const appBarItemsPrimary = (classes) => (
   <div>
-    <Link to='/'>
+    <Link to='/' className={classes.menuBtn}>
       <ListItem button>
         <ListItemIcon>
           <DashboardIcon />
@@ -33,7 +33,7 @@ export const appBarItemsPrimary = (
       </ListItemIcon>
       <ListItemText primary="Customers" />
     </ListItem>
-    <Link to='/reports'>
+    <Link to='/reports' className={classes.menuBtn}>
       <ListItem button>
         <ListItemIcon>
           <BarChartIcon />

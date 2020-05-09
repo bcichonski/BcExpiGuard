@@ -52,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
     }),
   },
   menuButton: {
-    marginRight: 36,
+    marginRight: 36
   },
   menuButtonHidden: {
     display: 'none',
@@ -89,6 +89,10 @@ const useStyles = makeStyles((theme) => ({
   container: {
     paddingTop: theme.spacing(4),
     paddingBottom: theme.spacing(4),
+  },
+  menuBtn: {
+    textDecoration: 'none',
+    color: theme.palette.text.primary
   }
 }));
 
@@ -139,9 +143,9 @@ function Layout(props) {
           </IconButton>
         </div>
         <Divider />
-        <List>{appBarItemsPrimary}</List>
+        <List className={classes.appBarNav}>{appBarItemsPrimary(classes)}</List>
         <Divider />
-        <List>{appBarItemsSecondary}</List>
+        <List className={classes.appBarNav}>{appBarItemsSecondary}</List>
       </Drawer>
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
