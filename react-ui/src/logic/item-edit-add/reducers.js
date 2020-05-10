@@ -14,6 +14,11 @@ const itemsAddEditReducer = (state = { state : types.ITEM_DIALOG_INACTIVE }, act
                 date : action.date
             }
             break;
+            case types.ITEM_QUANTITY_CHANGED:
+                newState = {
+                    quantity : action.quantity
+                }
+                break;
         case types.ITEM_IN_EDIT_MODE:
             newState = {
                 state : types.ITEM_DIALOG_EDIT,
@@ -25,7 +30,8 @@ const itemsAddEditReducer = (state = { state : types.ITEM_DIALOG_INACTIVE }, act
             newState = {
                 state : types.ITEM_DIALOG_ADD,
                 name : '',
-                date : null
+                date : '',
+                quantity : ''
             }
             navigate('/item/add')
             break;

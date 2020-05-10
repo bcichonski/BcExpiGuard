@@ -8,6 +8,11 @@ const itemNameChanged = (newName) => ({
     name: newName
 })
 
+const itemQuantityChanged = (newQuantity) => ({
+    type: types.ITEM_QUANTITY_CHANGED,
+    quantity: newQuantity
+})
+
 const itemExpirationDateChanged = (newDate) => ({
     type: types.ITEM_EXPIRATION_DATE_CHANGED,
     date: format(newDate, 'yyyy-MM-dd')
@@ -31,7 +36,8 @@ const itemToSave = () => (dispatch, getState) => {
     const state = getState()
     let itemData = {
         name : state.itemEditReducer.name,
-        date : state.itemEditReducer.date
+        date : state.itemEditReducer.date,
+        quantity : state.itemEditReducer.quantity
     }
     const id = createUUID(NAMESPACES.ItemName, itemData.name)
     itemData.id = id
@@ -44,6 +50,7 @@ export default {
     itemNameChanged,
     itemExpirationDateChanged,
     itemInEdit,
+    itemQuantityChanged,
     itemAbandoned,
     itemInCreation,
     itemToSave

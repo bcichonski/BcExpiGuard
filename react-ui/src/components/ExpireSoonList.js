@@ -1,12 +1,13 @@
 import React from 'react';
 import IconButton from '@material-ui/core/IconButton';
-import DeleteIcon from '@material-ui/icons/Delete';
+import DoneIcon from '@material-ui/icons/Done';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import Tooltip from '@material-ui/core/Tooltip'
 import Title from './Title';
 import PropTypes from 'prop-types';
 
@@ -18,7 +19,7 @@ function ExpireSoonList(props) {
       <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell padding="checkbox"></TableCell>
+            <TableCell padding="checkbox">Actions</TableCell>
             <TableCell>Name</TableCell>
             <TableCell>Quantity</TableCell>
             <TableCell align="right">Expiration</TableCell>
@@ -28,9 +29,11 @@ function ExpireSoonList(props) {
           {props.items.map((item) => (
             <TableRow key={item.id}>
               <TableCell padding="checkbox">
-                <IconButton aria-label="delete">
-                  <DeleteIcon />
+                <Tooltip title="dealt with" aria-label="dealt with">
+                <IconButton>
+                  <DoneIcon />
                 </IconButton>
+                </Tooltip>
               </TableCell>
               <TableCell>{item.name}</TableCell>
               <TableCell>{item.quantity}</TableCell>

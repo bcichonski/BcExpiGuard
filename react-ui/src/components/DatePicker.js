@@ -9,6 +9,7 @@ function Datepicker(props) {
     if (props.isMobile) {
         return (
             <DatePicker
+                shrink
                 disableToolbar
                 variant="dialog"
                 label={props.label}

@@ -61,11 +61,9 @@ function createWidgetIfNotEmpty(title, items, classes) {
   if (items && items.length > 0) {
     return (
       <Grid item xs={12}>
-        <Paper className={classes.paper}>
-          <ExpireSoonList title={title}
-            items={items.map(i => Object.assign({}, i, { datedescript: formatDistanceToNow(parseISO(i.date)) }))}
-          />
-        </Paper>
+        <ExpireSoonList title={title}
+          items={items.map(i => Object.assign({}, i, { datedescript: formatDistanceToNow(parseISO(i.date)) }))}
+        />
       </Grid>
     )
   }
@@ -86,20 +84,19 @@ function MainContent(props) {
   if (!anyWidget) {
     superWidget = (
       <Grid item xs={12}>
-        <Paper className={classes.paper}>
-          <Title>Great news!</Title>
-          <Fragment>
-            No items will expire in nearest future. You are really lucky man.
+        <Title>Great news!</Title>
+        <Fragment>
+          No items will expire in nearest future. You are really lucky man.
           </Fragment>
-        </Paper>
-      </Grid>
+      </Grid >
     )
   }
 
   return (
     <div>
-      <Grid container spacing={3}>
-        {/* Chart }
+      <Paper className={classes.paper}>
+        <Grid container spacing={3}>
+          {/* Chart }
         <Grid item xs={12} md={8} lg={9}>
           <Paper className={fixedHeightPaper}>
             <Chart />
@@ -112,12 +109,13 @@ function MainContent(props) {
           </Paper>
         </Grid>
         {/* Recent Orders */}
-        {expiredWidget}
-        {expiresTodayWidget}
-        {expiresWeekWidget}
-        {expiresMonthWidget}
-        {superWidget}
-      </Grid>
+          {expiredWidget}
+          {expiresTodayWidget}
+          {expiresWeekWidget}
+          {expiresMonthWidget}
+          {superWidget}
+        </Grid>
+      </Paper>
       <Fab color="primary" aria-label="add" className={classes.floatRight} onClick={props.handleAddNew}>
         <AddIcon />
       </Fab>
