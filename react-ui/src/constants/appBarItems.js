@@ -9,6 +9,7 @@ import PeopleIcon from '@material-ui/icons/People';
 import BarChartIcon from '@material-ui/icons/BarChart';
 import LayersIcon from '@material-ui/icons/Layers';
 import AssignmentIcon from '@material-ui/icons/Assignment';
+import AddIcon from '@material-ui/icons/Add';
 import { Link } from '@reach/router'
 
 export const appBarItemsPrimary = (classes) => (
@@ -50,14 +51,14 @@ export const appBarItemsPrimary = (classes) => (
   </div>
 );
 
-export const appBarItemsSecondary = (
+export const appBarItemsSecondary = (classes, props) => (
   <div>
-    <ListSubheader inset>Saved reports</ListSubheader>
-    <ListItem button>
+    <ListSubheader inset>Fast track</ListSubheader>
+    <ListItem button onClick={props.handleAddNew}>
       <ListItemIcon>
-        <AssignmentIcon />
+        <AddIcon />
       </ListItemIcon>
-      <ListItemText primary="Current month" />
+      <ListItemText primary="Add new item" />
     </ListItem>
     <ListItem button>
       <ListItemIcon>

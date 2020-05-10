@@ -7,7 +7,8 @@ const itemsReducer = (state = [], action) => {
                 ...state,
                 {
                     id: action.data.id,
-                    name: action.data.name
+                    name: action.data.name,
+                    date: action.data.data
                 }
             ]
         default:

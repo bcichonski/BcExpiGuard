@@ -5,7 +5,7 @@ import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Chart from '../components/Chart';
 import Deposits from '../components/Deposits';
-import Orders from '../components/Orders';
+import ExpireSoonList from '../components/ExpireSoonList';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import { itemEditActions } from '../logic/item-edit-add'
@@ -30,9 +30,9 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const mapStateToProps = (state /*, ownProps*/) => {
+/*const mapStateToProps = (state , ownProps) => {
   return { }
-}
+}*/
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
   handleAddNew : () => dispatch(itemEditActions.itemInCreation)
@@ -45,13 +45,13 @@ function MainContent(props) {
   return (
     <div>
       <Grid container spacing={3}>
-        {/* Chart */}
+        {/* Chart }
         <Grid item xs={12} md={8} lg={9}>
           <Paper className={fixedHeightPaper}>
             <Chart />
           </Paper>
         </Grid>
-        {/* Recent Deposits */}
+        {Recent Deposits}
         <Grid item xs={12} md={4} lg={3}>
           <Paper className={fixedHeightPaper}>
             <Deposits />
@@ -60,7 +60,17 @@ function MainContent(props) {
         {/* Recent Orders */}
         <Grid item xs={12}>
           <Paper className={classes.paper}>
-            <Orders />
+            <ExpireSoonList title='Expires today' />
+          </Paper>
+        </Grid>
+        <Grid item xs={12}>
+          <Paper className={classes.paper}>
+            <ExpireSoonList title='Within a week'/>
+          </Paper>
+        </Grid>
+        <Grid item xs={12}>
+          <Paper className={classes.paper}>
+            <ExpireSoonList title='Within a month'/>
           </Paper>
         </Grid>
       </Grid>
@@ -71,4 +81,4 @@ function MainContent(props) {
   )
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(MainContent)
+export default connect(null , mapDispatchToProps)(MainContent)

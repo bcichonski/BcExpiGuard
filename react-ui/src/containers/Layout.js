@@ -1,24 +1,26 @@
-import React from 'react';
-import clsx from 'clsx';
-import { makeStyles } from '@material-ui/core/styles';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import Drawer from '@material-ui/core/Drawer';
-import Box from '@material-ui/core/Box';
 import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import List from '@material-ui/core/List';
-import Typography from '@material-ui/core/Typography';
-import Divider from '@material-ui/core/Divider';
-import IconButton from '@material-ui/core/IconButton';
 import Badge from '@material-ui/core/Badge';
+import Box from '@material-ui/core/Box';
 import Container from '@material-ui/core/Container';
-import MenuIcon from '@material-ui/icons/Menu';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import Divider from '@material-ui/core/Divider';
+import Drawer from '@material-ui/core/Drawer';
+import IconButton from '@material-ui/core/IconButton';
+import List from '@material-ui/core/List';
+import { makeStyles } from '@material-ui/core/styles';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import MenuIcon from '@material-ui/icons/Menu';
 import NotificationsIcon from '@material-ui/icons/Notifications';
-import { appBarItemsPrimary, appBarItemsSecondary } from '../constants/appBarItems';
+import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import RouterSwitch from '../components/RouterSwitch'
-import Copyright from '../components/Copyright'
+import React from 'react';
+import { connect } from 'react-redux';
+import Copyright from '../components/Copyright';
+import RouterSwitch from '../components/RouterSwitch';
+import { appBarItemsPrimary, appBarItemsSecondary } from '../constants/appBarItems';
+import { itemEditActions } from '../logic/item-edit-add';
 
 const drawerWidth = 240;
 
@@ -96,6 +98,11 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
+const mapDispatchToProps = (dispatch, ownProps) => ({
+  ...ownProps,
+  handleAddNew : () => dispatch(itemEditActions.itemInCreation)
+})
+
 function Layout(props) {
   const classes = useStyles(props);
   const [open, setOpen] = React.useState(false);
@@ -143,9 +150,9 @@ function Layout(props) {
           </IconButton>
         </div>
         <Divider />
-        <List className={classes.appBarNav}>{appBarItemsPrimary(classes)}</List>
+        <List className={classes.appBarNav}>{appBarItemsPrimary(classes, props)}</List>
         <Divider />
-        <List className={classes.appBarNav}>{appBarItemsSecondary}</List>
+        <List className={classes.appBarNav}>{appBarItemsSecondary(classes, props)}</List>
       </Drawer>
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
@@ -164,4 +171,4 @@ Layout.propTypes = {
   isMobile: PropTypes.bool
 }
 
-export default Layout
+export default connect(null, mapDispatchToProps)(Layout)
