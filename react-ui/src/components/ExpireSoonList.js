@@ -10,18 +10,6 @@ import TableRow from '@material-ui/core/TableRow';
 import Title from './Title';
 import PropTypes from 'prop-types';
 
-// Generate Order Data
-function createData(id, name, quantity, datedescript) {
-  return { id, name, quantity, datedescript };
-}
-
-const rows = [
-  createData('abac', 'Parsley', '2', 'today'),
-  createData('abbc', 'Bread', '3', 'tommorow'),
-  createData('adbc', 'Pasta', '', 'in 3 days'),
-  createData('a2bc', 'Driving license', '', '2021-01-01'),
-];
-
 function ExpireSoonList(props) {
   //const classes = useStyles();
   return (
@@ -62,13 +50,9 @@ ExpireSoonList.propTypes = {
     id: PropTypes.string,
     name: PropTypes.string,
     datedescript: PropTypes.string,
-    quantity: PropTypes.number
+    quantity: PropTypes.string
   })),
   handleRemove: PropTypes.func
-}
-
-ExpireSoonList.defaultProps = {
-  items: rows
 }
 
 export default ExpireSoonList;

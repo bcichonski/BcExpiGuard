@@ -1,9 +1,9 @@
 import React from 'react';
 import { DatePicker, KeyboardDatePicker } from "@material-ui/pickers";
 import PropTypes from 'prop-types'
+import { DATE_FORMAT } from '../constants/constants'
 
 function Datepicker(props) {
-    const ISOdateformat = 'yyyy-MM-dd'
     const today = new Date()
 
     if (props.isMobile) {
@@ -15,7 +15,7 @@ function Datepicker(props) {
                 helperText={props.helperText}
                 value={props.selectedDate}
                 onChange={date => props.handleDateChange(date)}
-                format={ISOdateformat}
+                format={DATE_FORMAT}
                 minDate={today}
             />
         )
@@ -27,7 +27,7 @@ function Datepicker(props) {
                 value={props.selectedDate}
                 onChange={date => props.setDate(date)}
                 helperText={props.helperText}
-                format={ISOdateformat}
+                format={DATE_FORMAT}
                 minDate={today}
             />
         )

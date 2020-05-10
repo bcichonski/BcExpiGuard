@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import clsx from 'clsx';
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
@@ -10,6 +10,8 @@ import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import { itemEditActions } from '../logic/item-edit-add'
 import { connect } from 'react-redux';
+import { parseISO, differenceInDays } from 'date-fns'
+import Title from '../components/Title'
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -30,17 +32,67 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-/*const mapStateToProps = (state , ownProps) => {
-  return { }
-}*/
+function onlyExpired(today) {
+  return (item) => differenceInDays(parseISO(item.date), today) < 0
+}
+
+function onlyExpiresWithinDays(today, from, to) {
+  return (item) => {
+    const diff = differenceInDays(parseISO(item.date), today)
+    return diff >= from && diff < to
+  }
+}
+
+const mapStateToProps = (state, ownProps) => {
+  const today = new Date()
+  const expired = state.itemReducer.filter(onlyExpired(today));
+  const expiresToday = state.itemReducer.filter(onlyExpiresWithinDays(today, 0, 1));
+  const expiresInAWeek = state.itemReducer.filter(onlyExpiresWithinDays(today, 1, 7));
+  const expiresInAMonth = state.itemReducer.filter(onlyExpiresWithinDays(today, 7, 30));
+
+  return { expired, expiresToday, expiresInAWeek, expiresInAMonth }
+}
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
-  handleAddNew : () => dispatch(itemEditActions.itemInCreation)
+  handleAddNew: () => dispatch(itemEditActions.itemInCreation)
 })
+
+function createWidgetIfNotEmpty(title, items, classes) {
+  if (items && items.length > 0) {
+    return (
+      <Grid item xs={12}>
+        <Paper className={classes.paper}>
+          <ExpireSoonList title={title} items={items} />
+        </Paper>
+      </Grid>
+    )
+  }
+}
 
 function MainContent(props) {
   const classes = useStyles();
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
+
+  const expiredWidget = createWidgetIfNotEmpty('Already expired', props.expired, classes)
+  const expiresTodayWidget = createWidgetIfNotEmpty('Expires today', props.expiresToday, classes)
+  const expiresWeekWidget = createWidgetIfNotEmpty('In a week', props.expiresInAWeek, classes)
+  const expiresMonthWidget = createWidgetIfNotEmpty('In a month', props.expiresInAMonth, classes)
+
+  const anyWidget = expiredWidget || expiresTodayWidget || expiresWeekWidget || expiresMonthWidget
+
+  let superWidget
+  if (!anyWidget) {
+    superWidget = (
+      <Grid item xs={12}>
+        <Paper className={classes.paper}>
+          <Title>Great news!</Title>
+          <Fragment>
+            No items will expire in nearest future. You are really lucky man.
+          </Fragment>
+        </Paper>
+      </Grid>
+    )
+  }
 
   return (
     <div>
@@ -58,21 +110,11 @@ function MainContent(props) {
           </Paper>
         </Grid>
         {/* Recent Orders */}
-        <Grid item xs={12}>
-          <Paper className={classes.paper}>
-            <ExpireSoonList title='Expires today' />
-          </Paper>
-        </Grid>
-        <Grid item xs={12}>
-          <Paper className={classes.paper}>
-            <ExpireSoonList title='Within a week'/>
-          </Paper>
-        </Grid>
-        <Grid item xs={12}>
-          <Paper className={classes.paper}>
-            <ExpireSoonList title='Within a month'/>
-          </Paper>
-        </Grid>
+        {expiredWidget}
+        {expiresTodayWidget}
+        {expiresWeekWidget}
+        {expiresMonthWidget}
+        {superWidget}
       </Grid>
       <Fab color="primary" aria-label="add" className={classes.floatRight} onClick={props.handleAddNew}>
         <AddIcon />
@@ -81,4 +123,4 @@ function MainContent(props) {
   )
 }
 
-export default connect(null , mapDispatchToProps)(MainContent)
+export default connect(mapStateToProps, mapDispatchToProps)(MainContent)
