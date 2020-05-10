@@ -10,7 +10,7 @@ import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import { itemEditActions } from '../logic/item-edit-add'
 import { connect } from 'react-redux';
-import { parseISO, differenceInDays } from 'date-fns'
+import { parseISO, differenceInDays, formatDistanceToNow } from 'date-fns'
 import Title from '../components/Title'
 
 const useStyles = makeStyles((theme) => ({
@@ -62,7 +62,9 @@ function createWidgetIfNotEmpty(title, items, classes) {
     return (
       <Grid item xs={12}>
         <Paper className={classes.paper}>
-          <ExpireSoonList title={title} items={items} />
+          <ExpireSoonList title={title}
+            items={items.map(i => Object.assign({}, i, { datedescript: formatDistanceToNow(parseISO(i.date)) }))}
+          />
         </Paper>
       </Grid>
     )
