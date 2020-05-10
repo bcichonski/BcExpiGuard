@@ -9,8 +9,8 @@ function Autocomplete(props) {
   return (
     <LabAutocomplete
       freeSolo
-      value={props.value}
-      onChange={(event, newValue) => {
+      inputValue={props.value}
+      onInputChange={(event, newValue) => {
         props.setValue(newValue);
       }}
       options={props.options}

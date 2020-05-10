@@ -7,7 +7,6 @@ import Autocomplete from '../components/Autocomplete'
 import Datepicker from '../components/DatePicker'
 import { connect } from 'react-redux'
 import { itemEditActions } from '../logic/item-edit-add'
-import parseISO from 'date-fns/parseISO'
 import Title from '../components/Title';
 
 const useStyles = makeStyles((theme) => ({
@@ -21,14 +20,9 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 const mapStateToProps = (state /*, ownProps*/) => {
-    let date = new Date()
-    if (!!state.itemEditReducer.date) {
-        date = parseISO(state.itemEditReducer.date)
-    }
-
     return {
         name: state.itemEditReducer.name,
-        date
+        date: state.itemEditReducer.date
     }
 }
 
@@ -36,7 +30,7 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
     setName: (value) => dispatch(itemEditActions.itemNameChanged(value)),
     setDate: (value) => dispatch(itemEditActions.itemExpirationDateChanged(value)),
     handleCancelClick: () => dispatch(itemEditActions.itemAbandoned),
-    handleAddItemClick: () => dispatch(itemEditActions.itemToSave)
+    handleAddItemClick: () => dispatch(itemEditActions.itemToSave())
 })
 
 function AddItem(props) {

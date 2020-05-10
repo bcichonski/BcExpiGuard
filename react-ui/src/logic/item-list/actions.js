@@ -1,7 +1,7 @@
-import ADD_ITEM from './types'
+import types from './types'
 
 const addItem = (itemData) => ({
-    type: ADD_ITEM,
+    type: types.ITEM_ADD,
     data: itemData
 })
 

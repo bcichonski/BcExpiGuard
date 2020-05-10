@@ -27,18 +27,14 @@ const itemsAddEditReducer = (state = { state : types.ITEM_DIALOG_INACTIVE }, act
                 name : '',
                 date : null
             }
-            if(state.state !== newState.state) {
-                navigate('/item/add')
-            }
+            navigate('/item/add')
             break;
         case types.ITEM_DIALOG_OK:
         case types.ITEM_DIALOG_INACTIVE:
             newState = {
                 state : types.ITEM_DIALOG_INACTIVE
             }
-            if(state.state !== newState.state) {
-                navigate('/')
-            }
+            navigate('/')
             break;
         default:
             return state
