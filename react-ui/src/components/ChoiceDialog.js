@@ -6,11 +6,13 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Dialog from '@material-ui/core/Dialog';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { useTheme } from '@material-ui/core/styles';
 
 /*const useStyles = makeStyles({
 });*/
 
-function SimpleDialog(props) {
+function ChoiceDialog(props) {
     //const classes = useStyles();
     const { title, choices, onClose, open } = props;
 
@@ -22,13 +24,16 @@ function SimpleDialog(props) {
         onClose(value);
     };
 
+    const theme = useTheme();
+    const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
     return (
-        <Dialog onClose={handleClose} open={open}>
+        <Dialog onClose={handleClose} fullScreen={fullScreen} open={open}>
             <DialogTitle id="simple-dialog">{title}</DialogTitle>
             <List>
                 {choices.map((choice) => (
-                    <ListItem button onClick={() => handleListItemClick(choice)} key={choice}>
-                        <ListItemText primary={choice} />
+                    <ListItem button onClick={() => handleListItemClick(choice.id)} key={choice.id}>
+                        <ListItemText primary={choice.name} />
                     </ListItem>
                 ))}
             </List>
@@ -36,11 +41,14 @@ function SimpleDialog(props) {
     );
 }
 
-SimpleDialog.propTypes = {
+ChoiceDialog.propTypes = {
     title: PropTypes.string,
     onClose: PropTypes.func.isRequired,
     open: PropTypes.bool.isRequired,
-    choices: PropTypes.array
+    choices: PropTypes.arrayOf(PropTypes.shape({
+        id: PropTypes.string,
+        name: PropTypes.string
+    }))
 };
 
-export default SimpleDialog;
+export default ChoiceDialog;

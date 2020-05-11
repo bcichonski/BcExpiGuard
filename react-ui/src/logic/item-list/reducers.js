@@ -21,7 +21,7 @@ function daysFromNow(days) {
 const defaultItems = [
     createData('abac', itemParsley, '2', daysFromNow(-1)),
     createData('abbc', itemBread, '3', daysFromNow(0)),
-    createData('adbc', itemPasta, '', daysFromNow(3)),
+    createData('adbc', itemPasta, '3 bags', daysFromNow(3)),
     createData('ae3bc', itemBread, '', daysFromNow(14)),
     createData('a2bc', itemDrivingLicense, '', daysFromNow(300)),
 ];
