@@ -32,7 +32,7 @@ function InputDialog(props) {
                     id="input"
                     label={props.inputLabel}
                     value={inputValue}
-                    onChange={setInputValue}
+                    onChange={(event) => setInputValue(event.target.value)}
                     fullWidth
                 />
             </DialogContent>

@@ -7,9 +7,11 @@ import ExpireSoonList from '../components/ExpireSoonList';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import { itemEditActions } from '../logic/item-edit-add'
+import { itemActions } from '../logic/item-list'
 import { connect } from 'react-redux';
 import { parseISO, differenceInDays, formatDistanceToNow, isPast, isToday } from 'date-fns'
 import Title from '../components/Title'
+import clsx from 'clsx';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -59,7 +61,8 @@ const mapStateToProps = (state, ownProps) => {
 }
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
-  handleAddNew: () => dispatch(itemEditActions.itemInCreation)
+  handleAddNew: () => dispatch(itemEditActions.itemInCreation),
+  handleDone: (id, value) => dispatch(itemActions.updateItem(id, value))
 })
 
 function formatDateText(datestr) {
@@ -74,11 +77,11 @@ function formatDateText(datestr) {
   return dateformat
 }
 
-function createWidgetIfNotEmpty(title, items, classes) {
+function createWidgetIfNotEmpty(title, items, handleDone) {
   if (items && items.length > 0) {
     return (
       <Grid item xs={12}>
-        <ExpireSoonList title={title}
+        <ExpireSoonList title={title} handleRemove={handleDone}
           items={items.map(i => Object.assign({}, i, { datedescript: formatDateText(i.date) }))}
         />
       </Grid>
@@ -90,10 +93,10 @@ function MainContent(props) {
   const classes = useStyles();
   //const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
-  const expiredWidget = createWidgetIfNotEmpty('Already expired', props.expired, classes)
-  const expiresTodayWidget = createWidgetIfNotEmpty('Expires today', props.expiresToday, classes)
-  const expiresWeekWidget = createWidgetIfNotEmpty('In a week', props.expiresInAWeek, classes)
-  const expiresMonthWidget = createWidgetIfNotEmpty('In a month', props.expiresInAMonth, classes)
+  const expiredWidget = createWidgetIfNotEmpty('Already expired', props.expired, props.handleDone)
+  const expiresTodayWidget = createWidgetIfNotEmpty('Expires today', props.expiresToday, props.handleDone)
+  const expiresWeekWidget = createWidgetIfNotEmpty('In a week', props.expiresInAWeek, props.handleDone)
+  const expiresMonthWidget = createWidgetIfNotEmpty('In a month', props.expiresInAMonth, props.handleDone)
 
   const anyWidget = expiredWidget || expiresTodayWidget || expiresWeekWidget || expiresMonthWidget
 

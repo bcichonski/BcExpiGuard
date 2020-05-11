@@ -1,5 +1,13 @@
 const ITEM_ADD = 'ITEM_ADD'
+const ITEM_CHANGED = "ITEM_CHANGED"
+const ITEM_UNDO = "ITEM_UNDO"
+const ITEM_ACTIVE = "ITEM_ACTIVE"
+const ITEM_DONE = "ITEM_DONE"
 
 export default {
-    ITEM_ADD
+    ITEM_ADD,
+    ITEM_CHANGED,
+    ITEM_UNDO,
+    ITEM_ACTIVE,
+    ITEM_DONE
 }

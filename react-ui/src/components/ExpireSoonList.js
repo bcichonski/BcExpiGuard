@@ -1,6 +1,6 @@
 import React from 'react';
 import IconButton from '@material-ui/core/IconButton';
-//import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -13,10 +13,16 @@ import PropTypes from 'prop-types';
 import ChoiceDialog from './ChoiceDialog'
 import ConfirmDialog from './ConfirmDialog'
 import InputDialog from './InputDialog'
+import clsx from 'clsx';
+import { itemTypes } from '../logic/item-list'
+import UndoIcon from '@material-ui/icons/Undo';
+import CheckBoxOutlinedIcon from '@material-ui/icons/CheckBoxOutlined';
 
-/*const useStyles = makeStyles((theme) => ({
-
-}))*/
+const useStyles = makeStyles((theme) => ({
+  striked: {
+    textDecorationLine: 'line-through'
+  }
+}))
 
 function generateChoices(item) {
   let quantity = parseInt(item.quantity)
@@ -25,7 +31,7 @@ function generateChoices(item) {
   let s = ''
   for (let i = 1; i <= Math.min(3, quantity); i++) {
     choices.push({
-      id: i,
+      id: i.toString(),
       name: `${i} item${s}`
     })
     s = 's'
@@ -49,19 +55,19 @@ function generateChoices(item) {
 function generateDialog(item, open, handleClose) {
   if (!item.quantity) {
     return (
-      <ConfirmDialog title="I've dealt with it" descript="Please confirm it's done" open={open} onClose={handleClose} />
+      <ConfirmDialog title={item.name} descript="Please confirm it's done" open={open} onClose={handleClose} />
     )
   }
 
   if (!isNaN(item.quantity)) {
     return (
-      <ChoiceDialog open={open} onClose={handleClose} title="I've dealt with..." choices={generateChoices(item)} />
+      <ChoiceDialog open={open} onClose={handleClose} title="How many?" choices={generateChoices(item)} />
     )
   } else {
     return (
-      <InputDialog title="I've dealt with..."
-        descript='Please enter how many were left. If none, leave the input field blank'
-        inputLabel={item.name} open={open} onClose={handleClose}
+      <InputDialog title={item.name}
+        descript='Please enter how many were left.'
+        inputLabel='If none, leave this input blank' open={open} onClose={handleClose}
         value={item.quantity} />
     )
   }
@@ -76,31 +82,52 @@ function ActionsWithDialogs(props) {
 
   const handleClose = (value) => {
     setOpen(false);
-    //props.handleRemove(props.item.id, value);
+    props.handleRemove(props.item.id, value);
   };
+
+  const handleUndo = () => { }
+
+  const actions = []
+  if (props.item.state === itemTypes.ITEM_ACTIVE) {
+    actions.push((<Tooltip key={`${props.item.id}-done`} title="dealt with" aria-label="dealt with">
+      <IconButton onClick={handleDialogOpen}>
+        <CheckBoxOutlineBlankIcon />
+      </IconButton>
+    </Tooltip>))
+  } else if (props.item.state === itemTypes.ITEM_CHANGED) {
+    actions.push(
+      <Tooltip title="undo" key={`${props.item.id}-undo`} aria-label="undo">
+        <IconButton onClick={handleUndo}>
+          <UndoIcon />
+        </IconButton>
+      </Tooltip>)
+  } else {
+    actions.push(
+      <Tooltip title="undo" key={`${props.item.id}-doneundo`} aria-label="undo">
+        <IconButton onClick={handleUndo}>
+          <CheckBoxOutlinedIcon />
+        </IconButton>
+      </Tooltip>)
+  }
 
   return (
     <TableCell padding="checkbox">
-      <Tooltip title="dealt with" aria-label="dealt with">
-        <IconButton onClick={handleDialogOpen}>
-          <CheckBoxOutlineBlankIcon />
-        </IconButton>
-      </Tooltip>
+      {actions}
       {generateDialog(props.item, open, handleClose)}
     </TableCell>
   )
 }
 
 function ExpireSoonList(props) {
-  //const classes = useStyles();
-  
+  const classes = useStyles();
+
   return (
     <React.Fragment>
       <Title>{props.title}</Title>
       <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell padding="checkbox">Actions</TableCell>
+            <TableCell padding="checkbox"></TableCell>
             <TableCell>Name</TableCell>
             <TableCell>Quantity</TableCell>
             <TableCell align="right">Expiration</TableCell>
@@ -108,8 +135,8 @@ function ExpireSoonList(props) {
         </TableHead>
         <TableBody>
           {props.items.map((item) => (
-            <TableRow hover key={item.id}>
-              <ActionsWithDialogs item={item} ></ActionsWithDialogs>
+            <TableRow hover key={item.id} className={clsx(item.state === itemTypes.ITEM_DONE && classes.striked)}>
+              <ActionsWithDialogs item={item} handleRemove={props.handleRemove}></ActionsWithDialogs>
               <TableCell>{item.name}</TableCell>
               <TableCell>{item.quantity}</TableCell>
               <TableCell align="right">{item.datedescript}</TableCell>
