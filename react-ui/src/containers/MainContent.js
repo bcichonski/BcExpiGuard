@@ -1,10 +1,8 @@
 import React, { Fragment } from 'react';
-import clsx from 'clsx';
+//import clsx from 'clsx';
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
-import Chart from '../components/Chart';
-import Deposits from '../components/Deposits';
 import ExpireSoonList from '../components/ExpireSoonList';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
@@ -90,7 +88,7 @@ function createWidgetIfNotEmpty(title, items, classes) {
 
 function MainContent(props) {
   const classes = useStyles();
-  const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
+  //const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
   const expiredWidget = createWidgetIfNotEmpty('Already expired', props.expired, classes)
   const expiresTodayWidget = createWidgetIfNotEmpty('Expires today', props.expiresToday, classes)

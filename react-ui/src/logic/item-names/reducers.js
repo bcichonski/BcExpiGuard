@@ -30,7 +30,7 @@ const itemNamesReducer = (state = defaultItemNames, action) => {
                 action.payload.id = itemNameCategoryID
             }
 
-            if (state.findIndex((itemName) => itemName.name == action.payload.name) < 0) {
+            if (state.findIndex((itemName) => itemName.name === action.payload.name) < 0) {
                 return [
                     ...state,
                     action.payload

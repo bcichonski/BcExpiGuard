@@ -26,7 +26,7 @@ const categoriesReducer = (state = defaultCategories, action) => {
                 action.payload.id = payloadCategoryID
             }
 
-            if (state.findIndex((cat) => cat.name == action.payload.name) < 0) {
+            if (state.findIndex((cat) => cat.name === action.payload.name) < 0) {
                 return [
                     ...state,
                     action.payload
