@@ -10,13 +10,56 @@ import Tooltip from '@material-ui/core/Tooltip'
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import Title from './Title';
 import PropTypes from 'prop-types';
+import SimpleDialog from './SimpleDialog'
 
 /*const useStyles = makeStyles((theme) => ({
 
 }))*/
 
+function generateChoices(item) {
+  let quantity = parseInt(item.quantity)
+  let choices = []
+
+  let s=''
+  for(let i=1;i<=Math.min(3, quantity);i++) {
+    choices.push(`${i} item${s}`)
+    s='s'
+  }
+
+  if(quantity>3) {
+    choices.push('More...')
+  }
+  
+  choices.push('Cancel')
+
+  return choices
+}
+
+function generateDialog(item, open, handleClose) {
+  if(!item.quantity) {
+    return null
+  }
+
+  if(!isNaN(item.quantity)) {
+    return (
+      <SimpleDialog open={open} onClose={handleClose} title="I've dealt with:" choices={generateChoices(item)} />
+    )
+  }
+}
+
 function ExpireSoonList(props) {
   //const classes = useStyles();
+  const [open, setOpen] = React.useState(false);
+
+  const handleDialogOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = (value) => {
+    setOpen(false);
+    props.handleRemove(value);
+  };
+
   return (
     <React.Fragment>
       <Title>{props.title}</Title>
@@ -34,10 +77,11 @@ function ExpireSoonList(props) {
             <TableRow hover key={item.id}>
               <TableCell padding="checkbox">
                 <Tooltip title="dealt with" aria-label="dealt with">
-                <IconButton>
-                  <CheckBoxOutlineBlankIcon/>
-                </IconButton>
+                  <IconButton onClick={handleDialogOpen}>
+                    <CheckBoxOutlineBlankIcon />
+                  </IconButton>
                 </Tooltip>
+                {generateDialog(item, open, handleClose)}
               </TableCell>
               <TableCell>{item.name}</TableCell>
               <TableCell>{item.quantity}</TableCell>
