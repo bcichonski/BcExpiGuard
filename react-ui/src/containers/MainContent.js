@@ -10,7 +10,7 @@ import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import { itemEditActions } from '../logic/item-edit-add'
 import { connect } from 'react-redux';
-import { parseISO, differenceInDays, formatDistanceToNow } from 'date-fns'
+import { parseISO, differenceInDays, formatDistanceToNow, isPast, isToday } from 'date-fns'
 import Title from '../components/Title'
 
 const useStyles = makeStyles((theme) => ({
@@ -43,12 +43,19 @@ function onlyExpiresWithinDays(today, from, to) {
   }
 }
 
+function normalize(collection, state) {
+  return collection.map(item => ({
+    ...item,
+    name : state.itemNameReducer.find(nm => nm.id === item.nameID).name ?? item.nameID,
+  }))
+}
+
 const mapStateToProps = (state, ownProps) => {
   const today = new Date()
-  const expired = state.itemReducer.filter(onlyExpired(today));
-  const expiresToday = state.itemReducer.filter(onlyExpiresWithinDays(today, 0, 1));
-  const expiresInAWeek = state.itemReducer.filter(onlyExpiresWithinDays(today, 1, 7));
-  const expiresInAMonth = state.itemReducer.filter(onlyExpiresWithinDays(today, 7, 30));
+  const expired = normalize(state.itemReducer.filter(onlyExpired(today)), state)
+  const expiresToday = normalize(state.itemReducer.filter(onlyExpiresWithinDays(today, 0, 1)), state);
+  const expiresInAWeek = normalize(state.itemReducer.filter(onlyExpiresWithinDays(today, 1, 7)), state);
+  const expiresInAMonth = normalize(state.itemReducer.filter(onlyExpiresWithinDays(today, 7, 30)), state);
 
   return { expired, expiresToday, expiresInAWeek, expiresInAMonth }
 }
@@ -57,12 +64,24 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
   handleAddNew: () => dispatch(itemEditActions.itemInCreation)
 })
 
+function formatDateText(datestr) {
+  const date = parseISO(datestr)
+  if(isToday(date)) {
+    return 'today'
+  }
+  const dateformat = formatDistanceToNow(date)
+  if(isPast(date)) {
+    return dateformat+' ago'
+  }
+  return dateformat
+}
+
 function createWidgetIfNotEmpty(title, items, classes) {
   if (items && items.length > 0) {
     return (
       <Grid item xs={12}>
         <ExpireSoonList title={title}
-          items={items.map(i => Object.assign({}, i, { datedescript: formatDistanceToNow(parseISO(i.date)) }))}
+          items={items.map(i => Object.assign({}, i, { datedescript: formatDateText(i.date) }))}
         />
       </Grid>
     )

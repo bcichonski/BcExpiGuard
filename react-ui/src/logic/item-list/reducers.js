@@ -1,9 +1,17 @@
 import types from './types'
 import { DATE_FORMAT } from '../../constants/constants'
 import { format, addDays } from 'date-fns'
+import defaultCategory from '../categories/reducers'
+import { itemParsley, itemBread, itemDrivingLicense, itemPasta } from '../item-names/reducers'
 
-function createData(id, name, quantity, date) {
-    return { id, name, quantity, date };
+function createData(id, nameItem, quantity, date) {
+    return {
+        id,
+        categoryID: defaultCategory.id,
+        nameID: nameItem.id,
+        quantity, 
+        date
+    };
 }
 
 function daysFromNow(days) {
@@ -11,11 +19,11 @@ function daysFromNow(days) {
 }
 
 const defaultItems = [
-    createData('abac', 'Parsley', '2', daysFromNow(-1)),
-    createData('abbc', 'Bread', '3', daysFromNow(0)),
-    createData('adbc', 'Pasta', '', daysFromNow(3)),
-    createData('ae3bc', 'Bread', '', daysFromNow(14)),
-    createData('a2bc', 'Driving license', '', daysFromNow(300)),
+    createData('abac', itemParsley, '2', daysFromNow(-1)),
+    createData('abbc', itemBread, '3', daysFromNow(0)),
+    createData('adbc', itemPasta, '', daysFromNow(3)),
+    createData('ae3bc', itemBread, '', daysFromNow(14)),
+    createData('a2bc', itemDrivingLicense, '', daysFromNow(300)),
 ];
 
 const itemsReducer = (state = defaultItems, action) => {

@@ -8,11 +8,17 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Tooltip from '@material-ui/core/Tooltip'
+import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
+import CheckBoxOutlinedIcon from '@material-ui/icons/CheckBoxOutlined';
 import Title from './Title';
 import PropTypes from 'prop-types';
 
+const useStyles = makeStyles((theme) => ({
+
+}))
+
 function ExpireSoonList(props) {
-  //const classes = useStyles();
+  const classes = useStyles();
   return (
     <React.Fragment>
       <Title>{props.title}</Title>
@@ -27,11 +33,11 @@ function ExpireSoonList(props) {
         </TableHead>
         <TableBody>
           {props.items.map((item) => (
-            <TableRow key={item.id}>
+            <TableRow hover key={item.id}>
               <TableCell padding="checkbox">
                 <Tooltip title="dealt with" aria-label="dealt with">
                 <IconButton>
-                  <DoneIcon />
+                  <CheckBoxOutlineBlankIcon/>
                 </IconButton>
                 </Tooltip>
               </TableCell>
