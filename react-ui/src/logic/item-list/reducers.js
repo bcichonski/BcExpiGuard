@@ -30,9 +30,14 @@ const defaultItems = [
 function changeItem(item, value) {
     const newItem = Object.assign({}, item);
 
-    if(value === 'cancel' || value === false || value === item.quantity) return item
+    if(value === 'cancel' || value === false) return item
 
-    if (!isNaN(item.quantity)) {
+    if(item.quantity === '') {
+        newItem.state = types.ITEM_DONE
+        return newItem
+    }
+
+    if (item.quantity !== '' && !isNaN(item.quantity)) {
         if (!isNaN(value)) {
             const oldValue = parseInt(item.quantity)
             const newValue = parseInt(value)
@@ -41,17 +46,37 @@ function changeItem(item, value) {
                 throw Error("New value cannot be greater than old value")
             }
 
-            if (newValue <= 0) {
-                newItem.previousQuantity = item.quantity
+            newItem.previousQuantity = item.quantity     
+            newItem.quantity = (newItem.quantity - newValue).toString()
+
+            if (newItem.quantity <= 0) {
                 newItem.quantity = '0'
                 newItem.state = types.ITEM_DONE
-                return newItem
+            } else {
+                newItem.state = types.ITEM_CHANGED
             }
+            return newItem
         }
     }
+
     newItem.previousQuantity = item.quantity
     newItem.quantity = value
     newItem.state = (value === '' ? types.ITEM_DONE : types.ITEM_CHANGED)
+    return newItem
+}
+
+function undoItemChanges(item) {
+    if(item.state === types.ITEM_ACTIVE) return item;
+    const newItem = Object.assign({}, item);
+
+    if(!item.previousQuantity) {
+        newItem.state = types.ITEM_ACTIVE
+    }
+
+    newItem.quantity = item.previousQuantity
+    delete newItem.previousQuantity
+    newItem.state = types.ITEM_ACTIVE
+
     return newItem
 }
 
@@ -76,6 +101,15 @@ const itemsReducer = (state = defaultItems, action) => {
             return [
                 ...otherItems,
                 changedItem
+            ]
+        case types.ITEM_UNDO:
+            const item2 = state.find(i => i.id === action.payload.id)
+            const otherItems2 = state.filter(i => i.id !== action.payload.id)
+            const changedItem2 = undoItemChanges(item2)
+
+            return [
+                ...otherItems2,
+                changedItem2
             ]
         default:
             return state

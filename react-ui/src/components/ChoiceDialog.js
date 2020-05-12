@@ -6,8 +6,8 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Dialog from '@material-ui/core/Dialog';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
-import { useTheme } from '@material-ui/core/styles';
+//import useMediaQuery from '@material-ui/core/useMediaQuery';
+//import { useTheme } from '@material-ui/core/styles';
 
 /*const useStyles = makeStyles({
 });*/
@@ -24,11 +24,11 @@ function ChoiceDialog(props) {
         onClose(value);
     };
 
-    const theme = useTheme();
-    const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+    //const theme = useTheme();
+    //const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
     return (
-        <Dialog onClose={handleClose} fullScreen={fullScreen} open={open}>
+        <Dialog onClose={handleClose} open={open}>
             <DialogTitle id="simple-dialog">{title}</DialogTitle>
             <List>
                 {choices.map((choice) => (

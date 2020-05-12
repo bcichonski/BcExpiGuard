@@ -10,8 +10,9 @@ const updateItem = (id, newQuantity) => ({
     payload: { id, value: newQuantity }
 })
 
-const undoItemChanges = () => ({
-    type: types.ITEM_UNDO
+const undoItemChanges = (id) => ({
+    type: types.ITEM_UNDO,
+    payload: { id }
 })
 
 export default {

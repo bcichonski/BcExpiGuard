@@ -16,11 +16,16 @@ import InputDialog from './InputDialog'
 import clsx from 'clsx';
 import { itemTypes } from '../logic/item-list'
 import UndoIcon from '@material-ui/icons/Undo';
-import CheckBoxOutlinedIcon from '@material-ui/icons/CheckBoxOutlined';
 
 const useStyles = makeStyles((theme) => ({
   striked: {
     textDecorationLine: 'line-through'
+  },
+  half: {
+    width: '50%'
+  },
+  quater: {
+    width: '25%'
   }
 }))
 
@@ -85,7 +90,9 @@ function ActionsWithDialogs(props) {
     props.handleRemove(props.item.id, value);
   };
 
-  const handleUndo = () => { }
+  const handleUndo = () => {
+    props.handleUndo(props.item.id)
+  }
 
   const actions = []
   if (props.item.state === itemTypes.ITEM_ACTIVE) {
@@ -94,18 +101,11 @@ function ActionsWithDialogs(props) {
         <CheckBoxOutlineBlankIcon />
       </IconButton>
     </Tooltip>))
-  } else if (props.item.state === itemTypes.ITEM_CHANGED) {
+  } else {
     actions.push(
       <Tooltip title="undo" key={`${props.item.id}-undo`} aria-label="undo">
         <IconButton onClick={handleUndo}>
           <UndoIcon />
-        </IconButton>
-      </Tooltip>)
-  } else {
-    actions.push(
-      <Tooltip title="undo" key={`${props.item.id}-doneundo`} aria-label="undo">
-        <IconButton onClick={handleUndo}>
-          <CheckBoxOutlinedIcon />
         </IconButton>
       </Tooltip>)
   }
@@ -121,25 +121,32 @@ function ActionsWithDialogs(props) {
 function ExpireSoonList(props) {
   const classes = useStyles();
 
+  let header
+  if (props.showHeader) {
+    header = (
+      <TableHead>
+        <TableRow>
+          <TableCell padding="checkbox" ></TableCell>
+          <TableCell className={classes.half}>Name</TableCell>
+          <TableCell className={classes.quater}>Quantity</TableCell>
+          <TableCell className={classes.quater} align="right">Expiration</TableCell>
+        </TableRow>
+      </TableHead>
+    )
+  }
+
   return (
     <React.Fragment>
       <Title>{props.title}</Title>
       <Table size="small">
-        <TableHead>
-          <TableRow>
-            <TableCell padding="checkbox"></TableCell>
-            <TableCell>Name</TableCell>
-            <TableCell>Quantity</TableCell>
-            <TableCell align="right">Expiration</TableCell>
-          </TableRow>
-        </TableHead>
+        {header}
         <TableBody>
           {props.items.map((item) => (
             <TableRow hover key={item.id} className={clsx(item.state === itemTypes.ITEM_DONE && classes.striked)}>
-              <ActionsWithDialogs item={item} handleRemove={props.handleRemove}></ActionsWithDialogs>
-              <TableCell>{item.name}</TableCell>
-              <TableCell>{item.quantity}</TableCell>
-              <TableCell align="right">{item.datedescript}</TableCell>
+              <ActionsWithDialogs item={item} handleRemove={props.handleRemove} handleUndo={props.handleUndo}></ActionsWithDialogs>
+              <TableCell className={classes.half}>{item.name}</TableCell>
+              <TableCell className={classes.quater}>{item.quantity}</TableCell>
+              <TableCell className={classes.quater} align="right">{item.datedescript}</TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -157,7 +164,9 @@ ExpireSoonList.propTypes = {
     datedescript: PropTypes.string,
     quantity: PropTypes.string
   })),
-  handleRemove: PropTypes.func
+  handleRemove: PropTypes.func,
+  handleUndo: PropTypes.func,
+  showHeader: PropTypes.bool
 }
 
 export default ExpireSoonList;

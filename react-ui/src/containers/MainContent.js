@@ -11,7 +11,6 @@ import { itemActions } from '../logic/item-list'
 import { connect } from 'react-redux';
 import { parseISO, differenceInDays, formatDistanceToNow, isPast, isToday } from 'date-fns'
 import Title from '../components/Title'
-import clsx from 'clsx';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -62,7 +61,8 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
   handleAddNew: () => dispatch(itemEditActions.itemInCreation),
-  handleDone: (id, value) => dispatch(itemActions.updateItem(id, value))
+  handleDone: (id, value) => dispatch(itemActions.updateItem(id, value)),
+  handleUndo: (id) => dispatch(itemActions.undoItemChanges(id))
 })
 
 function formatDateText(datestr) {
@@ -77,11 +77,11 @@ function formatDateText(datestr) {
   return dateformat
 }
 
-function createWidgetIfNotEmpty(title, items, handleDone) {
+function createWidgetIfNotEmpty(title, items, handleDone, handleUndo, hideHeader) {
   if (items && items.length > 0) {
     return (
       <Grid item xs={12}>
-        <ExpireSoonList title={title} handleRemove={handleDone}
+        <ExpireSoonList title={title} handleRemove={handleDone} handleUndo={handleUndo} showHeader={!hideHeader}
           items={items.map(i => Object.assign({}, i, { datedescript: formatDateText(i.date) }))}
         />
       </Grid>
@@ -93,10 +93,15 @@ function MainContent(props) {
   const classes = useStyles();
   //const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
-  const expiredWidget = createWidgetIfNotEmpty('Already expired', props.expired, props.handleDone)
-  const expiresTodayWidget = createWidgetIfNotEmpty('Expires today', props.expiresToday, props.handleDone)
-  const expiresWeekWidget = createWidgetIfNotEmpty('In a week', props.expiresInAWeek, props.handleDone)
-  const expiresMonthWidget = createWidgetIfNotEmpty('In a month', props.expiresInAMonth, props.handleDone)
+  const { expired, handleDone, handleUndo, expiresToday, expiresInAWeek, expiresInAMonth } = props
+  let anyItems = false;
+  const expiredWidget = createWidgetIfNotEmpty('Already expired', expired, handleDone, handleUndo, anyItems)
+  anyItems = anyItems || expiredWidget
+  const expiresTodayWidget = createWidgetIfNotEmpty('Expires today', expiresToday, handleDone, handleUndo, anyItems)
+  anyItems = anyItems || expiresTodayWidget
+  const expiresWeekWidget = createWidgetIfNotEmpty('In a week', expiresInAWeek, handleDone, handleUndo, anyItems)
+  anyItems = anyItems || expiresWeekWidget
+  const expiresMonthWidget = createWidgetIfNotEmpty('In a month', expiresInAMonth, handleDone, handleUndo, anyItems)
 
   const anyWidget = expiredWidget || expiresTodayWidget || expiresWeekWidget || expiresMonthWidget
 
