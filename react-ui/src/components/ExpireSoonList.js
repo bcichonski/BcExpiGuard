@@ -7,7 +7,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Tooltip from '@material-ui/core/Tooltip'
-import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
+import AssignmentTurnedInOutlinedIcon from '@material-ui/icons/AssignmentTurnedInOutlined';
 import Title from './Title';
 import PropTypes from 'prop-types';
 import ChoiceDialog from './ChoiceDialog'
@@ -98,7 +98,7 @@ function ActionsWithDialogs(props) {
   if (props.item.state === itemTypes.ITEM_ACTIVE) {
     actions.push((<Tooltip key={`${props.item.id}-done`} title="dealt with" aria-label="dealt with">
       <IconButton onClick={handleDialogOpen}>
-        <CheckBoxOutlineBlankIcon />
+        <AssignmentTurnedInOutlinedIcon />
       </IconButton>
     </Tooltip>))
   } else {

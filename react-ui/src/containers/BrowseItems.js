@@ -11,15 +11,21 @@ import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
+import MoreVertOutlinedIcon from '@material-ui/icons/MoreVertOutlined';
 // @ts-ignore
 import MaterialTable, { MTableToolbar } from 'material-table'
 import Title from '../components/Title'
-import React, { forwardRef, Fragment } from 'react';
+import React, { forwardRef, useState } from 'react';
 import { connect } from 'react-redux';
-import { Grid } from '@material-ui/core';
+import { Grid, FormHelperText } from '@material-ui/core';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
+import { itemTypes } from '../logic/item-list'
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { useTheme } from '@material-ui/core/styles';
+import clsx from 'clsx';
+import AssignmentTurnedInOutlinedIcon from '@material-ui/icons/AssignmentTurnedInOutlined';
 
 const tableIcons = {
     Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -38,21 +44,28 @@ const tableIcons = {
     Search: forwardRef((props, ref) => <Search {...props} ref={ref} />),
     SortArrow: forwardRef((props, ref) => <ArrowDownward {...props} ref={ref} />),
     ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} />),
-    ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
+    ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />),
+    MoreVertOutlined: forwardRef((props, ref) => <MoreVertOutlinedIcon {...props} ref={ref} />),
+    AssignmentTurnedInOutlined: forwardRef((props, ref) => <AssignmentTurnedInOutlinedIcon {...props} ref={ref} />),
 };
 
 
 const useStyles = makeStyles((theme) => ({
+    spacingLeftRight: {
+        '& div.MuiGrid-root': {
+            paddingLeft: theme.spacing(2),
+            paddingRight: theme.spacing(2)
+        }
+    },
     spacing: {
         padding: theme.spacing(2),
-        display: 'flex',
+        flexGrow: 1,
         overflow: 'auto',
-        flexDirection: 'column',
     },
     hovered: {
         '& tbody>.MuiTableRow-root:hover': {
             background: theme.palette.action.hover
-          }
+        }
     }
 }))
 
@@ -65,20 +78,65 @@ function normalize(collection, state) {
 
 const mapStateToProps = (state) => {
     const data = normalize(state.itemReducer, state)
-    const mainFilter = 'active'
-    return { data, mainFilter }
+    return { data }
 }
 
 const mapDispatchToProps = (state) => {
-    const handleMainFilterChange = (dispatch) => { }
-
     return {
-        handleMainFilterChange
     }
 }
 
 function BrowseItems(props) {
     const classes = useStyles()
+    const theme = useTheme()
+    const [mainFilterValue, setMainFilterValue] = useState(itemTypes.ITEM_ACTIVE)
+
+    const filteredData = props.data.filter((item) => mainFilterValue === 'none' || item.state === mainFilterValue)
+
+    const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
+    let actions = []
+    let actionloc = {
+        header: {
+            actions: ''
+        }
+    }
+    if (!fullScreen) {
+        actions = [
+            {
+                icon: tableIcons.Delete,
+                tooltip: 'Delete',
+                onClick: (event, rowData) => {
+                    // Do save operation
+                }
+            },
+            {
+                icon: tableIcons.Edit,
+                tooltip: 'Edit',
+                onClick: (event, rowData) => {
+                    // Do save operation
+                }
+            },
+            {
+                icon: tableIcons.AssignmentTurnedInOutlined,
+                tooltip: 'Dealt with',
+                onClick: (event, rowData) => {
+                    // Do save operation
+                }
+            },
+        ]
+        actionloc = { }
+    } else {
+        actions = [
+            {
+                icon: tableIcons.MoreVertOutlined,
+                tooltip: 'Actions',
+                onClick: (event, rowData) => {
+                    // Do save operation
+                }
+            }
+        ]
+    }
 
     return (
         <Grid container direction='column'>
@@ -87,50 +145,36 @@ function BrowseItems(props) {
                     <Title>Browse</Title>
                 </Paper>
             </Grid>
-            <Grid item className={classes.hovered}>
+            <Grid item className={clsx(classes.hovered, classes.spacingLeftRight)}>
                 <MaterialTable
                     options={{ paging: false, filtering: false }}
-                    actions={[
-                        {
-                            icon: tableIcons.Delete,
-                            tooltip: 'Delete',
-                            onClick: (event, rowData) => {
-                                // Do save operation
-                            }
-                        },
-                        {
-                            icon: tableIcons.Edit,
-                            tooltip: 'Edit',
-                            onClick: (event, rowData) => {
-                                // Do save operation
-                            }
-                        },
-                    ]}
+                    actions={actions}
                     columns={[
                         { title: 'Name', field: 'name' },
                         { title: 'Quantity', field: 'quantity' },
                         { title: 'Expiration date', field: 'date' }
                     ]}
-                    data={props.data}
+                    localization={actionloc}
+                    data={filteredData}
                     title=""
                     icons={tableIcons}
                     components={{
                         Toolbar: props => (
-                            <Grid container direction='columns'>
-                                <Grid item sm={3} className={classes.spacing}>
+                            <Grid container direction='columns' justify='space-between' alignItems='flex-end'>
+                                <Grid item sm={3} xs={3} className={classes.spacing}>
                                     <InputLabel id="main-filter-label">Filter</InputLabel>
                                     <Select
                                         labelId="main-filter-label"
                                         id="main-filter"
-                                        value={props.mainFilterValue}
-                                        onChange={props.handleFilterChange}
+                                        value={mainFilterValue}
+                                        onChange={(event) => setMainFilterValue(event.target.value)}
                                     >
-                                        <MenuItem value='active'>Active</MenuItem>
-                                        <MenuItem value='expired'>Expired</MenuItem>
+                                        <MenuItem value={itemTypes.ITEM_ACTIVE}>Active</MenuItem>
+                                        <MenuItem value={itemTypes.ITEM_DONE}>Expired</MenuItem>
                                         <MenuItem value='none'>None</MenuItem>
                                     </Select>
                                 </Grid>
-                                <Grid item sm={9} className={classes.spacing}>
+                                <Grid item sm={8} xs={8} className={classes.spacing}>
                                     <MTableToolbar {...props} />
                                 </Grid>
                             </Grid>
