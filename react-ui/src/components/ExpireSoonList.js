@@ -16,6 +16,8 @@ import InputDialog from './InputDialog'
 import clsx from 'clsx';
 import { itemTypes } from '../logic/item-list'
 import UndoIcon from '@material-ui/icons/Undo';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { useTheme } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
   striked: {
@@ -121,6 +123,9 @@ function ActionsWithDialogs(props) {
 function ExpireSoonList(props) {
   const classes = useStyles();
 
+  const theme = useTheme()
+  const mobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   let header
   if (props.showHeader) {
     header = (
@@ -128,8 +133,9 @@ function ExpireSoonList(props) {
         <TableRow>
           <TableCell padding="checkbox" ></TableCell>
           <TableCell className={classes.half}>Name</TableCell>
-          <TableCell className={classes.quater}>Quantity</TableCell>
-          <TableCell className={classes.quater} align="right">Expiration</TableCell>
+          <TableCell className={classes.quater} align="right">{mobile ? "Qt." : "Quantity"}</TableCell>
+          <TableCell className={classes.quater}>Unit</TableCell>
+          <TableCell className={classes.quater} align="right">{mobile ? "Exp." : "Expiration"}</TableCell>
         </TableRow>
       </TableHead>
     )
@@ -145,7 +151,8 @@ function ExpireSoonList(props) {
             <TableRow hover key={item.id} className={clsx(item.state === itemTypes.ITEM_DONE && classes.striked)}>
               <ActionsWithDialogs item={item} handleRemove={props.handleRemove} handleUndo={props.handleUndo}></ActionsWithDialogs>
               <TableCell className={classes.half}>{item.name}</TableCell>
-              <TableCell className={classes.quater}>{item.quantity}</TableCell>
+              <TableCell className={classes.quater} align="right">{item.quantity}</TableCell>
+              <TableCell className={classes.quater} align="left">{item.unit}</TableCell>
               <TableCell className={classes.quater} align="right">{item.datedescript}</TableCell>
             </TableRow>
           ))}
@@ -161,6 +168,7 @@ ExpireSoonList.propTypes = {
   items: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.string,
     name: PropTypes.string,
+    unit: PropTypes.string,
     datedescript: PropTypes.string,
     quantity: PropTypes.string
   })),

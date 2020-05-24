@@ -4,12 +4,13 @@ import { format, addDays } from 'date-fns'
 import defaultCategory from '../categories/reducers'
 import { itemParsley, itemBread, itemDrivingLicense, itemPasta } from '../item-names/reducers'
 
-function createData(id, nameItem, quantity, date, state = types.ITEM_ACTIVE) {
+function createData(id, nameItem, quantity, unit, date, state = types.ITEM_ACTIVE) {
     return {
         id,
         categoryID: defaultCategory.id,
         nameID: nameItem.id,
         quantity,
+        unit,
         date,
         state
     };
@@ -20,11 +21,11 @@ function daysFromNow(days) {
 }
 
 const defaultItems = [
-    createData('abac', itemParsley, '2', daysFromNow(-1)),
-    createData('abbc', itemBread, '3', daysFromNow(0)),
-    createData('adbc', itemPasta, '3 bags', daysFromNow(3)),
-    createData('ae3bc', itemBread, '', daysFromNow(14)),
-    createData('a2bc', itemDrivingLicense, '', daysFromNow(300)),
+    createData('abac', itemParsley, '2.5', 'kg', daysFromNow(-1)),
+    createData('abbc', itemBread, '3', 'l', daysFromNow(0)),
+    createData('adbc', itemPasta, '3', 'bags', daysFromNow(3)),
+    createData('ae3bc', itemBread, '', '', daysFromNow(14)),
+    createData('a2bc', itemDrivingLicense, '', '', daysFromNow(300)),
 ];
 
 function changeItem(item, value) {
@@ -90,6 +91,7 @@ const itemsReducer = (state = defaultItems, action) => {
                     name: action.data.name,
                     date: action.data.date,
                     quantity: action.data.quantity,
+                    unit: action.data.unit,
                     state: types.ITEM_ACTIVE
                 }
             ]

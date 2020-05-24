@@ -16,7 +16,10 @@ const useStyles = makeStyles((theme) => ({
         padding: theme.spacing(2),
         overflow: 'auto',
     },
-    spacer: {
+    spacer1: {
+        marginTop: theme.spacing(1)
+    },
+    spacer2: {
         marginTop: theme.spacing(2)
     },
     spacingLeft: {
@@ -28,7 +31,8 @@ const mapStateToProps = (state /*, ownProps*/) => {
     return {
         name: state.itemEditReducer.name,
         date: state.itemEditReducer.date ?? '',
-        quantity: state.itemEditReducer.quantity
+        quantity: state.itemEditReducer.quantity,
+        unit: state.unit
     }
 }
 
@@ -36,44 +40,52 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
     setName: (value) => dispatch(itemEditActions.itemNameChanged(value)),
     setDate: (value) => dispatch(itemEditActions.itemExpirationDateChanged(value)),
     setQuantity: (value) => dispatch(itemEditActions.itemQuantityChanged(value)),
+    setUnit: (value) => dispatch(itemEditActions.itemUnitChanged(value)),
     handleCancelClick: () => dispatch(itemEditActions.itemAbandoned),
     handleAddItemClick: () => dispatch(itemEditActions.itemToSave())
 })
 
 function AddItem(props) {
     const classes = useStyles();
-    const spacingTopLeft = clsx(classes.spacer, classes.spacingLeft)
+    const spacingTopLeft = clsx(classes.spacer2, classes.spacingLeft)
 
     return (
         <Paper className={classes.paper}>
             <Title>Add new item</Title>
             <Grid>
                 <Grid item xs={12} sm={8} md={6} lg={4} xl={2}>
-                    <Autocomplete options={[{ name: 'test' }]} label='Name' value={props.name} setValue={props.setName} />
+                    <Autocomplete options={[{ name: 'test' }]}
+                        label='Name'
+                        value={props.name}
+                        setValue={props.setName} />
                 </Grid>
                 <Grid item xs={12} sm={8} md={6} lg={4} xl={2}>
                     <Grid container direction='row'>
-                        <Grid item xs={8}>
-                            <Datepicker label='Expiration date' helperText='Select when this thing will be too old for usage'
+                        <Grid item xs={6}>
+                            <Datepicker label='Expiration date'
                                 setDate={props.setDate} selectedDate={props.date} />
                         </Grid>
-                        <Grid item xs={4}>
+                        <Grid item xs={3}>
                             <TextField className={classes.spacingLeft}
                                 id="tfQuantity"
                                 label="Quantity"
+                                type="number"
                                 value={props.quantity}
                                 onChange={(event) => props.setQuantity(event.target.value)}
                             />
                         </Grid>
+                        <Grid item xs={3}>
+                            <Autocomplete options={[{ name: 'l' }, { name: 'kg' }]}
+                                label="Unit"
+                                value={props.unit}
+                                setValue={props.setUnit} />
+                        </Grid>
                     </Grid>
-                </Grid>
-                <Grid item xs={12} sm={8} md={6} lg={4} xl={2}>
-
                 </Grid>
                 <Grid item xs={12} sm={8} md={6} lg={4} xl={2}>
                     <Grid container justify="flex-end" direction='row'>
                         <Button variant='contained'
-                            className={classes.spacer}
+                            className={classes.spacer2}
                             onClick={props.handleCancelClick}>Cancel</Button>
                         <Button variant='contained'
                             className={spacingTopLeft}
