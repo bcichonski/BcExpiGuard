@@ -1,6 +1,6 @@
 import types from './types'
 import { DATE_FORMAT } from '../../constants/constants'
-import { format, addDays } from 'date-fns'
+import { format, addDays, isValid } from 'date-fns'
 import defaultCategory from '../categories/reducers'
 import { itemParsley, itemBread, itemDrivingLicense, itemPasta } from '../item-names/reducers'
 
@@ -33,6 +33,10 @@ function changeItem(item, value) {
 
     if(value === 'cancel' || value === false) return item
 
+    if(value === 'all') {
+        value = item.quantity
+    }
+
     if(item.quantity === '') {
         newItem.state = types.ITEM_DONE
         return newItem
@@ -40,8 +44,8 @@ function changeItem(item, value) {
 
     if (item.quantity !== '' && !isNaN(item.quantity)) {
         if (!isNaN(value)) {
-            const oldValue = parseInt(item.quantity)
-            const newValue = parseInt(value)
+            const oldValue = parseFloat(item.quantity)
+            const newValue = parseFloat(value)
 
             if (oldValue < newValue) {
                 throw Error("New value cannot be greater than old value")

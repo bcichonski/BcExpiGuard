@@ -26,6 +26,9 @@ import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useTheme } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import AssignmentTurnedInOutlinedIcon from '@material-ui/icons/AssignmentTurnedInOutlined';
+import Menu from '@material-ui/core/Menu';
+import DealtWithDialog from '../components/DealtWithDialog'
+import { itemActions } from '../logic/item-list'
 
 const tableIcons = {
     Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -81,10 +84,9 @@ const mapStateToProps = (state) => {
     return { data }
 }
 
-const mapDispatchToProps = (state) => {
-    return {
-    }
-}
+const mapDispatchToProps = (dispatch) => ({
+    handleDialogDone: (id, value) => dispatch(itemActions.updateItem(id, value)),
+})
 
 function BrowseItems(props) {
     const classes = useStyles()
@@ -121,21 +123,44 @@ function BrowseItems(props) {
                 icon: tableIcons.AssignmentTurnedInOutlined,
                 tooltip: 'Dealt with',
                 onClick: (event, rowData) => {
-                    // Do save operation
+                    setMenuRowData(rowData)
+                    setDialogOpen(true)
                 }
             },
         ]
-        actionloc = { }
+        actionloc = {}
     } else {
         actions = [
             {
                 icon: tableIcons.MoreVertOutlined,
                 tooltip: 'Actions',
                 onClick: (event, rowData) => {
-                    // Do save operation
+                    setMenuRowData(rowData)
+                    handleClick(event)
                 }
             }
         ]
+    }
+
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const [dialogOpen, setDialogOpen] = React.useState(false);
+    const [menuRowData, setMenuRowData] = React.useState(null);
+
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleSelected = (event) => {
+        setAnchorEl(null);
+    }
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleDialog = (id, value) => {
+        setDialogOpen(false)
+        props.handleDialogDone(id,value)
     }
 
     return (
@@ -146,6 +171,18 @@ function BrowseItems(props) {
                 </Paper>
             </Grid>
             <Grid item className={clsx(classes.hovered, classes.spacingLeftRight)}>
+                <Menu
+                    id="actions-menu"
+                    anchorEl={anchorEl}
+                    keepMounted
+                    open={Boolean(anchorEl)}
+                    onClose={handleClose}
+                >
+                    <MenuItem onClick={handleSelected}>Delete</MenuItem>
+                    <MenuItem onClick={handleSelected}>Edit</MenuItem>
+                    <MenuItem onClick={handleSelected}>Dealt with</MenuItem>
+                </Menu>
+                <DealtWithDialog item={menuRowData} open={dialogOpen} setResult={handleDialog}></DealtWithDialog>
                 <MaterialTable
                     options={{ paging: false, filtering: false }}
                     actions={actions}

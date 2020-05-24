@@ -10,14 +10,12 @@ import Tooltip from '@material-ui/core/Tooltip'
 import AssignmentTurnedInOutlinedIcon from '@material-ui/icons/AssignmentTurnedInOutlined';
 import Title from './Title';
 import PropTypes from 'prop-types';
-import ChoiceDialog from './ChoiceDialog'
-import ConfirmDialog from './ConfirmDialog'
-import InputDialog from './InputDialog'
 import clsx from 'clsx';
 import { itemTypes } from '../logic/item-list'
 import UndoIcon from '@material-ui/icons/Undo';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useTheme } from '@material-ui/core/styles';
+import DealtWithDialog from './DealtWithDialog'
 
 const useStyles = makeStyles((theme) => ({
   striked: {
@@ -31,59 +29,19 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-function generateChoices(item) {
-  let quantity = parseInt(item.quantity)
-  let choices = []
 
-  let s = ''
-  for (let i = 1; i <= Math.min(3, quantity); i++) {
-    choices.push({
-      id: i.toString(),
-      name: `${i} ${item.unit}${s}`
-    })
-    s = 's'
-  }
-
-  if (quantity > 3) {
-    choices.push({
-      id: 'more',
-      name: 'Other...'
-    })
-  }
-
-  choices.push({
-    id: 'cancel',
-    name: 'Cancel'
-  })
-
-  return choices
-}
-
-function generateDialog(item, open, handleClose) {
-  if (!item.quantity) {
-    return (
-      <ConfirmDialog title={item.name} descript="Please confirm it's done" open={open} onClose={handleClose} />
-    )
-  }
-
-  if (!isNaN(item.quantity)) {
-    return (
-      <ChoiceDialog open={open} onClose={handleClose} title="How many?" choices={generateChoices(item)} />
-    )
-  }
-}
 
 function ActionsWithDialogs(props) {
   const [open, setOpen] = React.useState(false)
 
   const handleDialogOpen = () => {
-    setOpen(true);
-  };
+    setOpen(true)
+  }
 
-  const handleClose = (value) => {
+  const handleClose = (id, value) => {
     setOpen(false);
-    props.handleRemove(props.item.id, value);
-  };
+    props.handleRemove(id, value);
+  }
 
   const handleUndo = () => {
     props.handleUndo(props.item.id)
@@ -108,7 +66,7 @@ function ActionsWithDialogs(props) {
   return (
     <TableCell padding="checkbox">
       {actions}
-      {generateDialog(props.item, open, handleClose)}
+      <DealtWithDialog item={props.item} open={open} setResult={handleClose}></DealtWithDialog>
     </TableCell>
   )
 }
