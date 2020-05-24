@@ -152,6 +152,7 @@ function BrowseItems(props) {
                     columns={[
                         { title: 'Name', field: 'name' },
                         { title: 'Quantity', field: 'quantity' },
+                        { title: 'Unit', field: 'unit' },
                         { title: 'Expiration date', field: 'date' }
                     ]}
                     localization={actionloc}

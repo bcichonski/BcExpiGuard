@@ -39,7 +39,7 @@ function generateChoices(item) {
   for (let i = 1; i <= Math.min(3, quantity); i++) {
     choices.push({
       id: i.toString(),
-      name: `${i} item${s}`
+      name: `${i} ${item.unit}${s}`
     })
     s = 's'
   }
@@ -47,7 +47,7 @@ function generateChoices(item) {
   if (quantity > 3) {
     choices.push({
       id: 'more',
-      name: 'More...'
+      name: 'Other...'
     })
   }
 
@@ -69,13 +69,6 @@ function generateDialog(item, open, handleClose) {
   if (!isNaN(item.quantity)) {
     return (
       <ChoiceDialog open={open} onClose={handleClose} title="How many?" choices={generateChoices(item)} />
-    )
-  } else {
-    return (
-      <InputDialog title={item.name}
-        descript='Please enter how many were left.'
-        inputLabel='If none, leave this input blank' open={open} onClose={handleClose}
-        value={item.quantity} />
     )
   }
 }

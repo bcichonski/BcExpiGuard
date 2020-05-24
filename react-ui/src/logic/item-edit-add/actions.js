@@ -1,6 +1,7 @@
 import types from './types'
 import {format } from 'date-fns'
 import { itemActions } from '../item-list'
+import { itemNameActions } from '../item-names'
 import { NAMESPACES, createUUID } from '../../common/utils'
 
 const itemNameChanged = (newName) => ({
@@ -46,8 +47,10 @@ const itemToSave = () => (dispatch, getState) => {
         unit : state.itemEditReducer.unit
     }
     const id = createUUID(NAMESPACES.ItemName, itemData.name)
+    const nameid = createUUID(NAMESPACES.ItemName, itemData.name)
     itemData.id = id
-
+    itemData.nameID = nameid
+    dispatch(itemNameActions.addItemName({id : nameid, name: itemData.name}))
     dispatch(itemActions.addItem(itemData))
     dispatch({type: types.ITEM_DIALOG_OK})
 }
