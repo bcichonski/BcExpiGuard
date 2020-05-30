@@ -22,6 +22,7 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import Avatar from '@material-ui/core/Avatar';
 import AccountBoxOutlinedIcon from '@material-ui/icons/AccountBoxOutlined';
+import { navigate } from "@reach/router"
 
 const StyledMenu = withStyles({
   paper: {
@@ -97,16 +98,26 @@ const useStyles = makeStyles((theme) => ({
 
 const NavBar = (props) => {
   const classes = useStyles();
+  const { isAuthenticated, loginWithRedirect, logout, user } = useAuth0();
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
+  const handleMenuItemClick = (event, index) => {
+    if(index == 'profile') {
+      navigate('/profile')
+    } else {
+      logout()
+    }
+    setAnchorEl(null);
+  };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const { isAuthenticated, loginWithRedirect, logout, user } = useAuth0();
+  
 
   return (
     <AppBar position="absolute" className={clsx(classes.appBar, props.open && classes.appBarShift)}>
@@ -155,13 +166,13 @@ const NavBar = (props) => {
             open={Boolean(anchorEl)}
             onClose={handleClose}
           >
-            <StyledMenuItem>
+            <StyledMenuItem onClick={(event) => handleMenuItemClick(event, 'profile')}>
               <ListItemIcon>
                 <AccountBoxOutlinedIcon fontSize="small" />
               </ListItemIcon>
               <ListItemText primary="Profile" />
             </StyledMenuItem>
-            <StyledMenuItem>
+            <StyledMenuItem onClick={(event) => handleMenuItemClick(event, 'logout')}>
               <ListItemIcon>
                 <ExitToAppIcon fontSize="small" />
               </ListItemIcon>

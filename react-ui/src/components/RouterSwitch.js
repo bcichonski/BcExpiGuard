@@ -1,9 +1,9 @@
 import React from 'react';
 import { Router } from '@reach/router'
-import MainContent from '../containers/MainContent'
-import AddItem from '../containers/AddItem'
-import BrowseItems from '../containers/BrowseItems'
-import Profile from '../components/Profile'
+import MainContent from '../pages/MainContent'
+import AddItem from '../pages/AddItem'
+import BrowseItems from '../pages/BrowseItems'
+import Profile from '../pages/Profile'
 import Chart from './Chart'
 import PropTypes from 'prop-types';
 
