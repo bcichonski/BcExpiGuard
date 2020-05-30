@@ -59,6 +59,16 @@ const useStyles = makeStyles((theme) => ({
   menuBtn: {
     textDecoration: 'none',
     color: theme.palette.text.primary
+  },
+  toolbar: {
+    paddingRight: 24, // keep right padding when drawer closed
+  },
+  toolbarIcon: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    padding: '0 8px',
+    ...theme.mixins.toolbar,
   }
 }));
 
@@ -81,7 +91,7 @@ function Layout(props) {
   return (
     <div className={classes.root}>
       <CssBaseline />
-      <NavBar/>
+      <NavBar open={open} handleDrawerOpen={handleDrawerOpen}/>
       <Drawer
         variant="permanent"
         classes={{
@@ -102,7 +112,7 @@ function Layout(props) {
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
         <Container maxWidth="xl" className={classes.container}>
-          <RouterSwitch />
+          <RouterSwitch history={props.history} />
           <Box pt={4}>
             <Copyright />
           </Box>
@@ -113,7 +123,8 @@ function Layout(props) {
 }
 
 Layout.propTypes = {
-  isMobile: PropTypes.bool
+  isMobile: PropTypes.bool,
+  history: PropTypes.object
 }
 
 export default connect(null, mapDispatchToProps)(Layout)
