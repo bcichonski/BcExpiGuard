@@ -106,7 +106,7 @@ const NavBar = (props) => {
   };
 
   const handleMenuItemClick = (event, index) => {
-    if(index == 'profile') {
+    if(index === 'profile') {
       navigate('/profile')
     } else {
       logout()

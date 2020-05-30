@@ -5,6 +5,7 @@ import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
 import { useAuth0 } from "./common/auth0";
 import PropTypes from 'prop-types';
+import LoadingPanel from './components/LoadingPanel'
 
 
 function App(props) {
@@ -13,7 +14,7 @@ function App(props) {
   const { loading } = useAuth0();
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <LoadingPanel/>;
   }
 
   return (
