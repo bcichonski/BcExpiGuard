@@ -15,8 +15,14 @@ const undoItemChanges = (id) => ({
     payload: { id }
 })
 
+const removeItem = (id) => ({
+    type: types.ITEM_REMOVED,
+    payload: { id }
+})
+
 export default {
     addItem,
     updateItem,
-    undoItemChanges
+    undoItemChanges,
+    removeItem
 }

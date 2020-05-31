@@ -2,6 +2,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import AddBox from '@material-ui/icons/AddBox';
 import ArrowDownward from '@material-ui/icons/ArrowDownward';
 import Check from '@material-ui/icons/Check';
+import ConfirmDialog from '../components/ConfirmDialog'
 import Clear from '@material-ui/icons/Clear';
 import DeleteOutline from '@material-ui/icons/DeleteOutline';
 import FilterList from '@material-ui/icons/FilterList';
@@ -86,6 +87,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => ({
     handleDialogDone: (id, value) => dispatch(itemActions.updateItem(id, value)),
+    handleItemRemoval: (id) => dispatch(itemActions.removeItem(id))
 })
 
 function BrowseItems(props) {
@@ -109,7 +111,8 @@ function BrowseItems(props) {
                 icon: tableIcons.Delete,
                 tooltip: 'Delete',
                 onClick: (event, rowData) => {
-                    // Do save operation
+                    setMenuRowData(rowData)
+                    handleSelected('delete')
                 }
             },
             {
@@ -124,7 +127,7 @@ function BrowseItems(props) {
                 tooltip: 'Dealt with',
                 onClick: (event, rowData) => {
                     setMenuRowData(rowData)
-                    setDialogOpen(true)
+                    handleSelected('done')
                 }
             },
         ]
@@ -145,12 +148,18 @@ function BrowseItems(props) {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [dialogOpen, setDialogOpen] = React.useState(false);
     const [menuRowData, setMenuRowData] = React.useState(null);
+    const [confirmDialogOpen, setConfirmDialogOpen] = React.useState(false);
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
 
-    const handleSelected = (event) => {
+    const handleSelected = (action) => {
+        if (action === 'delete') {
+            setConfirmDialogOpen(true)
+        } else if (action === 'done') {
+            setDialogOpen(true)
+        }
         setAnchorEl(null);
     }
 
@@ -160,7 +169,14 @@ function BrowseItems(props) {
 
     const handleDialog = (id, value) => {
         setDialogOpen(false)
-        props.handleDialogDone(id,value)
+        props.handleDialogDone(id, value)
+    }
+
+    const handleConfirmDialogClose = (value) => {
+        if (value) {
+            props.handleItemRemoval(menuRowData.id)
+        }
+        setConfirmDialogOpen(false)
     }
 
     return (
@@ -178,11 +194,14 @@ function BrowseItems(props) {
                     open={Boolean(anchorEl)}
                     onClose={handleClose}
                 >
-                    <MenuItem onClick={handleSelected}>Delete</MenuItem>
-                    <MenuItem onClick={handleSelected}>Edit</MenuItem>
-                    <MenuItem onClick={handleSelected}>Dealt with</MenuItem>
+                    <MenuItem onClick={() => { handleSelected('delete') }}>Delete</MenuItem>
+                    <MenuItem onClick={() => { handleSelected('edit') }}>Edit</MenuItem>
+                    <MenuItem onClick={() => { handleSelected('done') }}>Dealt with</MenuItem>
                 </Menu>
                 <DealtWithDialog item={menuRowData} open={dialogOpen} setResult={handleDialog}></DealtWithDialog>
+                <ConfirmDialog title="Item removal"
+                    descript="Please confirm action. You can restore item at any time using 'deleted' filter option."
+                    open={confirmDialogOpen} onClose={handleConfirmDialogClose} />
                 <MaterialTable
                     options={{ paging: false, filtering: false }}
                     actions={actions}
@@ -209,6 +228,7 @@ function BrowseItems(props) {
                                     >
                                         <MenuItem value={itemTypes.ITEM_ACTIVE}>Active</MenuItem>
                                         <MenuItem value={itemTypes.ITEM_DONE}>Expired</MenuItem>
+                                        <MenuItem value={itemTypes.ITEM_REMOVED}>Deleted</MenuItem>
                                         <MenuItem value='none'>None</MenuItem>
                                     </Select>
                                 </Grid>

@@ -7,9 +7,9 @@ import ExpireSoonList from '../components/ExpireSoonList';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import { itemEditActions } from '../logic/item-edit-add'
-import { itemActions } from '../logic/item-list'
+import { itemActions, itemTypes } from '../logic/item-list'
 import { connect } from 'react-redux';
-import { parseISO, differenceInDays, formatDistanceToNow, isPast, isToday } from 'date-fns'
+import { parseISO, differenceInDays, differenceInHours, formatDistanceToNow, isPast, isToday } from 'date-fns'
 import Title from '../components/Title'
 
 const useStyles = makeStyles((theme) => ({
@@ -31,14 +31,27 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
+function onlyNotRemoved(item) {
+  return item.state !== itemTypes.ITEM_REMOVED;
+}
+
+function onlyActive(item) {
+  return onlyNotRemoved(item) && item.state !== itemTypes.ITEM_DONE;
+}
+
 function onlyExpired(today) {
-  return (item) => differenceInDays(parseISO(item.date), today) < 0
+  return (item) => differenceInDays(parseISO(item.date), today) < 0 && onlyActive(item)
+}
+
+function changedToday(item, today) {
+  const diff = differenceInHours(parseISO(item.date), today)
+  return diff >= 0 && diff < 24
 }
 
 function onlyExpiresWithinDays(today, from, to) {
   return (item) => {
     const diff = differenceInDays(parseISO(item.date), today)
-    return diff >= from && diff < to
+    return diff >= from && diff < to && (onlyActive(item) || (onlyNotRemoved(item) && changedToday(item)))
   }
 }
 

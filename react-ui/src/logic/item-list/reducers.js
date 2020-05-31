@@ -12,7 +12,8 @@ function createData(id, nameItem, quantity, unit, date, state = types.ITEM_ACTIV
         quantity,
         unit,
         date,
-        state
+        state,
+        creation_timestamp: new Date()
     };
 }
 
@@ -39,6 +40,7 @@ function changeItem(item, value) {
 
     if(item.quantity === '') {
         newItem.state = types.ITEM_DONE
+        newItem.changed_timestamp = new Date()
         return newItem
     }
 
@@ -60,6 +62,7 @@ function changeItem(item, value) {
             } else {
                 newItem.state = types.ITEM_CHANGED
             }
+            newItem.changed_timestamp = new Date()
             return newItem
         }
     }
@@ -67,6 +70,7 @@ function changeItem(item, value) {
     newItem.previousQuantity = item.quantity
     newItem.quantity = value
     newItem.state = (value === '' ? types.ITEM_DONE : types.ITEM_CHANGED)
+    newItem.changed_timestamp = new Date()
     return newItem
 }
 
@@ -81,6 +85,7 @@ function undoItemChanges(item) {
     newItem.quantity = item.previousQuantity
     delete newItem.previousQuantity
     newItem.state = types.ITEM_ACTIVE
+    newItem.changed_timestamp = new Date()
 
     return newItem
 }
@@ -116,6 +121,15 @@ const itemsReducer = (state = defaultItems, action) => {
             return [
                 ...otherItems2,
                 changedItem2
+            ]
+        case types.ITEM_REMOVED:
+            const item3 = state.find(i => i.id === action.payload.id)
+            const otherItems3 = state.filter(i => i.id !== action.payload.id)
+            const changedItem3 = Object.assign({}, item3)
+            changedItem3.state = types.ITEM_REMOVED
+            return [
+                ...otherItems3,
+                changedItem3
             ]
         default:
             return state
