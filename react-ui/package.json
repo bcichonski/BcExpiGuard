@@ -19,6 +19,8 @@
     "date-fns": "^2.13.0",
     "history": "^4.10.1",
     "material-table": "^1.57.2",
+    "pouchdb": "^7.2.1",
+    "pouchdb-debug": "^7.2.1",
     "prop-types": "^15.7.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",

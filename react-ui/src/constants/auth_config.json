@@ -1,4 +1,5 @@
 {
     "domain": "bcexpiguard.eu.auth0.com",
-    "clientId": "IS6APnNj272EOSF9Cq1Oenw5r6gTspRp"
+    "clientId": "IS6APnNj272EOSF9Cq1Oenw5r6gTspRp",
+    "audience" : "https://expiguard.bartq.toh.info"
   }
