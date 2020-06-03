@@ -1,19 +1,17 @@
 import React, { Fragment } from "react";
 import { useAuth0 } from "../common/auth0";
-import Database from '../persistence'
-import { NAMESPACES, createUUID } from '../common/utils'
+import { users } from '../persistence'
+
 
 const Profile = () => {
-  const { loading, user, getTokenSilently } = useAuth0();
+  const { loading, user } = useAuth0();
 
   if (loading || !user) {
     return <div>Loading...</div>;
   }
 
   const handleClick = async () => {
-    const id = createUUID(NAMESPACES.UserId, user.email)
-    const db = await Database.UseUser(user, getTokenSilently);
-    await db.users.put({_id: id , userEmail : user.email})
+    users.add(user)
   }
 
   return (

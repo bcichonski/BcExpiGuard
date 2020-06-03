@@ -21,6 +21,7 @@
     "material-table": "^1.57.2",
     "pouchdb": "^7.2.1",
     "pouchdb-debug": "^7.2.1",
+    "pouchdb-upsert": "^2.2.0",
     "prop-types": "^15.7.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
