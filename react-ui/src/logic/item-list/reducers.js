@@ -1,33 +1,4 @@
 import types from './types'
-import { DATE_FORMAT } from '../../constants/constants'
-import { format, addDays, isValid } from 'date-fns'
-import defaultCategory from '../categories/reducers'
-import { itemParsley, itemBread, itemDrivingLicense, itemPasta } from '../item-names/reducers'
-
-function createData(id, nameItem, quantity, unit, date, state = types.ITEM_ACTIVE) {
-    return {
-        id,
-        categoryID: defaultCategory.id,
-        nameID: nameItem.id,
-        quantity,
-        unit,
-        date,
-        state,
-        creation_timestamp: new Date()
-    };
-}
-
-function daysFromNow(days) {
-    return format(addDays(new Date(), days), DATE_FORMAT)
-}
-
-const defaultItems = [
-    createData('abac', itemParsley, '2.5', 'kg', daysFromNow(-1)),
-    createData('abbc', itemBread, '3', 'l', daysFromNow(0)),
-    createData('adbc', itemPasta, '3', 'bags', daysFromNow(3)),
-    createData('ae3bc', itemBread, '', '', daysFromNow(14)),
-    createData('a2bc', itemDrivingLicense, '', '', daysFromNow(300)),
-];
 
 function changeItem(item, value) {
     const newItem = Object.assign({}, item);
@@ -90,7 +61,7 @@ function undoItemChanges(item) {
     return newItem
 }
 
-const itemsReducer = (state = defaultItems, action) => {
+const itemsReducer = (state = [], action) => {
     switch (action.type) {
         case types.ITEM_ADD:
             return [

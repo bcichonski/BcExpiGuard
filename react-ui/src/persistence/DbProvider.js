@@ -1,6 +1,6 @@
 import PouchDB from 'pouchdb';
 import { REMOTE_API_ADDRESS } from '../constants/constants'
-import userFuncs from './user'
+import userFuncs from './users'
 
 class DbProvider {
     constructor() {
@@ -10,8 +10,12 @@ class DbProvider {
         }
 
         const users = new PouchDB('users')
+        const itemNames = new PouchDB('itemNames')
+        const items = new PouchDB('items')
         this.local = {
-            users
+            users,
+            itemNames,
+            items
         }
     }
 

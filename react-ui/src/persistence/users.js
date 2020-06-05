@@ -1,6 +1,6 @@
 import { NAMESPACES, createUUID } from '../common/utils'
 import { ensureDb } from './validate'
-import dbprovider from '../persistence'
+import dbprovider from '.'
 
 const getId = (auth0UserData) => {
     return createUUID(NAMESPACES.UserId, auth0UserData.email);

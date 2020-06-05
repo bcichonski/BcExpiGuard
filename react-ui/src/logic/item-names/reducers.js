@@ -8,16 +8,10 @@ function createItemName(name) {
     }
 }
 
-export const itemParsley = createItemName('Parsley')
-export const itemPasta = createItemName('Pasta')
-export const itemBread = createItemName('Bread')
-export const itemDrivingLicense = createItemName('Driving license')
+export const itemFirstToDo = createItemName('Add more things to the list')
 
 const defaultItemNames = [
-    itemParsley,
-    itemPasta,
-    itemBread,
-    itemDrivingLicense
+    itemFirstToDo
 ]
 
 const itemNamesReducer = (state = defaultItemNames, action) => {

@@ -2,7 +2,7 @@ import types from './types'
 import {format } from 'date-fns'
 import { itemActions } from '../item-list'
 import { itemNameActions } from '../item-names'
-import { NAMESPACES, createUUID } from '../../common/utils'
+import { NAMESPACES, createUUID, newUUID } from '../../common/utils'
 
 const itemNameChanged = (newName) => ({
     type: types.ITEM_NAME_CHANGED,
@@ -46,7 +46,7 @@ const itemToSave = () => (dispatch, getState) => {
         quantity : state.itemEditReducer.quantity,
         unit : state.itemEditReducer.unit
     }
-    const id = createUUID(NAMESPACES.ItemName, itemData.name)
+    const id = newUUID()
     const nameid = createUUID(NAMESPACES.ItemName, itemData.name)
     itemData.id = id
     itemData.nameID = nameid
