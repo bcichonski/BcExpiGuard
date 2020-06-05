@@ -3,12 +3,14 @@ import itemReducer from '../logic/item-list'
 import itemEditReducer from '../logic/item-edit-add'
 import categoryReducer from '../logic/categories'
 import itemNameReducer from '../logic/item-names'
+import appStateReducer from '../logic/appstate'
 
 const appReducer = combineReducers({
     itemReducer,
     itemEditReducer,
     categoryReducer,
-    itemNameReducer
+    itemNameReducer,
+    appStateReducer
 })
 
 export default appReducer

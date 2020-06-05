@@ -1,9 +1,9 @@
-export function ensureDb(dbprovider, dbname) {
+export function ensureDb(dbprovider, dbname, remote) {
     if(!dbprovider) {
         throw new Error("No database provider")
     }
     
-    if(!dbprovider.logged) {
+    if(remote && !dbprovider.logged) {
         throw new Error("User not authenticated")
     }
 

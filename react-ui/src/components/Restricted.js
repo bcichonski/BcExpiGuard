@@ -1,4 +1,4 @@
-import React, { useEffect, Fragment } from "react";
+import React from "react";
 import { useAuth0 } from "../common/auth0";
 import { Redirect } from "@reach/router"
 

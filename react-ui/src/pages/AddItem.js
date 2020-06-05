@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
 const mapStateToProps = (state /*, ownProps*/) => {
     return {
         name: state.itemEditReducer.name,
-        date: state.itemEditReducer.date ?? '',
+        date: state.itemEditReducer.date ?? ' ',
         quantity: state.itemEditReducer.quantity,
         unit: state.unit
     }

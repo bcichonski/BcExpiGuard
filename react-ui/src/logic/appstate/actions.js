@@ -3,7 +3,7 @@ import { itemNameActions } from '../item-names'
 import { itemActions } from '../item-list'
 import { itemNames, items } from '../../persistence'
 
-const appError = ({ message }) => ({
+const appError = (message) => ({
     type: types.ERROR,
     payload: { message }
 })

@@ -17,7 +17,8 @@ import { appBarItemsPrimary, appBarItemsSecondary } from '../constants/appBarIte
 import { itemEditActions } from '../logic/item-edit-add';
 import NavBar from '../components/NavBar'
 import { drawerWidth } from '../constants/constants'
-
+import MuiAlert from '@material-ui/lab/Alert';
+import Snackbar from '@material-ui/core/Snackbar';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -66,13 +67,28 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'flex-end',
     padding: '0 8px',
     ...theme.mixins.toolbar,
-  }
+  },
+  alertSpacer: {
+    width: '100%',
+    '& > * + *': {
+      marginTop: theme.spacing(2),
+    },
+  },
 }));
+
+const mapStateToProps = (state) => ({
+  errorMessage: state.appStateReducer.lastError,
+  alertShouldBeOpen: !!state.appStateReducer.lastError
+})
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
   ...ownProps,
-  handleAddNew : () => dispatch(itemEditActions.itemInCreation)
+  handleAddNew: () => dispatch(itemEditActions.itemInCreation)
 })
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 function Layout(props) {
   const classes = useStyles(props);
@@ -85,10 +101,15 @@ function Layout(props) {
     setOpen(false);
   };
 
+  const [alertOpen, setAlertOpen] = React.useState(props.alertShouldBeOpen);
+  const handleAlertClose = () => {
+    setAlertOpen(false);
+  }
+
   return (
     <div className={classes.root}>
       <CssBaseline />
-      <NavBar open={open} handleDrawerOpen={handleDrawerOpen}/>
+      <NavBar open={open} handleDrawerOpen={handleDrawerOpen} />
       <Drawer
         variant="permanent"
         classes={{
@@ -107,6 +128,14 @@ function Layout(props) {
         <List className={classes.appBarNav}>{appBarItemsSecondary(classes, props)}</List>
       </Drawer>
       <main className={classes.content}>
+        <div className={classes.alertSpacer} >
+          <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleAlertClose}
+            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
+            <Alert onClose={handleAlertClose} severity="error">
+              {props.errorMessage}
+            </Alert>
+          </Snackbar>
+        </div>
         <div className={classes.appBarSpacer} />
         <Container maxWidth="xl" className={classes.container}>
           <RouterSwitch history={props.history} />
@@ -124,4 +153,4 @@ Layout.propTypes = {
   history: PropTypes.object
 }
 
-export default connect(null, mapDispatchToProps)(Layout)
+export default connect(mapStateToProps, mapDispatchToProps)(Layout)

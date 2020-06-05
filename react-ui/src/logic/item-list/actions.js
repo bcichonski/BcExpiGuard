@@ -3,6 +3,7 @@ import { format, addDays } from 'date-fns'
 import { DATE_FORMAT } from '../../constants/constants'
 import defaultCategory from '../categories/reducers'
 import { itemFirstToDo } from '../item-names/reducers'
+import { items } from '../../persistence'
 
 function createData(id, nameItem, quantity, unit, date, state = types.ITEM_ACTIVE) {
     return {
@@ -21,10 +22,14 @@ function daysFromNow(days) {
     return format(addDays(new Date(), days), DATE_FORMAT)
 }
 
-const addItem = (itemData) => ({
-    type: types.ITEM_ADD,
-    data: itemData
-})
+const addItem = (itemData) => async (dispatch) => {
+    dispatch({
+        type: types.ITEM_ADD,
+        data: itemData
+    })
+
+    await items.add(itemData)
+}
 
 const addDummyItem = () => {
     return addItem(

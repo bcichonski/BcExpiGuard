@@ -7,7 +7,7 @@ const getId = (auth0UserData) => {
 }
 
 const add = async (auth0UserData) => {
-    ensureDb(dbprovider, 'users')
+    ensureDb(dbprovider, 'users', true)
 
     if(!auth0UserData) {
         throw new Error("No user data to store")

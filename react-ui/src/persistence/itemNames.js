@@ -14,7 +14,8 @@ const add = async (payload) => {
 
 const getAll = async () => {
     const all = await dbprovider.local.itemNames.allDocs({ include_docs: true });
-    return all.rows.forEach((r) => fromPouch_id(r))
+    all.rows.forEach((r) => fromPouch_id(r))
+    return all.rows
 }
 
 export default { add, getAll }
