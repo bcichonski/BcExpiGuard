@@ -35,7 +35,7 @@ const itemsAddEditReducer = (state = { state: types.ITEM_DIALOG_INACTIVE }, acti
             newState = {
                 state: types.ITEM_DIALOG_ADD,
                 name: '',
-                date: '',
+                date: null,
                 unit: '',
                 quantity: ''
             }

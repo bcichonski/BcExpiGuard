@@ -40,17 +40,17 @@ const itemInCreation = ({
 
 const itemToSave = () => (dispatch, getState) => {
     const state = getState()
+    const name = state.itemEditReducer.name
     let itemData = {
-        name : state.itemEditReducer.name,
         date : state.itemEditReducer.date,
         quantity : state.itemEditReducer.quantity,
         unit : state.itemEditReducer.unit
     }
     const id = newUUID()
-    const nameid = createUUID(NAMESPACES.ItemName, itemData.name)
+    const nameid = createUUID(NAMESPACES.ItemName, name)
     itemData.id = id
     itemData.nameID = nameid
-    dispatch(itemNameActions.addItemName({id : nameid, name: itemData.name}))
+    dispatch(itemNameActions.addItemName({id : nameid, name}))
     dispatch(itemActions.addItem(itemData))
     dispatch({type: types.ITEM_DIALOG_OK})
 }

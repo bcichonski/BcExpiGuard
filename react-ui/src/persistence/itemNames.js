@@ -9,13 +9,15 @@ const add = async (payload) => {
         throw new Error("No payload data to store")
     }
 
-    await dbprovider.local.users.putIfNotExists(toPouch_id(payload))
+    await dbprovider.local.itemNames.putIfNotExists(toPouch_id(payload))
 }
 
 const getAll = async () => {
     const all = await dbprovider.local.itemNames.allDocs({ include_docs: true });
-    all.rows.forEach((r) => fromPouch_id(r))
-    return all.rows
+    let rows = all.rows ?? [all]
+    rows = rows.map(r => r.doc ?? r)
+    rows.forEach((r) => fromPouch_id(r))
+    return rows
 }
 
 export default { add, getAll }

@@ -1,20 +1,7 @@
 import types from './types'
 import { NAMESPACES, createUUID } from '../../common/utils'
 
-function createItemName(name) {
-    return {
-        id : createUUID(NAMESPACES.ItemName, name),
-        name
-    }
-}
-
-export const itemFirstToDo = createItemName('Add more things to the list')
-
-const defaultItemNames = [
-    itemFirstToDo
-]
-
-const itemNamesReducer = (state = defaultItemNames, action) => {
+const itemNamesReducer = (state = [], action) => {
     switch (action.type) {
         case types.ITEMNAME_ADD_IF_NOT_EXISTS:
             const itemNameID = createUUID(NAMESPACES.ItemName, action.payload.name)
@@ -32,6 +19,8 @@ const itemNamesReducer = (state = defaultItemNames, action) => {
             } else {
                 return state
             }
+        case types.LOAD_ITEMNAMES:
+            return action.payload
         default:
             return state
     }

@@ -1,4 +1,5 @@
 import types from './types'
+import { NAMESPACES, createUUID } from '../../common/utils'
 import { itemNames } from '../../persistence'
 
 const addItemName = (payload) => async (dispatch) => {
@@ -14,6 +15,19 @@ const addItemNameInternal = (payload) => {
     }
 }
 
+function createItemName(name) {
+    return {
+        id : createUUID(NAMESPACES.ItemName, name),
+        name
+    }
+}
+
+export const itemFirstToDo = createItemName('Add more things to the list')
+
+const addDummyName = () => {
+    return addItemName(itemFirstToDo)
+}
+
 const loadNames = (payload) => {
     return {
         type: types.LOAD_ITEMNAMES,
@@ -23,5 +37,6 @@ const loadNames = (payload) => {
 
 export default {
     addItemName,
-    loadNames
+    loadNames,
+    addDummyName
 }

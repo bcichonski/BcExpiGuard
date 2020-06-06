@@ -2,7 +2,7 @@ import types from './types'
 import { format, addDays } from 'date-fns'
 import { DATE_FORMAT } from '../../constants/constants'
 import defaultCategory from '../categories/reducers'
-import { itemFirstToDo } from '../item-names/reducers'
+import { itemFirstToDo } from '../item-names/actions'
 import { items } from '../../persistence'
 
 function createData(id, nameItem, quantity, unit, date, state = types.ITEM_ACTIVE) {
@@ -52,10 +52,16 @@ const removeItem = (id) => ({
     payload: { id }
 })
 
+const load = (payload) => ({
+    type: types.ITEM_LOAD,
+    payload
+})
+
 export default {
     addItem,
     updateItem,
     undoItemChanges,
     removeItem,
-    addDummyItem
+    addDummyItem,
+    load
 }

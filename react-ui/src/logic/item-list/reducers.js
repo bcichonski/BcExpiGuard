@@ -102,6 +102,8 @@ const itemsReducer = (state = [], action) => {
                 ...otherItems3,
                 changedItem3
             ]
+        case types.ITEM_LOAD:
+            return action.payload;
         default:
             return state
     }

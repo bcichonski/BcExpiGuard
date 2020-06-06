@@ -11,10 +11,14 @@ const appError = (message) => ({
 const initialize = () => async (dispatch) => {
     try {
         const storedItemNames = await itemNames.getAll()
-        dispatch(itemNameActions.loadNames(storedItemNames))
+        if (!storedItemNames || storedItemNames.length === 0) {
+            dispatch(itemNameActions.addDummyName())
+        } else {
+            dispatch(itemNameActions.loadNames(storedItemNames))
+        }
 
         const storedItems = await items.getAll();
-        if(!storedItems || storedItems.length === 0) {
+        if (!storedItems || storedItems.length === 0) {
             dispatch(itemActions.addDummyItem())
         } else {
             dispatch(itemActions.load(storedItems))

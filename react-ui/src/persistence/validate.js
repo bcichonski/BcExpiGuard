@@ -37,6 +37,9 @@ export function fromPouch_id(payload) {
     }
 
     if(!payload._id) {
+        if(payload.id) {
+            return payload
+        }
         throw new Error("Couldn't find payload id")
     }
 

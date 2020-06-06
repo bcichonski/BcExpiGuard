@@ -13,8 +13,10 @@ const add = async (payload) => {
 
 const getAll = async () => {
     const all = await dbprovider.local.items.allDocs({ include_docs: true });
-    all.rows.forEach((r) => fromPouch_id(r))
-    return all.rows
+    let rows = all.rows ?? [all]
+    rows = rows.map(r => r.doc ?? r)
+    rows.forEach((r) => fromPouch_id(r))
+    return rows
 }
 
 export default { add, getAll }
