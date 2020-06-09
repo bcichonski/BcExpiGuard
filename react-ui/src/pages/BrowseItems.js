@@ -76,7 +76,7 @@ const useStyles = makeStyles((theme) => ({
 function normalize(collection, state) {
     return collection.map(item => ({
         ...item,
-        name: state.itemNameReducer.find(nm => nm.id === item.nameID).name ?? item.nameID,
+        name: state.itemNameReducer.find(nm => nm.id === item.nameID)?.name ?? item.nameID,
     }))
 }
 
@@ -86,7 +86,7 @@ const mapStateToProps = (state) => {
 }
 
 const mapDispatchToProps = (dispatch) => ({
-    handleDialogDone: (id, value) => dispatch(itemActions.updateItem(id, value)),
+    handleDialogDone: (item, value) => dispatch(itemActions.updateItemQuantity(item, value)),
     handleItemRemoval: (id) => dispatch(itemActions.removeItem(id))
 })
 
@@ -217,7 +217,7 @@ function BrowseItems(props) {
                     icons={tableIcons}
                     components={{
                         Toolbar: props => (
-                            <Grid container direction='columns' justify='space-between' alignItems='flex-end'>
+                            <Grid container direction='row' justify='space-between' alignItems='flex-end'>
                                 <Grid item sm={3} xs={3} className={classes.spacing}>
                                     <InputLabel id="main-filter-label">Filter</InputLabel>
                                     <Select

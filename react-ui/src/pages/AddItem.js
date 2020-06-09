@@ -27,14 +27,13 @@ const useStyles = makeStyles((theme) => ({
     },
 }))
 
-const mapStateToProps = (state /*, ownProps*/) => {
-    return {
-        name: state.itemEditReducer.name,
-        date: state.itemEditReducer.date ?? ' ',
-        quantity: state.itemEditReducer.quantity,
-        unit: state.unit
-    }
-}
+const mapStateToProps = (state /*, ownProps*/) => ({
+    name: state.itemEditReducer.name,
+    date: state.itemEditReducer.date ?? ' ',
+    quantity: state.itemEditReducer.quantity,
+    unit: state.unit,
+    allNames: state.itemNameReducer.filter(n => !!n.id).map(n => ({ name: n.name }))
+})
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
     setName: (value) => dispatch(itemEditActions.itemNameChanged(value)),
@@ -54,7 +53,7 @@ function AddItem(props) {
             <Title>Add new item</Title>
             <Grid>
                 <Grid item xs={12} sm={8} md={6} lg={4} xl={2}>
-                    <Autocomplete options={[{ name: 'test' }]}
+                    <Autocomplete options={props.allNames}
                         label='Name'
                         value={props.name}
                         setValue={props.setName} />

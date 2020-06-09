@@ -23,9 +23,14 @@ function daysFromNow(days) {
 }
 
 const addItem = (itemData) => async (dispatch) => {
-    if(!itemData.state) {
+    if (!itemData.state) {
         itemData.state = types.ITEM_ACTIVE
     }
+
+    if (!itemData.creation_timestamp) {
+        itemData.creation_timestamp = new Date()
+    }
+
     dispatch({
         type: types.ITEM_ADD,
         data: itemData
@@ -40,20 +45,105 @@ const addDummyItem = () => {
     )
 }
 
-const updateItem = (id, newQuantity) => ({
-    type: types.ITEM_CHANGED,
-    payload: { id, value: newQuantity }
-})
+function changeItem(item, value) {
+    const newItem = Object.assign({}, item);
 
-const undoItemChanges = (id) => ({
-    type: types.ITEM_UNDO,
-    payload: { id }
-})
+    if (value === 'cancel' || value === false) return item
 
-const removeItem = (id) => ({
-    type: types.ITEM_REMOVED,
-    payload: { id }
-})
+    if (value === 'all') {
+        value = item.quantity
+    }
+
+    if (!item.quantity || typeof item.quantity !== 'string' ||isNaN(item.quantity)) {
+        newItem.state = types.ITEM_DONE
+        newItem.changed_timestamp = new Date()
+        return newItem
+    }
+
+    if (item.quantity !== '' && !isNaN(item.quantity)) {
+        if (!isNaN(value)) {
+            const oldValue = parseFloat(item.quantity)
+            const newValue = parseFloat(value)
+
+            if (oldValue < newValue) {
+                throw Error("New value cannot be greater than old value")
+            }
+
+            newItem.previousQuantity = item.quantity
+            newItem.quantity = (newItem.quantity - newValue).toString()
+
+            if (newItem.quantity <= 0) {
+                newItem.quantity = '0'
+                newItem.state = types.ITEM_DONE
+            } else {
+                newItem.state = types.ITEM_CHANGED
+            }
+            newItem.changed_timestamp = new Date()
+            return newItem
+        }
+    }
+
+    newItem.previousQuantity = item.quantity
+    newItem.quantity = value
+    newItem.state = (value === '' ? types.ITEM_DONE : types.ITEM_CHANGED)
+    newItem.changed_timestamp = new Date()
+    return newItem
+}
+
+const updateItemQuantity = (item, newQuantity) => async (dispatch) => {
+    const newItem = changeItem(item, newQuantity)
+
+    dispatch({
+        type: types.ITEM_CHANGED,
+        payload: { id: item.id, newItem }
+    })
+
+    if (item.state !== newItem.quantity) {
+        await items.changeState(item.id, newItem.state)
+    }
+
+    if (item.quantity !== newItem.quantity) {
+        await items.changeQuantity(item.id, newItem.quantity)
+    }
+}
+
+function undoItemChangesInternal(item) {
+    if (item.state === types.ITEM_ACTIVE) return item;
+    const newItem = Object.assign({}, item);
+
+    newItem.quantity = item.previousQuantity
+    delete newItem.previousQuantity
+    newItem.state = types.ITEM_ACTIVE
+    newItem.changed_timestamp = new Date()
+
+    return newItem
+}
+
+const undoItemChanges = (id) => async (dispatch, getState) => {
+    const item = getState().itemReducer.find((it) => it.id === id)
+
+    if (item) {
+        const newItem = undoItemChangesInternal(item)
+        dispatch({
+            type: types.ITEM_UNDO,
+            payload: { id, newItem }
+        })
+
+        if (newItem.state !== item.state) {
+            await items.changeState(id, newItem.state)
+            await items.changeQuantity(id, newItem.quantity)
+        }
+    }
+}
+
+const removeItem = (id) => async (dispatch) => {
+    dispatch({
+        type: types.ITEM_REMOVED,
+        payload: { id }
+    })
+
+    await items.changeState(id, types.ITEM_REMOVED)
+}
 
 const load = (payload) => ({
     type: types.ITEM_LOAD,
@@ -62,7 +152,7 @@ const load = (payload) => ({
 
 export default {
     addItem,
-    updateItem,
+    updateItemQuantity,
     undoItemChanges,
     removeItem,
     addDummyItem,

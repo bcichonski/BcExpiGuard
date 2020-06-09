@@ -39,11 +39,11 @@ function generateChoices(item) {
 function DealtWithDialog(props) {
 
     const handleClose = (value) => {
-        props.setResult(props.item.id, value);
+        props.setResult(props.item, value);
     };
 
     if (props.item) {
-        if (!props.item.quantity) {
+        if (!props.item.quantity || typeof props.item.quantity !== 'string' || isNaN(props.item.quantity)) {
             return (
                 <ConfirmDialog title={props.item.name} descript="Please confirm it's done" open={props.open} onClose={handleClose} />
             )

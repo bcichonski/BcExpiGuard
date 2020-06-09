@@ -9,7 +9,9 @@ const add = async (payload) => {
         throw new Error("No payload data to store")
     }
 
-    await dbprovider.local.users.putIfNotExists(toPouch_id(payload))
+    payload.userId = dbprovider.userId
+
+    await dbprovider.local.categories.putIfNotExists(toPouch_id(payload))
 }
 
 export default { add }

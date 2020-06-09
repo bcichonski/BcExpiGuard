@@ -74,7 +74,7 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
   handleAddNew: () => dispatch(itemEditActions.itemInCreation),
-  handleDone: (id, value) => dispatch(itemActions.updateItem(id, value)),
+  handleDone: (item, value) => dispatch(itemActions.updateItemQuantity(item, value)),
   handleUndo: (id) => dispatch(itemActions.undoItemChanges(id))
 })
 

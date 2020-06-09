@@ -49,4 +49,11 @@ export function fromPouch_id(payload) {
     return payload;
 }
 
-export default { ensureDb, toPouch_id, fromPouch_id }
+export function transfromFromPouch(pouchResult) {
+    let rows = pouchResult.rows ?? [ pouchResult ]
+    rows = rows.map(r => r.doc ?? r)
+    rows.forEach((r) => fromPouch_id(r))
+    return rows
+}
+
+export default { ensureDb, toPouch_id, fromPouch_id, transfromFromPouch }

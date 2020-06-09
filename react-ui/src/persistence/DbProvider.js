@@ -10,12 +10,14 @@ class DbProvider {
         }
 
         const users = new PouchDB('users')
-        const itemNames = new PouchDB('itemNames')
+        const item_names = new PouchDB('item_names')
         const items = new PouchDB('items')
+        const groups = new PouchDB('groups')
         this.local = {
             users,
-            itemNames,
-            items
+            item_names,
+            items,
+            groups
         }
     }
 
@@ -35,51 +37,80 @@ class DbProvider {
         return this;
     }
 
-    Login(user, token) {
-        this.opts.headers.Authorization = 'Bearer ' + token
-        this.userId = userFuncs.getId(user)
+    CreateRemoteDb(dbName, filterParams, filterName = 'restrict/restrict') {
+        const remoteDb = new PouchDB(`${REMOTE_API_ADDRESS}${dbName}`, this.opts)
+        const localDb = this.local[dbName]
 
-        const rusers = new PouchDB(`${REMOTE_API_ADDRESS}users`, this.opts)
-        const { users } = this.local
+        if (!localDb) {
+            throw new Error(`Local table ${dbName} not found`)
+        }
+
         const liveRepl = {
             live: true,
             retry: true,
         }
 
-        const liveReplFiltered = (params) => ({        
-                live: true,
-                retry: true,
-                filter: 'restrict/restrict',
-                query_params: { params }
-        })
+        const liveReplFiltered = {
+            live: true,
+            retry: true,
+            filter: filterName,
+            query_params: filterParams
+        }
 
-        const remoteUserReplHandler = rusers.replicate.to(users, liveReplFiltered({ users: [this.userId] }))     
+        const remoteUserReplHandler = remoteDb.replicate.to(localDb, liveReplFiltered)
+        const localUserReplHandler = localDb.replicate.to(remoteDb, liveRepl)
 
-        const localUserReplHandler = users.replicate.to(rusers, liveRepl)
+        return {
+            remote_table: remoteDb,
+            localReplicationHandler: localUserReplHandler,
+            remoteReplicationHandler: remoteUserReplHandler
+        }
+    }
+
+    Login(user, token) {
+        this.opts.headers.Authorization = 'Bearer ' + token
+        this.userId = userFuncs.getId(user)
+        this.groupId = this.userId
 
         this.remote = {
-            users: { users: rusers, localUserReplHandler,  remoteUserReplHandler},
+            users: this.CreateRemoteDb('users', { user: this.userId }),
+            items: this.CreateRemoteDb('items', { groups: [this.groupId] }),
+            item_names: this.CreateRemoteDb('item_names', { groups: [this.groupId] }),
+            groups: this.CreateRemoteDb('groups', { users: [this.userId] })
         }
 
         this.logged = true
+
+        userFuncs.add(user)
+    }
+
+    async Clear(remoteDbMetadata) {
+        if (remoteDbMetadata?.remote_table) {
+            await remoteDbMetadata.remote_table.close()
+        }
+        if (remoteDbMetadata?.localReplicationHandler) {
+            remoteDbMetadata.localReplicationHandler.cancel()
+        }
+        if (remoteDbMetadata?.remoteReplicationHandler) {
+            remoteDbMetadata.remoteReplicationHandler.cancel()
+        }
     }
 
     async Logout() {
-        if (this.logged) {
-            delete this.opts.headers.Authorization;
-            delete this.userId;
+        try {
+            if (this.logged) {
+                delete this.opts.headers.Authorization;
+                delete this.userId;
 
-            if (this.remote?.users?.users) {
-                await this.remote.users.users.close()
+                await this.Clear(this.remote.users)
+                await this.Clear(this.remote.items)
+                await this.Clear(this.remote.itemNames)
+                await this.Clear(this.remote.groups)
             }
-            if (this.remote?.users?.localUserReplHandler) {
-                this.remote.users.localUserReplHandler.cancel()
-            }
-            if (this.remote?.users?.remoteUserReplHandler) {
-                this.remote.users.remoteUserReplHandler.cancel()
-            }
+        } finally {
+            this.logged = false
         }
-        this.logged = false
+
     }
 }
 

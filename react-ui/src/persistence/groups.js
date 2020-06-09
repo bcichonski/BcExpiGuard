@@ -1,9 +1,8 @@
 import { ensureDb, toPouch_id, transfromFromPouch } from './validate'
 import dbprovider from '../persistence'
 
-
 const add = async (payload) => {
-    ensureDb(dbprovider, 'item_names')
+    ensureDb(dbprovider, 'groups')
 
     if (!payload) {
         throw new Error("No payload data to store")
@@ -11,11 +10,11 @@ const add = async (payload) => {
 
     payload.userId = dbprovider.userId
 
-    await dbprovider.local.item_names.putIfNotExists(toPouch_id(payload))
+    await dbprovider.local.groups.putIfNotExists(toPouch_id(payload))
 }
 
 const getAll = async () => {
-    const all = await dbprovider.local.item_names.allDocs({ include_docs: true });
+    const all = await dbprovider.local.groups.allDocs({ include_docs: true });
     return transfromFromPouch(all)
 }
 

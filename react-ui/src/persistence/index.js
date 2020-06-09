@@ -13,6 +13,7 @@ export {default as users} from './users'
 export {default as categories} from './categories'
 export {default as itemNames} from './itemNames'
 export {default as items} from './items'
+export {default as groups} from './groups'
 
 export default dbProvider;
 

@@ -9,6 +9,10 @@ const addItemName = (payload) => async (dispatch) => {
 }
 
 const addItemNameInternal = (payload) => {
+    if(!payload.creation_timestamp) {
+        payload.creation_timestamp = new Date()
+    }
+
     return {
         type: types.ITEMNAME_ADD_IF_NOT_EXISTS,
         payload

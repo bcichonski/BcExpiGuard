@@ -3,7 +3,10 @@ import { categories } from '../../persistence'
 
 const addCategory = (payload) => {
     return async dispatch => {
-
+        if(!payload.creation_timestamp) {
+            payload.creation_timestamp = new Date()
+        }
+        
         await categories.add(payload)
 
         return {

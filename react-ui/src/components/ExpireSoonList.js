@@ -38,9 +38,9 @@ function ActionsWithDialogs(props) {
     setOpen(true)
   }
 
-  const handleClose = (id, value) => {
+  const handleClose = (item, value) => {
     setOpen(false);
-    props.handleRemove(id, value);
+    props.handleRemove(item, value);
   }
 
   const handleUndo = () => {

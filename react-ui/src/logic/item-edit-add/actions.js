@@ -44,7 +44,7 @@ const itemToSave = () => (dispatch, getState) => {
     let itemData = {
         date : state.itemEditReducer.date,
         quantity : state.itemEditReducer.quantity,
-        unit : state.itemEditReducer.unit
+        unit : state.itemEditReducer.unit,
     }
     const id = newUUID()
     const nameid = createUUID(NAMESPACES.ItemName, name)
