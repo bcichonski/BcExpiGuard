@@ -23,6 +23,9 @@ function daysFromNow(days) {
 }
 
 const addItem = (itemData) => async (dispatch) => {
+    if(!itemData.state) {
+        itemData.state = types.ITEM_ACTIVE
+    }
     dispatch({
         type: types.ITEM_ADD,
         data: itemData
