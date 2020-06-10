@@ -124,7 +124,7 @@ function MainContent(props) {
       <Grid item xs={12}>
         <Title>Great news!</Title>
         <Fragment>
-          No items will expire in nearest future. You are really lucky man.
+          No items will expire in the nearest future. You are really lucky.
           </Fragment>
       </Grid >
     )
