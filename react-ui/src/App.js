@@ -11,7 +11,8 @@ import { connect } from 'react-redux';
 import { appActions } from './logic/appstate'
 
 const mapDispatchToProps = (dispatch) => ({
-  appInitialize: () => dispatch(appActions.initialize())
+  appInitialize: (changeSyncStateFn) => dispatch(appActions.initialize(changeSyncStateFn)),
+  changeSyncState: (state) => dispatch(appActions.changeSyncState(state))
 })
 
 function App(props) {
@@ -21,7 +22,7 @@ function App(props) {
   const [appInitialization, setAppInitialization] = useState(false);
 
   if(!appInitialization) {
-    props.appInitialize();
+    props.appInitialize(props.changeSyncState);
 
     setAppInitialization(true);
   }

@@ -1,15 +1,22 @@
 import types from './types'
 import { itemNameActions } from '../item-names'
 import { itemActions } from '../item-list'
-import { itemNames, items } from '../../persistence'
+import dbProvider, { itemNames, items } from '../../persistence'
 
 const appError = (message) => ({
     type: types.ERROR,
     payload: { message }
 })
 
-const initialize = () => async (dispatch) => {
+const changeSyncState = (state) => ({
+    type: types.SYNCSTATE,
+    payload: state
+})
+
+const initialize = (changeSyncStateFn) => async (dispatch) => {
     try {
+        dbProvider.setSyncStateHandler(changeSyncStateFn)
+
         const storedItemNames = await itemNames.getAll()
         if (!storedItemNames || storedItemNames.length === 0) {
             dispatch(itemNameActions.addDummyName())
@@ -30,5 +37,6 @@ const initialize = () => async (dispatch) => {
 
 export default {
     initialize,
-    appError
+    appError,
+    changeSyncState
 }

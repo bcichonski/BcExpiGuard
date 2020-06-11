@@ -9,6 +9,8 @@ class DbProvider {
             headers: {}
         }
 
+        this.dbSyncState = {}
+
         const users = new PouchDB('users')
         const item_names = new PouchDB('item_names')
         const items = new PouchDB('items')
@@ -32,9 +34,32 @@ class DbProvider {
         return this;
     }
 
+    setSyncStateHandler(changeSyncStateFn) {
+        this.changeSyncState = changeSyncStateFn
+    }
+
     UseUser(isAuth, user, getToken) {
         (async () => { await this.UseUserAsync(isAuth, user, getToken) })()
         return this;
+    }
+
+    handleSyncState() {
+        for (const key in this.dbSyncState) {
+            if (this.dbSyncState.hasOwnProperty(key)) {
+                const element = this.dbSyncState[key];
+                if(element === 'error') {
+                    this.changeSyncState('error')
+                    return
+                } else if(element === 'change') {
+                    this.changeSyncState('changed')
+                    return
+                } else if (element === 'paused') {
+                    this.changeSyncState('ok')
+                    return
+                }
+            }
+        }
+        this.changeSyncState('ok')
     }
 
     CreateRemoteDb(dbName, filterParams, filterName = 'restrict/restrict') {
@@ -57,8 +82,45 @@ class DbProvider {
             query_params: filterParams
         }
 
+        const self = this;
         const remoteUserReplHandler = remoteDb.replicate.to(localDb, liveReplFiltered)
+            .on('change', function (change) {
+                console.log(`XXX remote ${dbName}: change`)
+                self.dbSyncState[dbName+'-remote'] = 'change'
+                self.handleSyncState()
+            }).on('paused', function (info) {
+                console.log(`XXX remote ${dbName}: paused`)
+                self.dbSyncState[dbName+'-remote'] = 'paused'
+                self.handleSyncState()
+            }).on('active', function (info) {
+                console.log(`XXX remote ${dbName}: active`)
+                self.dbSyncState[dbName+'-remote'] = 'active'
+                self.handleSyncState()
+            }).on('error', function (err) {
+                console.log(`XXX remote ${dbName}: error`)
+                self.dbSyncState[dbName+'-remote'] = 'error'
+                self.handleSyncState()
+            })
         const localUserReplHandler = localDb.replicate.to(remoteDb, liveRepl)
+            .on('change', function (change) {
+                console.log(`XXX local ${dbName}: change`)
+                self.dbSyncState[dbName+'-local'] = 'change'
+                self.handleSyncState()
+            }).on('paused', function (info) {
+                console.log(`XXX local ${dbName}: paused`)
+                self.dbSyncState[dbName+'-local'] = 'paused'
+                self.handleSyncState()
+            }).on('active', function (info) {
+                console.log(`XXX local ${dbName}: active`)
+                self.dbSyncState[dbName+'-local'] = 'active'
+                self.handleSyncState()
+            }).on('error', function (err) {
+                console.log(`XXX local ${dbName}: error`)
+                self.dbSyncState[dbName+'-local'] = 'error'
+                self.handleSyncState()
+            })
+
+        this.remotes++;
 
         return {
             remote_table: remoteDb,
@@ -94,6 +156,8 @@ class DbProvider {
         if (remoteDbMetadata?.remoteReplicationHandler) {
             remoteDbMetadata.remoteReplicationHandler.cancel()
         }
+
+        this.remotes = 0
     }
 
     async Logout() {

@@ -4,9 +4,8 @@ import { useAuth0 } from "../common/auth0";
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import MenuIcon from '@material-ui/icons/Menu';
-import NotificationsIcon from '@material-ui/icons/Notifications';
+//import NotificationsIcon from '@material-ui/icons/Notifications';
 import AppBar from '@material-ui/core/AppBar';
-import Badge from '@material-ui/core/Badge';
 import clsx from 'clsx';
 import { makeStyles } from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
@@ -23,6 +22,8 @@ import ListItemText from '@material-ui/core/ListItemText';
 import Avatar from '@material-ui/core/Avatar';
 import AccountBoxOutlinedIcon from '@material-ui/icons/AccountBoxOutlined';
 import { navigate } from "@reach/router"
+import SyncState from "./SyncState";
+import { connect } from 'react-redux'
 
 const StyledMenu = withStyles({
   paper: {
@@ -96,6 +97,27 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
+function getHintFromState(state) {
+  if(state === 'ok'){
+    return 'Sync is active'
+  }
+  if(state === 'disabled'){
+    return 'Sync is disabled'
+  }
+  if(state === 'error'){
+    return 'There was problems with syncing'
+  }
+  if(state === 'changed'){
+    return 'Changes were synced'
+  }
+}
+
+const mapStateToProps = (state, ownProps) => ({
+  state: state.appStateReducer.syncState ?? 'ok',
+  hint: getHintFromState(state.appStateReducer.syncState ?? 'ok'),
+  ...ownProps,
+})
+
 const NavBar = (props) => {
   const classes = useStyles();
   const { isAuthenticated, loginWithRedirect, logout, user } = useAuth0();
@@ -106,7 +128,7 @@ const NavBar = (props) => {
   };
 
   const handleMenuItemClick = (event, index) => {
-    if(index === 'profile') {
+    if (index === 'profile') {
       navigate('/profile')
     } else {
       logout()
@@ -117,7 +139,7 @@ const NavBar = (props) => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-  
+
 
   return (
     <AppBar position="absolute" className={clsx(classes.appBar, props.open && classes.appBarShift)}>
@@ -151,13 +173,9 @@ const NavBar = (props) => {
 
         )}
         {isAuthenticated && <Fragment>
-          <IconButton color="inherit">
-            <Badge badgeContent={4} color="secondary">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
+          <SyncState state={props.state} hint={props.hint} />
           <IconButton color="inherit" onClick={handleClick}>
-             <Avatar alt={user.name} src={user.picture} />
+            <Avatar alt={user.name} src={user.picture} />
           </IconButton>
           <StyledMenu
             id="user-menu"
@@ -190,4 +208,4 @@ NavBar.propTypes = {
   handleDrawerOpen: PropTypes.func
 }
 
-export default NavBar;
+export default connect(mapStateToProps, null)(NavBar);
