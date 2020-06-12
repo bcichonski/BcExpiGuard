@@ -39,8 +39,20 @@ const loadNames = (payload) => {
     }
 }
 
+const refreshNames = (payload) => ({
+    type: types.ITEMNAMES_REFRESH,
+    payload
+})
+
+const preloadNames = (payload) => ({
+    type: types.ITEMNAMES_PRELOAD,
+    payload
+})
+
 export default {
     addItemName,
     loadNames,
-    addDummyName
+    addDummyName,
+    refreshNames,
+    preloadNames
 }

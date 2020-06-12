@@ -11,8 +11,9 @@ import { connect } from 'react-redux';
 import { appActions } from './logic/appstate'
 
 const mapDispatchToProps = (dispatch) => ({
-  appInitialize: (changeSyncStateFn) => dispatch(appActions.initialize(changeSyncStateFn)),
-  changeSyncState: (state) => dispatch(appActions.changeSyncState(state))
+  appInitialize: (syncHooks) => dispatch(appActions.initialize(syncHooks)),
+  changeSyncState: (state) => dispatch(appActions.changeSyncState(state)),
+  refreshData: (key) => dispatch(appActions.syncChanges(key)),
 })
 
 function App(props) {
@@ -21,8 +22,8 @@ function App(props) {
 
   const [appInitialization, setAppInitialization] = useState(false);
 
-  if(!appInitialization) {
-    props.appInitialize(props.changeSyncState);
+  if (!appInitialization) {
+    props.appInitialize({ changeSyncState: props.changeSyncState, refreshData: props.refreshData });
 
     setAppInitialization(true);
   }
@@ -30,7 +31,7 @@ function App(props) {
   dbProvider.UseUser(isAuthenticated, user, getTokenSilently)
 
   if (loading) {
-    return <LoadingPanel/>;
+    return <LoadingPanel />;
   }
 
   return (
@@ -43,7 +44,7 @@ function App(props) {
 }
 
 App.propTypes = {
-  history : PropTypes.object
+  history: PropTypes.object
 }
 
 export default connect(null, mapDispatchToProps)(App);

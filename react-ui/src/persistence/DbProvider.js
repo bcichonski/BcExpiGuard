@@ -23,7 +23,7 @@ class DbProvider {
         }
     }
 
-    async UseUserAsync(isAuth, user, getToken) {
+    async useUserAsync(isAuth, user, getToken) {
         if (isAuth && user && !this.logged) {
             this.Login(user, await getToken())
         }
@@ -34,32 +34,34 @@ class DbProvider {
         return this;
     }
 
-    setSyncStateHandler(changeSyncStateFn) {
-        this.changeSyncState = changeSyncStateFn
+    setSyncHooks(syncHooks) {
+        this.syncHooks = syncHooks
     }
 
     UseUser(isAuth, user, getToken) {
-        (async () => { await this.UseUserAsync(isAuth, user, getToken) })()
+        (async () => { await this.useUserAsync(isAuth, user, getToken) })()
         return this;
     }
 
     handleSyncState() {
+        let stateSend = false
         for (const key in this.dbSyncState) {
             if (this.dbSyncState.hasOwnProperty(key)) {
                 const element = this.dbSyncState[key];
-                if(element === 'error') {
-                    this.changeSyncState('error')
-                    return
-                } else if(element === 'change') {
-                    this.changeSyncState('changed')
-                    return
-                } else if (element === 'paused') {
-                    this.changeSyncState('ok')
-                    return
-                }
+                if (element === 'error') {
+                    this.syncHooks.changeSyncState('error', key)
+                    stateSend = true
+                } else if (element === 'change') {
+                    if (!stateSend) {
+                        this.syncHooks.changeSyncState('changed', key)
+                        stateSend = true
+                    }
+                    this.syncHooks.refreshData(key)
+                }// else if (element === 'paused') {
+                //}
             }
         }
-        this.changeSyncState('ok')
+        this.syncHooks.changeSyncState('ok', '')
     }
 
     CreateRemoteDb(dbName, filterParams, filterName = 'restrict/restrict') {
@@ -79,44 +81,54 @@ class DbProvider {
             live: true,
             retry: true,
             filter: filterName,
-            query_params: filterParams
+            query_params: filterParams,
+            back_off_function: function (delay) {
+                let newdelay = delay
+                if (delay === 0) {
+                    newdelay = 1000;
+                } else {
+                    newdelay *= 3
+                }
+                console.log(`Backoff! ${delay} to ${newdelay}`)
+                return newdelay;
+            }
         }
 
         const self = this;
         const remoteUserReplHandler = remoteDb.replicate.to(localDb, liveReplFiltered)
             .on('change', function (change) {
                 console.log(`XXX remote ${dbName}: change`)
-                self.dbSyncState[dbName+'-remote'] = 'change'
+                self.dbSyncState[dbName + '-remote'] = 'change'
                 self.handleSyncState()
             }).on('paused', function (info) {
                 console.log(`XXX remote ${dbName}: paused`)
-                self.dbSyncState[dbName+'-remote'] = 'paused'
+                self.dbSyncState[dbName + '-remote'] = 'paused'
                 self.handleSyncState()
             }).on('active', function (info) {
                 console.log(`XXX remote ${dbName}: active`)
-                self.dbSyncState[dbName+'-remote'] = 'active'
+                self.dbSyncState[dbName + '-remote'] = 'active'
                 self.handleSyncState()
             }).on('error', function (err) {
                 console.log(`XXX remote ${dbName}: error`)
-                self.dbSyncState[dbName+'-remote'] = 'error'
+                self.dbSyncState[dbName + '-remote'] = 'error'
                 self.handleSyncState()
             })
         const localUserReplHandler = localDb.replicate.to(remoteDb, liveRepl)
             .on('change', function (change) {
                 console.log(`XXX local ${dbName}: change`)
-                self.dbSyncState[dbName+'-local'] = 'change'
+                self.dbSyncState[dbName + '-local'] = 'change'
                 self.handleSyncState()
             }).on('paused', function (info) {
                 console.log(`XXX local ${dbName}: paused`)
-                self.dbSyncState[dbName+'-local'] = 'paused'
+                self.dbSyncState[dbName + '-local'] = 'paused'
                 self.handleSyncState()
             }).on('active', function (info) {
                 console.log(`XXX local ${dbName}: active`)
-                self.dbSyncState[dbName+'-local'] = 'active'
+                self.dbSyncState[dbName + '-local'] = 'active'
                 self.handleSyncState()
             }).on('error', function (err) {
                 console.log(`XXX local ${dbName}: error`)
-                self.dbSyncState[dbName+'-local'] = 'error'
+                self.dbSyncState[dbName + '-local'] = 'error'
                 self.handleSyncState()
             })
 

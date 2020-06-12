@@ -150,11 +150,17 @@ const load = (payload) => ({
     payload
 })
 
+const refresh = (payload) => ({
+    type: types.ITEM_REFRESH,
+    payload
+})
+
 export default {
     addItem,
     updateItemQuantity,
     undoItemChanges,
     removeItem,
     addDummyItem,
-    load
+    load,
+    refresh
 }

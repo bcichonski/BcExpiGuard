@@ -15,9 +15,9 @@ const appStateReducer = (state = { syncState: 'ok' }, action) => {
 
             return newState
         case types.SYNCSTATE:
-            if (state.syncState !== action.payload) {
+            if (state.syncState !== action.payload.state) {
                 let newState2 = Object.assign({}, state)
-                newState2.syncState = action.payload
+                newState2.syncState = action.payload.state
                 return newState2
             } else {
                 return state

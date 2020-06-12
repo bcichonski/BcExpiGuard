@@ -13,3 +13,44 @@ export function createUUID(namespace, value) {
 export function newUUID() {
     return uuidv4()
 }
+
+export function refresh(item, refreshItem) {
+    let newItem = Object.assign({}, item)
+
+    if (refreshItem) {
+        for (const key in item) {
+            if (item.hasOwnProperty(key)) {
+                const element = item[key];
+
+                const refreshedElement = refreshItem[key];
+
+                if (typeof refreshedElement !== 'undefined' && element !== refreshedElement) {
+                    newItem[key] = refreshedElement
+                }
+            }
+        }
+    }
+
+    return newItem
+}
+
+export function refreshState(state = [], emptyItem = {}, payload = {}) {
+    const newState = state.map(element => {
+        const newItemIndex = payload.indexOf(it => it.id === element.id)
+        let result = undefined
+        if(newItemIndex > -1) {
+            result = refresh(element, payload[newItemIndex])
+            delete payload[newItemIndex]
+        }
+        else {
+            result = refresh(emptyItem, element)
+        }
+        return result
+    });
+    payload.forEach(element => {
+        if(element) {
+            newState.push(refresh(emptyItem, element))
+        }
+    });
+    return newState
+}

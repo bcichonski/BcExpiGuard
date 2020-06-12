@@ -1,5 +1,10 @@
 import types from './types'
-import { NAMESPACES, createUUID } from '../../common/utils'
+import { NAMESPACES, createUUID, refresh, refreshState } from '../../common/utils'
+
+const emptyItem = ({
+    id: '',
+    name: ''
+})
 
 const itemNamesReducer = (state = [], action) => {
     switch (action.type) {
@@ -20,7 +25,17 @@ const itemNamesReducer = (state = [], action) => {
                 return state
             }
         case types.LOAD_ITEMNAMES:
-            return action.payload
+            return action.payload.map(it => refresh(emptyItem, it))
+        case types.ITEMNAMES_REFRESH:
+            return refreshState(state, emptyItem, action.payload)
+        case types.ITEMNAMES_PRELOAD:
+            const newPreloadState = [...state]
+            action.payload.forEach(element => {
+                if (!state.find(it => it.id === element)) {
+                    newPreloadState.push(refresh(emptyItem, { id: element }))
+                }
+            });
+            return newPreloadState
         default:
             return state
     }

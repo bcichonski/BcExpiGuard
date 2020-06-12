@@ -1,4 +1,15 @@
 import types from './types'
+import {refresh, refreshState} from '../../common/utils'
+
+const emptyItem = {
+    id: '',
+    nameID: '',
+    date: '',
+    quantity: '',
+    previousQuantity: '',
+    unit: '',
+    state: ''
+}
 
 const itemsReducer = (state = [], action) => {
     switch (action.type) {
@@ -37,8 +48,11 @@ const itemsReducer = (state = [], action) => {
                 ...otherItems3,
                 changedItem3
             ]
+        case types.ITEM_REFRESH:
+            const refreshedState = refreshState(state, emptyItem, action.payload)
+            return refreshedState
         case types.ITEM_LOAD:
-            return action.payload;
+            return action.payload.map(item => refresh(emptyItem, item));
         default:
             return state
     }

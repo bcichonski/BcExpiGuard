@@ -8,14 +8,33 @@ const appError = (message) => ({
     payload: { message }
 })
 
-const changeSyncState = (state) => ({
+const changeSyncState = (state, key) => ({
     type: types.SYNCSTATE,
-    payload: state
+    payload: {state, key}
 })
 
-const initialize = (changeSyncStateFn) => async (dispatch) => {
+const syncChanges = (key) => async (dispatch) => {
+    switch (key) {
+        case 'items-local':
+        case 'items-remote':
+            const dbItems = await items.getAll()
+            const dbItemPreloadedNames = dbItems.map(it => it.nameId)
+            dispatch(itemNameActions.preload(dbItemPreloadedNames))
+            dispatch(itemActions.refresh(dbItems))
+            break;
+        case 'item-names-local':
+        case 'item-names-remote':
+            const dbItemNames = await itemNames.getAll()
+            dispatch(itemNames.refreshNames(dbItemNames))
+            break;
+        default:
+            console.log(`Unexpected sync key ${key}`)
+    }
+}
+
+const initialize = (syncHooks) => async (dispatch) => {
     try {
-        dbProvider.setSyncStateHandler(changeSyncStateFn)
+        dbProvider.setSyncHooks(syncHooks)
 
         const storedItemNames = await itemNames.getAll()
         if (!storedItemNames || storedItemNames.length === 0) {
@@ -38,5 +57,6 @@ const initialize = (changeSyncStateFn) => async (dispatch) => {
 export default {
     initialize,
     appError,
-    changeSyncState
+    changeSyncState,
+    syncChanges
 }
