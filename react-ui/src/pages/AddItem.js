@@ -11,6 +11,7 @@ import { itemEditActions } from '../logic/item-edit-add'
 import dbProvider from '../persistence'
 import Title from '../components/Title';
 import clsx from 'clsx';
+import syncMonkey from '../common/syncMonkey'
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -57,6 +58,7 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
 function AddItem(props) {
     const classes = useStyles();
     const spacingTopLeft = clsx(classes.spacer2, classes.spacingLeft)
+    syncMonkey.reset()
 
     const groupingFunction = (el) => {
         return (el.userId === dbProvider.userId) ? 'Your items' : 'Suggestions'

@@ -43,37 +43,88 @@ class DbProvider {
         return this;
     }
 
-    throttleSyncStateChange(key, value) {
-        if(this.throttleHandle) {
-            clearTimeout(this.throttleHandle)
+    replicate(dbName) {
+        if (this.inReplication) {
+            console.log('already in progress')
+            return
         }
 
-        this.throttleHandle = setInterval((key, value) => {
-            this.syncHooks.changeSyncState(key, value)
-            if(key === 'change') {
-                this.syncHooks.refreshData(key)
-            }
-        }, 200, key, value)
-    }
+        this.inReplication = true
 
-    handleSyncState() {
-        let stateSend = false
-        for (const key in this.dbSyncState) {
-            if (this.dbSyncState.hasOwnProperty(key)) {
-                const element = this.dbSyncState[key];
-                if (element === 'error') {
-                    this.throttleSyncStateChange('error', key)
-                    stateSend = true
-                } else if (element === 'change') {
-                    if (!stateSend) {
-                        this.throttleSyncStateChange('changed', key)
-                        stateSend = true
-                    }
-                }// else if (element === 'paused') {
-                //}
-            }
+
+
+        const remoteDb = this.remote[dbName]?.remote_table;
+        const remoteFilterParams = this.remote[dbName]?.filter_params;
+        const remoteFilterName = this.remote[dbName]?.filter_name;
+
+        const replFiltered = {
+            filter: remoteFilterName,
+            query_params: remoteFilterParams,
         }
-        this.throttleSyncStateChange('ok', '')
+
+        const localDb = this.local[dbName]
+        if (!remoteDb) {
+            console.warn(`No remote db ${dbName} found`)
+        }
+        if (!localDb) {
+            console.warn(`No local db ${dbName} found`)
+        }
+
+        const self = this
+        const promise = new Promise(
+            (resolve, reject) => {
+                let wasChanges = false
+                remoteDb.replicate.to(localDb, replFiltered)
+                    .on('change', function (change) {
+                        console.log(`XXX remote ${dbName}: change`)
+                        wasChanges = true
+                    }).on('paused', function (info) {
+                        console.log(`XXX remote ${dbName}: paused`)
+                    }).on('active', function (info) {
+                        console.log(`XXX remote ${dbName}: active`)
+                    }).on('error', function (err) {
+                        console.log(err)
+                        reject(err)
+                    }).on('denied', function (err) {
+                        console.log(err)
+                        reject(err)
+                    }).on('complete', function (info) {
+                        resolve(wasChanges)
+                    })
+            }
+        ).then((wasChanges) => {
+            if (wasChanges) {
+                try {
+                    this.syncHooks.refreshData(dbName)
+                } catch (err) {
+                    self.inReplication = false
+                    return new Promise((resolve, reject) => reject(err))
+                }
+            }
+
+            return new Promise((resolve, reject) => {
+                localDb.replicate.to(remoteDb)
+                    .on('change', function (change) {
+                        console.log(`XXX local ${dbName}: change`)
+                    }).on('paused', function (info) {
+                        console.log(`XXX local ${dbName}: paused`)
+                    }).on('active', function (info) {
+                        console.log(`XXX local ${dbName}: active`)
+                    }).on('error', function (err) {
+                        console.log(err)
+                        reject(err)
+                    }).on('denied', function (err) {
+                        console.log(err)
+                        reject(err)
+                    }).on('complete', function (info) {
+                        resolve(wasChanges)
+                    })
+            })
+        }).finally(() => {
+            self.inReplication = false
+        })
+
+        return promise
     }
 
     CreateRemoteDb(dbName, filterParams, filterName = 'restrict/restrict') {
@@ -84,72 +135,10 @@ class DbProvider {
             throw new Error(`Local table ${dbName} not found`)
         }
 
-        const liveRepl = {
-            live: true,
-            retry: true,
-        }
-
-        const liveReplFiltered = {
-            live: true,
-            retry: true,
-            filter: filterName,
-            query_params: filterParams,
-            back_off_function: function (delay) {
-                let newdelay = delay
-                if (delay === 0) {
-                    newdelay = 1000;
-                } else {
-                    newdelay *= 3
-                }
-                console.log(`Backoff! ${delay} to ${newdelay}`)
-                return newdelay;
-            }
-        }
-
-        const self = this;
-        const remoteUserReplHandler = remoteDb.replicate.to(localDb, liveReplFiltered)
-            .on('change', function (change) {
-                console.log(`XXX remote ${dbName}: change`)
-                self.dbSyncState[dbName + '-remote'] = 'change'
-                self.handleSyncState()
-            }).on('paused', function (info) {
-                console.log(`XXX remote ${dbName}: paused`)
-                self.dbSyncState[dbName + '-remote'] = 'paused'
-                self.handleSyncState()
-            }).on('active', function (info) {
-                console.log(`XXX remote ${dbName}: active`)
-                self.dbSyncState[dbName + '-remote'] = 'active'
-                self.handleSyncState()
-            }).on('error', function (err) {
-                console.log(`XXX remote ${dbName}: error`)
-                self.dbSyncState[dbName + '-remote'] = 'error'
-                self.handleSyncState()
-            })
-        const localUserReplHandler = localDb.replicate.to(remoteDb, liveRepl)
-            .on('change', function (change) {
-                console.log(`XXX local ${dbName}: change`)
-                //self.dbSyncState[dbName + '-local'] = 'change'
-                //self.handleSyncState()
-            }).on('paused', function (info) {
-                console.log(`XXX local ${dbName}: paused`)
-                //self.dbSyncState[dbName + '-local'] = 'paused'
-                //self.handleSyncState()
-            }).on('active', function (info) {
-                console.log(`XXX local ${dbName}: active`)
-                //self.dbSyncState[dbName + '-local'] = 'active'
-                //self.handleSyncState()
-            }).on('error', function (err) {
-                console.log(`XXX local ${dbName}: error`)
-                //self.dbSyncState[dbName + '-local'] = 'error'
-                //self.handleSyncState()
-            })
-
-        this.remotes++;
-
         return {
             remote_table: remoteDb,
-            localReplicationHandler: localUserReplHandler,
-            remoteReplicationHandler: remoteUserReplHandler
+            filter_params: filterParams,
+            filter_name: filterName
         }
     }
 
@@ -174,14 +163,6 @@ class DbProvider {
         if (remoteDbMetadata?.remote_table) {
             await remoteDbMetadata.remote_table.close()
         }
-        if (remoteDbMetadata?.localReplicationHandler) {
-            remoteDbMetadata.localReplicationHandler.cancel()
-        }
-        if (remoteDbMetadata?.remoteReplicationHandler) {
-            remoteDbMetadata.remoteReplicationHandler.cancel()
-        }
-
-        this.remotes = 0
     }
 
     async Logout() {

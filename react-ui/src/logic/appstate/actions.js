@@ -2,6 +2,7 @@ import types from './types'
 import { itemNameActions } from '../item-names'
 import { itemActions } from '../item-list'
 import dbProvider, { itemNames, items } from '../../persistence'
+import syncMonkey from '../../common/syncMonkey'
 
 const appError = (message) => ({
     type: types.ERROR,
@@ -15,17 +16,15 @@ const changeSyncState = (state, key) => ({
 
 const syncChanges = (key) => async (dispatch) => {
     switch (key) {
-        case 'items-local':
-        case 'items-remote':
+        case 'items':
             const dbItems = await items.getAll()
             const dbItemPreloadedNames = dbItems.map(it => it.nameId)
             dispatch(itemNameActions.preloadNames(dbItemPreloadedNames))
             dispatch(itemActions.refresh(dbItems))
             break;
-        case 'item-names-local':
-        case 'item-names-remote':
+        case 'item_names':
             const dbItemNames = await itemNames.getAll()
-            dispatch(itemNames.refreshNames(dbItemNames))
+            dispatch(itemNameActions.refreshNames(dbItemNames))
             break;
         default:
             console.log(`Unexpected sync key ${key}`)
@@ -52,6 +51,7 @@ const initialize = (syncHooks) => async (dispatch) => {
     } catch (err) {
         dispatch(appError(err.message))
     }
+    syncMonkey.start()
 }
 
 export default {

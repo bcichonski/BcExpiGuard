@@ -19,8 +19,9 @@ const mapDispatchToProps = (dispatch) => ({
 function App(props) {
   const isMobile = useMediaQuery({ maxDeviceWidth: 1000 })
   const { loading, isAuthenticated, user, getTokenSilently } = useAuth0();
-
+  const [ignoreLoading, setIgnoreLoading] = useState(false)
   const [appInitialization, setAppInitialization] = useState(false);
+  const [useMoreElves, setUseMoreElves] = useState(false)
 
   if (!appInitialization) {
     props.appInitialize({ changeSyncState: props.changeSyncState, refreshData: props.refreshData });
@@ -30,8 +31,10 @@ function App(props) {
 
   dbProvider.UseUser(isAuthenticated, user, getTokenSilently)
 
-  if (loading) {
-    return <LoadingPanel />;
+  if (loading && !ignoreLoading) {
+    setTimeout(() => { setIgnoreLoading(true) }, 10 * 1000)
+    setTimeout(() => { setUseMoreElves(true) }, 5 * 1000);
+    return <LoadingPanel useMoreElves={useMoreElves} />;
   }
 
   return (

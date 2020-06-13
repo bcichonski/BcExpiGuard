@@ -30,6 +30,7 @@ import AssignmentTurnedInOutlinedIcon from '@material-ui/icons/AssignmentTurnedI
 import Menu from '@material-ui/core/Menu';
 import DealtWithDialog from '../components/DealtWithDialog'
 import { itemActions } from '../logic/item-list'
+import syncMonkey from '../common/syncMonkey'
 
 const tableIcons = {
     Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -98,6 +99,7 @@ function BrowseItems(props) {
     const filteredData = props.data.filter((item) => mainFilterValue === 'none' || item.state === mainFilterValue)
 
     const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+    syncMonkey.reset()
 
     let actions = []
     let actionloc = {

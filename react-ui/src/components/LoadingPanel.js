@@ -12,9 +12,21 @@ const useStyles = makeStyles((theme) => ({
 
 function LoadingPanel(props) {
     const classes = useStyles()
+
+    let elvesWidget = null
+    if(props.useMoreElves) {
+        elvesWidget = (
+            <span>
+                Something is taking longer than expected...
+                Waking up more elves...
+            </span>
+        )
+    }
+
     return (
         <Backdrop className={classes.backdrop} open={true}>
             <SpinnerRoundOutlined color='inherit' />
+            {elvesWidget}
         </Backdrop>
     );
 }

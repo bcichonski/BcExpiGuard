@@ -37,6 +37,9 @@ export function refresh(item, refreshItem) {
 export function refreshState(state = [], emptyItem = {}, payload = {}) {
     const newState = state.map(element => {
         const newItemIndex = payload.findIndex(it => {
+            if(typeof it === 'undefined'){
+                return false
+            }
             if(!it.id) {
                 console.log(`payload element has no id`)
             }
