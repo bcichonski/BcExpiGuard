@@ -36,9 +36,17 @@ export function refresh(item, refreshItem) {
 
 export function refreshState(state = [], emptyItem = {}, payload = {}) {
     const newState = state.map(element => {
-        const newItemIndex = payload.indexOf(it => it.id === element.id)
+        const newItemIndex = payload.findIndex(it => {
+            if(!it.id) {
+                console.log(`payload element has no id`)
+            }
+            if(!element.id) {
+                console.log(`state element has no id`)
+            }
+            return it.id === element.id
+        })
         let result = undefined
-        if(newItemIndex > -1) {
+        if (newItemIndex > -1) {
             result = refresh(element, payload[newItemIndex])
             delete payload[newItemIndex]
         }
@@ -48,7 +56,7 @@ export function refreshState(state = [], emptyItem = {}, payload = {}) {
         return result
     });
     payload.forEach(element => {
-        if(element) {
+        if (element) {
             newState.push(refresh(emptyItem, element))
         }
     });

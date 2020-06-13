@@ -1,8 +1,12 @@
 import types from './types'
 import { NAMESPACES, createUUID } from '../../common/utils'
-import { itemNames } from '../../persistence'
+import dbProvider, { itemNames } from '../../persistence'
 
 const addItemName = (payload) => async (dispatch) => {
+    if(!payload.userId) {
+        payload.userId = dbProvider.userId
+    }
+
     dispatch(addItemNameInternal(payload))
 
     await itemNames.add(payload)

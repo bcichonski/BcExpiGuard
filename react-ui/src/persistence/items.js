@@ -11,7 +11,11 @@ const add = async (payload) => {
     payload.userId = dbprovider.userId
     payload.groupId = dbprovider.userId
 
-    await dbprovider.local.items.putIfNotExists(toPouch_id(payload))
+    const pouchPayload = toPouch_id(payload)
+    await dbprovider.local.items.putIfNotExists(pouchPayload)
+    if (dbprovider?.remote?.items?.remote_table) {
+        await dbprovider.remote.items.remote_table.putIfNotExists(pouchPayload)
+    }
 }
 
 const changeState = async (id, newstate) => {
@@ -22,6 +26,9 @@ const changeState = async (id, newstate) => {
     }
 
     await dbprovider.local.items.upsert(id, stateDeltaFunction)
+    if (dbprovider?.remote?.items?.remote_table) {
+        await dbprovider.remote.items.remote_table.upsert(id, stateDeltaFunction)
+    }
 }
 
 const changeQuantity = async (id, quantity) => {
@@ -32,6 +39,9 @@ const changeQuantity = async (id, quantity) => {
     }
 
     await dbprovider.local.items.upsert(id, stateDeltaFunction)
+    if (dbprovider?.remote?.items?.remote_table) {
+        await dbprovider.remote.items.remote_table.upsert(id, stateDeltaFunction)
+    }
 }
 
 const getAll = async () => {

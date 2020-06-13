@@ -19,7 +19,7 @@ const syncChanges = (key) => async (dispatch) => {
         case 'items-remote':
             const dbItems = await items.getAll()
             const dbItemPreloadedNames = dbItems.map(it => it.nameId)
-            dispatch(itemNameActions.preload(dbItemPreloadedNames))
+            dispatch(itemNameActions.preloadNames(dbItemPreloadedNames))
             dispatch(itemActions.refresh(dbItems))
             break;
         case 'item-names-local':

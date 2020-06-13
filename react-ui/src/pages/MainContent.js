@@ -58,7 +58,7 @@ function onlyExpiresWithinDays(today, from, to) {
 function normalize(collection, state) {
   return collection.map(item => ({
     ...item,
-    name : state.itemNameReducer.find(nm => nm.id === item.nameID).name ?? item.nameID,
+    name : state.itemNameReducer.find(nm => nm.id === item.nameID)?.name ?? item.nameID,
   }))
 }
 

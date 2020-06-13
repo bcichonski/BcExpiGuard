@@ -11,7 +11,11 @@ const add = async (payload) => {
 
     payload.userId = dbprovider.userId
 
-    await dbprovider.local.item_names.putIfNotExists(toPouch_id(payload))
+    const pouchPayload = toPouch_id(payload)
+    await dbprovider.local.item_names.putIfNotExists(pouchPayload)
+    if(dbprovider?.remote?.item_names?.remote_table) {
+        await dbprovider.remote.item_names.remote_table.putIfNotExists(pouchPayload)
+    }
 }
 
 const getAll = async () => {

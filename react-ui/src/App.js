@@ -12,7 +12,7 @@ import { appActions } from './logic/appstate'
 
 const mapDispatchToProps = (dispatch) => ({
   appInitialize: (syncHooks) => dispatch(appActions.initialize(syncHooks)),
-  changeSyncState: (state) => dispatch(appActions.changeSyncState(state)),
+  changeSyncState: (state, key) => dispatch(appActions.changeSyncState(state, key)),
   refreshData: (key) => dispatch(appActions.syncChanges(key)),
 })
 

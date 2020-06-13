@@ -3,7 +3,8 @@ import { NAMESPACES, createUUID, refresh, refreshState } from '../../common/util
 
 const emptyItem = ({
     id: '',
-    name: ''
+    name: '',
+    userId: ''
 })
 
 const itemNamesReducer = (state = [], action) => {

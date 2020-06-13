@@ -43,25 +43,37 @@ class DbProvider {
         return this;
     }
 
+    throttleSyncStateChange(key, value) {
+        if(this.throttleHandle) {
+            clearTimeout(this.throttleHandle)
+        }
+
+        this.throttleHandle = setInterval((key, value) => {
+            this.syncHooks.changeSyncState(key, value)
+            if(key === 'change') {
+                this.syncHooks.refreshData(key)
+            }
+        }, 200, key, value)
+    }
+
     handleSyncState() {
         let stateSend = false
         for (const key in this.dbSyncState) {
             if (this.dbSyncState.hasOwnProperty(key)) {
                 const element = this.dbSyncState[key];
                 if (element === 'error') {
-                    this.syncHooks.changeSyncState('error', key)
+                    this.throttleSyncStateChange('error', key)
                     stateSend = true
                 } else if (element === 'change') {
                     if (!stateSend) {
-                        this.syncHooks.changeSyncState('changed', key)
+                        this.throttleSyncStateChange('changed', key)
                         stateSend = true
                     }
-                    this.syncHooks.refreshData(key)
                 }// else if (element === 'paused') {
                 //}
             }
         }
-        this.syncHooks.changeSyncState('ok', '')
+        this.throttleSyncStateChange('ok', '')
     }
 
     CreateRemoteDb(dbName, filterParams, filterName = 'restrict/restrict') {
@@ -116,20 +128,20 @@ class DbProvider {
         const localUserReplHandler = localDb.replicate.to(remoteDb, liveRepl)
             .on('change', function (change) {
                 console.log(`XXX local ${dbName}: change`)
-                self.dbSyncState[dbName + '-local'] = 'change'
-                self.handleSyncState()
+                //self.dbSyncState[dbName + '-local'] = 'change'
+                //self.handleSyncState()
             }).on('paused', function (info) {
                 console.log(`XXX local ${dbName}: paused`)
-                self.dbSyncState[dbName + '-local'] = 'paused'
-                self.handleSyncState()
+                //self.dbSyncState[dbName + '-local'] = 'paused'
+                //self.handleSyncState()
             }).on('active', function (info) {
                 console.log(`XXX local ${dbName}: active`)
-                self.dbSyncState[dbName + '-local'] = 'active'
-                self.handleSyncState()
+                //self.dbSyncState[dbName + '-local'] = 'active'
+                //self.handleSyncState()
             }).on('error', function (err) {
                 console.log(`XXX local ${dbName}: error`)
-                self.dbSyncState[dbName + '-local'] = 'error'
-                self.handleSyncState()
+                //self.dbSyncState[dbName + '-local'] = 'error'
+                //self.handleSyncState()
             })
 
         this.remotes++;

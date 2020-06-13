@@ -8,6 +8,7 @@ import Autocomplete from '../components/Autocomplete'
 import Datepicker from '../components/DatePicker'
 import { connect } from 'react-redux'
 import { itemEditActions } from '../logic/item-edit-add'
+import dbProvider from '../persistence'
 import Title from '../components/Title';
 import clsx from 'clsx';
 
@@ -38,7 +39,10 @@ const mapStateToProps = (state /*, ownProps*/) => ({
     date: state.itemEditReducer.date,
     quantity: state.itemEditReducer.quantity,
     unit: state.unit,
-    allNames: state.itemNameReducer.filter(n => !!n.id).map(n => ({ name: n.name }))
+    allNames: state.itemNameReducer
+        .filter(n => !!n.id && !!n.name && n.name.length > 0)
+        .map(n => ({ name: n.name, userId: n.userId }))
+        .sort((a, b) => a.name.localeCompare(b.name))
 })
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
@@ -54,6 +58,10 @@ function AddItem(props) {
     const classes = useStyles();
     const spacingTopLeft = clsx(classes.spacer2, classes.spacingLeft)
 
+    const groupingFunction = (el) => {
+        return (el.userId === dbProvider.userId) ? 'Your items' : 'Suggestions'
+    }
+
     return (
         <Paper className={classes.paper}>
             <Title>Add new item</Title>
@@ -62,7 +70,9 @@ function AddItem(props) {
                     <Autocomplete options={props.allNames}
                         label='Name'
                         value={props.name}
-                        setValue={props.setName} />
+                        setValue={props.setName}
+                        groupBy={groupingFunction}
+                        />
                 </Grid>
                 <Grid item xs={12} sm={8} md={4} lg={3} xl={1}>
                     <span className={classes.expand}>
