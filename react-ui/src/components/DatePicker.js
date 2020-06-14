@@ -10,12 +10,13 @@ function Datepicker(props) {
         return (
             <DatePicker
                 shrink
+                autoOk
                 disableToolbar
                 variant="dialog"
                 label={props.label}
                 helperText={props.helperText}
                 value={props.selectedDate}
-                onChange={date => props.handleDateChange(date)}
+                onChange={date => props.setDate(date)}
                 format={DATE_FORMAT}
                 minDate={today}
             />
@@ -23,6 +24,7 @@ function Datepicker(props) {
     } else {
         return (
             <KeyboardDatePicker
+                autook
                 variant="inline"
                 label={props.label}
                 value={props.selectedDate}

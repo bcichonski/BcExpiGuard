@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
@@ -12,6 +12,8 @@ import dbProvider from '../persistence'
 import Title from '../components/Title';
 import clsx from 'clsx';
 import syncMonkey from '../common/syncMonkey'
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { useTheme } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -55,9 +57,31 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
     handleAddItemClick: () => dispatch(itemEditActions.itemToSave())
 })
 
+function renderInput(inputProps) {
+    const { classes, ref, ...other } = inputProps;
+  
+    return (
+      <TextField
+        fullWidth
+        autoFocus
+        InputProps={{
+          inputRef: ref,
+          classes: {
+            input: classes.input
+          },
+          ...other
+        }}
+      />
+    );
+  }
+
 function AddItem(props) {
+    const theme = useTheme()
+    const mobile = useMediaQuery(theme.breakpoints.down('sm'));
     const classes = useStyles();
     const spacingTopLeft = clsx(classes.spacer2, classes.spacingLeft)
+    const focusRef = useRef()
+
     syncMonkey.reset()
 
     const groupingFunction = (el) => {
@@ -74,12 +98,17 @@ function AddItem(props) {
                         value={props.name}
                         setValue={props.setName}
                         groupBy={groupingFunction}
-                        />
+                        renderInput={renderInput}
+                        ref={focusRef}
+                    />
                 </Grid>
                 <Grid item xs={12} sm={8} md={4} lg={3} xl={1}>
                     <span className={classes.expand}>
                         <Datepicker label='Expiration date'
-                            setDate={props.setDate}
+                            setDate={(value) => {
+                                props.setDate(value)
+                            }}
+                            isMobile={mobile}
                             selectedDate={props.date}
                         /></span>
                 </Grid>
