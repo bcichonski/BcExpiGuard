@@ -42,10 +42,18 @@ const mapStateToProps = (state /*, ownProps*/) => ({
     date: state.itemEditReducer.date,
     quantity: state.itemEditReducer.quantity,
     unit: state.unit,
-    allNames: state.itemNameReducer
-        .filter(n => !!n.id && !!n.name && n.name.length > 0)
+    allNames: (userId) => state.itemNameReducer
+        .filter(n => !!n.id && !!n.userId && !!n.name && n.name.length > 0)
         .map(n => ({ name: n.name, userId: n.userId }))
-        .sort((a, b) => a.name.localeCompare(b.name))
+        .sort((a, b) => {
+            if(a.userId === userId && b.userId !== userId){
+                return 1
+            } else if(a.userId !== userId && b.userId === userId){
+                return -1
+            } else {
+                return a.name.localeCompare(b.name)}
+            }
+        )
 })
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
@@ -57,30 +65,11 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
     handleAddItemClick: () => dispatch(itemEditActions.itemToSave())
 })
 
-function renderInput(inputProps) {
-    const { classes, ref, ...other } = inputProps;
-  
-    return (
-      <TextField
-        fullWidth
-        autoFocus
-        InputProps={{
-          inputRef: ref,
-          classes: {
-            input: classes.input
-          },
-          ...other
-        }}
-      />
-    );
-  }
-
 function AddItem(props) {
     const theme = useTheme()
     const mobile = useMediaQuery(theme.breakpoints.down('sm'));
     const classes = useStyles();
     const spacingTopLeft = clsx(classes.spacer2, classes.spacingLeft)
-    const focusRef = useRef()
 
     syncMonkey.reset()
 
@@ -93,13 +82,11 @@ function AddItem(props) {
             <Title>Add new item</Title>
             <Grid>
                 <Grid item xs={12} sm={8} md={4} lg={3} xl={1}>
-                    <Autocomplete options={props.allNames}
+                    <Autocomplete options={props.allNames(dbProvider.userId)}
                         label='Name'
                         value={props.name}
                         setValue={props.setName}
                         groupBy={groupingFunction}
-                        renderInput={renderInput}
-                        ref={focusRef}
                     />
                 </Grid>
                 <Grid item xs={12} sm={8} md={4} lg={3} xl={1}>

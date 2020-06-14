@@ -24,6 +24,8 @@ import AccountBoxOutlinedIcon from '@material-ui/icons/AccountBoxOutlined';
 import { navigate } from "@reach/router"
 import SyncState from "./SyncState";
 import { connect } from 'react-redux'
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+import Tooltip from '@material-ui/core/Tooltip'
 
 const StyledMenu = withStyles({
   paper: {
@@ -98,16 +100,16 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 function getHintFromState(state) {
-  if(state === 'ok'){
+  if (state === 'ok') {
     return 'Sync is active'
   }
-  if(state === 'disabled'){
+  if (state === 'disabled') {
     return 'Sync is disabled'
   }
-  if(state === 'error'){
+  if (state === 'error') {
     return 'There was problems with syncing'
   }
-  if(state === 'changed'){
+  if (state === 'changed') {
     return 'Changes were synced'
   }
 }
@@ -173,10 +175,21 @@ const NavBar = (props) => {
 
         )}
         {isAuthenticated && <Fragment>
-          <SyncState state={props.state} hint={props.hint} />
-          <IconButton color="inherit" onClick={handleClick}>
-            <Avatar alt={user.name} src={user.picture} />
-          </IconButton>
+          <span className={classes.toolbar}>
+            <SyncState state={props.state} hint={props.hint} />
+          </span>
+          <Tooltip title={user.name}>
+            <Button
+              onClick={handleClick}
+              color="secondary"
+              variant="contained"
+              startIcon={
+                <Avatar alt={user.name} src={user.picture} />
+              }
+              endIcon={<MoreVertIcon />}
+            >
+            </Button>
+          </Tooltip>
           <StyledMenu
             id="user-menu"
             anchorEl={anchorEl}

@@ -9,12 +9,14 @@ function Autocomplete(props) {
   return (
     <LabAutocomplete
       freeSolo
+      autoFocus
       inputValue={props.value}
       onInputChange={(event, newValue) => {
         props.setValue(newValue);
       }}
       options={props.options}
       getOptionLabel={(option) => option?.name ?? ''}
+      groupBy={props.groupBy}
       renderInput={(params) => (
         <TextField {...params} label={props.label} margin="normal" />
       )}
@@ -40,7 +42,8 @@ Autocomplete.propTypes = {
   options : PropTypes.array,
   label : PropTypes.string,
   value : PropTypes.string,
-  setValue : PropTypes.func.isRequired
+  setValue : PropTypes.func.isRequired,
+  groupBy: PropTypes.func
 }
 
 export default Autocomplete;

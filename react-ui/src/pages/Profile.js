@@ -14,7 +14,7 @@ const Profile = () => {
       <img src={user.picture} alt="Profile" />
       <h2>{user.name}</h2>
       <p>{user.email}</p>
-      <span>Below is all intel about you we have access to. We care only about your email to distinguish you from billions of others.</span>
+      <p>Below is all the intel about you we have access to. We care only about your email to distinguish you from other people.</p>
       <code>{JSON.stringify(user, null, 2)}</code>
     </Fragment>
   );
