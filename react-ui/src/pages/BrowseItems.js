@@ -71,7 +71,7 @@ const useStyles = makeStyles((theme) => ({
         '& tbody>.MuiTableRow-root:hover': {
             background: theme.palette.action.hover
         }
-    }
+    },
 }))
 
 function normalize(collection, state) {
@@ -92,13 +92,14 @@ const mapDispatchToProps = (dispatch) => ({
 })
 
 function BrowseItems(props) {
-    const classes = useStyles()
     const theme = useTheme()
+    const mobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const classes = useStyles({ isMobile: mobile })
     const [mainFilterValue, setMainFilterValue] = useState(itemTypes.ITEM_ACTIVE)
 
     const filteredData = props.data.filter((item) => mainFilterValue === 'none' || item.state === mainFilterValue)
 
-    const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
     syncMonkey.reset()
 
     let actions = []
@@ -107,7 +108,7 @@ function BrowseItems(props) {
             actions: ''
         }
     }
-    if (!fullScreen) {
+    if (!mobile) {
         actions = [
             {
                 icon: tableIcons.Delete,
@@ -181,6 +182,9 @@ function BrowseItems(props) {
         setConfirmDialogOpen(false)
     }
 
+    const cellStyle = { padding: mobile ? theme.spacing(0.5) : theme.spacing(1)}
+    const autoCellStyle = Object.assign({}, cellStyle, {width: 50})
+
     return (
         <Grid container direction='column'>
             <Grid item>
@@ -205,13 +209,17 @@ function BrowseItems(props) {
                     descript="Please confirm action. You can restore item at any time using 'deleted' filter option."
                     open={confirmDialogOpen} onClose={handleConfirmDialogClose} />
                 <MaterialTable
-                    options={{ paging: false, filtering: false }}
+                    options={{
+                        paging: false,
+                        filtering: false,
+                        headerStyle: autoCellStyle
+                    }}
                     actions={actions}
                     columns={[
-                        { title: 'Name', field: 'name' },
-                        { title: 'Quantity', field: 'quantity' },
-                        { title: 'Unit', field: 'unit' },
-                        { title: 'Expiration date', field: 'date' }
+                        { title: 'Name', field: 'name', cellStyle },
+                        { title: mobile ? 'Qt.' : "Quantity", field: 'quantity', cellStyle : autoCellStyle },
+                        { title: 'Unit', field: 'unit', cellStyle : autoCellStyle },
+                        { title: mobile ? 'Exp.' : "Expiration date", field: 'date', cellStyle }
                     ]}
                     localization={actionloc}
                     data={filteredData}
@@ -243,7 +251,6 @@ function BrowseItems(props) {
                 />
             </Grid>
         </Grid>
-
     )
 }
 

@@ -26,7 +26,13 @@ const useStyles = makeStyles((theme) => ({
   },
   quater: {
     width: '25%'
-  }
+  },
+  nopadding: props => ({
+    padding: props.mobile ? 0 : theme.spacing(1)
+  }),
+  verysmallpadding: props =>({
+    padding: props.mobile ? theme.spacing(0.5) : theme.spacing(1)
+  })
 }))
 
 
@@ -64,7 +70,7 @@ function ActionsWithDialogs(props) {
   }
 
   return (
-    <TableCell padding="checkbox">
+    <TableCell className={props.classes.nopadding}>
       {actions}
       <DealtWithDialog item={props.item} open={open} setResult={handleClose}></DealtWithDialog>
     </TableCell>
@@ -72,21 +78,20 @@ function ActionsWithDialogs(props) {
 }
 
 function ExpireSoonList(props) {
-  const classes = useStyles();
-
   const theme = useTheme()
   const mobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const classes = useStyles({mobile});
 
   let header
   if (props.showHeader) {
     header = (
       <TableHead>
         <TableRow>
-          <TableCell padding="checkbox" ></TableCell>
-          <TableCell className={classes.half}>Name</TableCell>
-          <TableCell className={classes.quater} align="right">{mobile ? "Qt." : "Quantity"}</TableCell>
-          <TableCell className={classes.quater}>Unit</TableCell>
-          <TableCell className={classes.quater} align="right">{mobile ? "Exp." : "Expiration"}</TableCell>
+          <TableCell className={classes.nopadding}></TableCell>
+          <TableCell className={clsx(classes.half, classes.verysmallpadding)}>Name</TableCell>
+          <TableCell className={clsx(classes.quater, classes.verysmallpadding)} align="right">{mobile ? "Qt." : "Quantity"}</TableCell>
+          <TableCell className={clsx(classes.quater, classes.verysmallpadding)}>Unit</TableCell>
+          <TableCell className={clsx(classes.quater, classes.verysmallpadding)} align="right">{mobile ? "Exp." : "Expiration"}</TableCell>
         </TableRow>
       </TableHead>
     )
@@ -100,11 +105,11 @@ function ExpireSoonList(props) {
         <TableBody>
           {props.items.map((item) => (
             <TableRow hover key={item.id} className={clsx(item.state === itemTypes.ITEM_DONE && classes.striked)}>
-              <ActionsWithDialogs item={item} handleRemove={props.handleRemove} handleUndo={props.handleUndo}></ActionsWithDialogs>
-              <TableCell className={classes.half}>{item.name}</TableCell>
-              <TableCell className={classes.quater} align="right">{item.quantity}</TableCell>
-              <TableCell className={classes.quater} align="left">{item.unit}</TableCell>
-              <TableCell className={classes.quater} align="right">{item.datedescript}</TableCell>
+              <ActionsWithDialogs item={item} handleRemove={props.handleRemove} handleUndo={props.handleUndo} classes={classes}></ActionsWithDialogs>
+              <TableCell className={clsx(classes.half, classes.verysmallpadding)}>{item.name}</TableCell>
+              <TableCell className={clsx(classes.quater, classes.verysmallpadding)} align="right">{item.quantity}</TableCell>
+              <TableCell className={clsx(classes.quater, classes.verysmallpadding)} align="left">{item.unit}</TableCell>
+              <TableCell className={clsx(classes.quater, classes.verysmallpadding)} align="right">{item.datedescript}</TableCell>
             </TableRow>
           ))}
         </TableBody>
