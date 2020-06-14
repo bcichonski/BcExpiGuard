@@ -19,6 +19,7 @@ import NavBar from '../components/NavBar'
 import { drawerWidth } from '../constants/constants'
 import MuiAlert from '@material-ui/lab/Alert';
 import Snackbar from '@material-ui/core/Snackbar';
+import { navigate } from "@reach/router"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -83,7 +84,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
   ...ownProps,
-  handleAddNew: () => dispatch(itemEditActions.itemInCreation)
+  handeAddNewInternal: () => dispatch(itemEditActions.itemInCreation)
 })
 
 function Alert(props) {
@@ -106,6 +107,21 @@ function Layout(props) {
     setAlertOpen(false);
   }
 
+  const listProps = Object.assign({}, props, {
+    linkTo: (link) => {
+      navigate(link)
+      if (props.isMobile) {
+        handleDrawerClose()
+      }
+    },
+    handleAddNew: () => {
+      props.handeAddNewInternal()
+      if (props.isMobile) {
+        handleDrawerClose()
+      }
+    }
+  })
+
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -123,9 +139,9 @@ function Layout(props) {
           </IconButton>
         </div>
         <Divider />
-        <List className={classes.appBarNav}>{appBarItemsPrimary(classes, props)}</List>
+        <List className={classes.appBarNav}>{appBarItemsPrimary(classes, listProps)}</List>
         <Divider />
-        <List className={classes.appBarNav}>{appBarItemsSecondary(classes, props)}</List>
+        <List className={classes.appBarNav}>{appBarItemsSecondary(classes, listProps)}</List>
       </Drawer>
       <main className={classes.content}>
         <div className={classes.alertSpacer} >

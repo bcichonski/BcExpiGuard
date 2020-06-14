@@ -5,27 +5,24 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import AddIcon from '@material-ui/icons/Add';
-import { Link } from '@reach/router'
 import ListAltOutlinedIcon from '@material-ui/icons/ListAltOutlined';
 
-export const appBarItemsPrimary = (classes) => (
+export const appBarItemsPrimary = (classes, props) => (
   <div>
-    <Link to='/' className={classes.menuBtn}>
-      <ListItem button>
-        <ListItemIcon>
-          <DashboardIcon />
-        </ListItemIcon>
-        <ListItemText primary="Home" />
-      </ListItem>
-    </Link>
-    <Link to='/items' className={classes.menuBtn}>
-      <ListItem button>
-        <ListItemIcon>
-          <ListAltOutlinedIcon />
-        </ListItemIcon>
-        <ListItemText primary="Browse" />
-      </ListItem>
-    </Link>
+    <ListItem button onClick={() => props.linkTo('/')} className={classes.menuBtn}>
+      <ListItemIcon>
+        <DashboardIcon />
+      </ListItemIcon>
+      <ListItemText primary="Home" />
+    </ListItem>
+
+    <ListItem button onClick={() => props.linkTo('/items')} className={classes.menuBtn}>
+      <ListItemIcon>
+        <ListAltOutlinedIcon />
+      </ListItemIcon>
+      <ListItemText primary="Browse" />
+    </ListItem>
+
   </div>
 );
 
