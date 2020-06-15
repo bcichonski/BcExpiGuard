@@ -42,7 +42,8 @@ Datepicker.propTypes = {
     label: PropTypes.string,
     helperText: PropTypes.string,
     setDate: PropTypes.func,
-    selectedDate: PropTypes.string
+    selectedDate: PropTypes.string,
+    error: PropTypes.bool
 }
 
 Datepicker.defaultProps = {

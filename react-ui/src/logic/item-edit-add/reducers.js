@@ -1,16 +1,18 @@
 import types from './types'
 import { navigate } from "@reach/router"
 
-const itemsAddEditReducer = (state = { state: types.ITEM_DIALOG_INACTIVE }, action) => {
+const itemsAddEditReducer = (state = { state: types.ITEM_DIALOG_INACTIVE, nameError: true }, action) => {
     let newState = {}
     switch (action.type) {
         case types.ITEM_NAME_CHANGED:
             newState = {
-                name: action.name
+                name: action.name,
+                nameError: false
             }
             break;
         case types.ITEM_EXPIRATION_DATE_CHANGED:
             newState = {
+                dateError: action.error,
                 date: action.date
             }
             break;
@@ -37,7 +39,8 @@ const itemsAddEditReducer = (state = { state: types.ITEM_DIALOG_INACTIVE }, acti
                 name: '',
                 date: null,
                 unit: '',
-                quantity: ''
+                quantity: '',
+                nameError: true
             }
             navigate('/item/add')
             break;
@@ -47,6 +50,11 @@ const itemsAddEditReducer = (state = { state: types.ITEM_DIALOG_INACTIVE }, acti
                 state: types.ITEM_DIALOG_INACTIVE
             }
             navigate('/')
+            break;
+        case types.ITEM_NAME_ERROR:
+            newState = {
+                nameError: true
+            }
             break;
         default:
             return state

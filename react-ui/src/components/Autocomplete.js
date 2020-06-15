@@ -9,7 +9,7 @@ function Autocomplete(props) {
   return (
     <LabAutocomplete
       freeSolo
-      autoFocus
+      autoFocus={props.autoFocus}
       inputValue={props.value}
       onInputChange={(event, newValue) => {
         props.setValue(newValue);
@@ -18,7 +18,7 @@ function Autocomplete(props) {
       getOptionLabel={(option) => option?.name ?? ''}
       groupBy={props.groupBy}
       renderInput={(params) => (
-        <TextField {...params} label={props.label} margin="normal" />
+        <TextField {...params} label={props.label} margin="normal" helperText={props.helperText} />
       )}
       renderOption={(option, { inputValue }) => {
         const matches = match(option.name, inputValue);
@@ -43,7 +43,13 @@ Autocomplete.propTypes = {
   label : PropTypes.string,
   value : PropTypes.string,
   setValue : PropTypes.func.isRequired,
-  groupBy: PropTypes.func
+  groupBy: PropTypes.func,
+  error : PropTypes.bool,
+  autoFocus: PropTypes.bool
+}
+
+Autocomplete.defaultProps = {
+  autoFocus: false
 }
 
 export default Autocomplete;

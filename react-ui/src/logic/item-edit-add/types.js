@@ -7,6 +7,7 @@ const ITEM_DIALOG_INACTIVE = 'item/dialog/inactive'
 const ITEM_DIALOG_EDIT = 'item/dialog/edit'
 const ITEM_DIALOG_ADD = 'item/dialog/add'
 const ITEM_DIALOG_OK = 'item/dialog/ok'
+const ITEM_NAME_ERROR = 'item/name/error'
 
 export default {
     ITEM_NAME_CHANGED,
@@ -17,5 +18,6 @@ export default {
     ITEM_DIALOG_INACTIVE,
     ITEM_DIALOG_EDIT,
     ITEM_DIALOG_ADD,
-    ITEM_DIALOG_OK
+    ITEM_DIALOG_OK,
+    ITEM_NAME_ERROR
 }

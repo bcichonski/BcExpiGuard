@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React from 'react';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
@@ -42,18 +42,20 @@ const mapStateToProps = (state /*, ownProps*/) => ({
     date: state.itemEditReducer.date,
     quantity: state.itemEditReducer.quantity,
     unit: state.unit,
+    dateError: state.itemEditReducer.dateError,
+    nameError: state.itemEditReducer.nameError,
     allNames: (userId) => state.itemNameReducer
         .filter(n => !!n.id && !!n.userId && !!n.name && n.name.length > 0)
         .map(n => ({ name: n.name, userId: n.userId }))
         .sort((a, b) => {
-            if(a.userId === userId && b.userId !== userId){
-                return 1
-            } else if(a.userId !== userId && b.userId === userId){
+            if (a.userId === userId && b.userId !== userId) {
                 return -1
+            } else if (a.userId !== userId && b.userId === userId) {
+                return 1
             } else {
-                return a.name.localeCompare(b.name)}
+                return a.name.localeCompare(b.name)
             }
-        )
+        })
 })
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
@@ -65,6 +67,25 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
     handleAddItemClick: () => dispatch(itemEditActions.itemToSave())
 })
 
+const units = [
+    { name: 'metre', group: 'length' },
+    { name: 'centimetre', group: 'length' },
+    { name: 'gram', group: 'weight' },
+    { name: 'kilogram', group: 'weight' },
+    { name: 'litre', group: 'capacity' },
+    { name: 'millilitre', group: 'capacity'},
+    { name: 'item', group: 'unit'},
+    { name: 'pack', group: 'unit'},
+    { name: 'unit', group: 'unit'},
+].sort((a,b) => {
+    const unitCmp = a.group.localeCompare(b.group);
+    if(unitCmp === 0) {
+        return a.name.localeCompare(b.name)
+    } else {
+        return unitCmp
+    }
+})
+
 function AddItem(props) {
     const theme = useTheme()
     const mobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -73,10 +94,12 @@ function AddItem(props) {
 
     syncMonkey.reset()
 
-    const groupingFunction = (el) => {
+    const namesGroupingFunction = (el) => {
         return (el.userId === dbProvider.userId) ? 'Your items' : 'Suggestions'
     }
 
+    const unitsGroupingFunction = (el) => el.group
+    const anError = !!(props.dateError || props.nameError)
     return (
         <Paper className={classes.paper}>
             <Title>Add new item</Title>
@@ -86,7 +109,10 @@ function AddItem(props) {
                         label='Name'
                         value={props.name}
                         setValue={props.setName}
-                        groupBy={groupingFunction}
+                        groupBy={namesGroupingFunction}
+                        error={props.nameError}
+                        helperText={props.nameError ? 'You cannot add an item without a name' : ''}
+                        autoFocus
                     />
                 </Grid>
                 <Grid item xs={12} sm={8} md={4} lg={3} xl={1}>
@@ -97,6 +123,8 @@ function AddItem(props) {
                             }}
                             isMobile={mobile}
                             selectedDate={props.date}
+                            error={props.dateError}
+                            helperText={props.dateError ? 'If you provide a date, pick a valid one' : ''}
                         /></span>
                 </Grid>
                 <Grid item xs={12} sm={8} md={4} lg={3} xl={1}>
@@ -113,10 +141,11 @@ function AddItem(props) {
                             />
                         </Grid>
                         <Grid item xs={6}>
-                            <Autocomplete options={[{ name: 'l' }, { name: 'kg' }]}
+                            <Autocomplete options={units}
                                 label="Unit"
                                 value={props.unit}
                                 className={classes.spacingLeft}
+                                groupBy={unitsGroupingFunction}
                                 setValue={props.setUnit} />
                         </Grid>
                     </Grid>
@@ -128,7 +157,8 @@ function AddItem(props) {
                             onClick={props.handleCancelClick}>Cancel</Button>
                         <Button variant='contained'
                             className={spacingTopLeft}
-                            onClick={props.handleAddItemClick} color="primary">Add new item</Button>
+                            disabled={anError}
+                            onClick={props.handleAddItemClick} color={(anError ? undefined : "primary")}>Add new item</Button>
                     </Grid>
                 </Grid>
             </Grid>
