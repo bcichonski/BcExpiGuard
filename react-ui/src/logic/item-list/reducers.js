@@ -8,7 +8,9 @@ const emptyItem = {
     quantity: '',
     previousQuantity: '',
     unit: '',
-    state: ''
+    state: '',
+    creation_timestamp:'',
+    changed_timestamp:''
 }
 
 const itemsReducer = (state = [], action) => {
@@ -22,7 +24,8 @@ const itemsReducer = (state = [], action) => {
                     date: action.data.date,
                     quantity: action.data.quantity,
                     unit: action.data.unit,
-                    state: types.ITEM_ACTIVE
+                    state: types.ITEM_ACTIVE,
+                    creation_timestamp: action.creation_timestamp
                 }
             ]
         case types.ITEM_CHANGED:

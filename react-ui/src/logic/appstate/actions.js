@@ -18,7 +18,7 @@ const syncChanges = (key) => async (dispatch) => {
     switch (key) {
         case 'items':
             const dbItems = await items.getAll()
-            const dbItemPreloadedNames = dbItems.map(it => it.nameId)
+            const dbItemPreloadedNames = dbItems.map(it => it.nameID)
             dispatch(itemNameActions.preloadNames(dbItemPreloadedNames))
             dispatch(itemActions.refresh(dbItems))
             break;

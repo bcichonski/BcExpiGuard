@@ -34,7 +34,8 @@ export function refresh(item, refreshItem) {
     return newItem
 }
 
-export function refreshState(state = [], emptyItem = {}, payload = {}) {
+export function refreshState(state = [], emptyItem = {}, payloadArg = {}) {
+    const payload = [...payloadArg]
     const newState = state.map(element => {
         const newItemIndex = payload.findIndex(it => {
             if(typeof it === 'undefined'){

@@ -41,18 +41,18 @@ function onlyActive(item) {
 }
 
 function onlyExpired(today) {
-  return (item) => differenceInDays(parseISO(item.date), today) < 0 && onlyActive(item)
+  return (item) => differenceInDays(parseISO(item.date), today) < 0 && (onlyActive(item) || (onlyNotRemoved(item) && changedToday(item, today)))
 }
 
 function changedToday(item, today) {
-  const diff = differenceInHours(parseISO(item.date), today)
+  const diff = differenceInHours(parseISO(item.changed_timestamp), today)
   return diff >= 0 && diff < 24
 }
 
 function onlyExpiresWithinDays(today, from, to) {
   return (item) => {
     const diff = differenceInDays(parseISO(item.date), today)
-    return diff >= from && diff < to && (onlyActive(item) || (onlyNotRemoved(item) && changedToday(item)))
+    return diff >= from && diff < to && (onlyActive(item) || (onlyNotRemoved(item) && changedToday(item, today)))
   }
 }
 

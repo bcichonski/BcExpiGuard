@@ -27,7 +27,7 @@ function Datepicker(props) {
     } else {
         return (
             <KeyboardDatePicker
-                autook={true}
+                autoOk={true}
                 variant="inline"
                 label={props.label}
                 value={props.selectedDate ?? null}
