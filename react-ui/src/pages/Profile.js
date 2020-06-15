@@ -15,7 +15,7 @@ const Profile = () => {
       <h2>{user.name}</h2>
       <p>{user.email}</p>
       <p>Below is all the intel about you we have access to. We care only about your email to distinguish you from other people.</p>
-      <code>{JSON.stringify(user, null, 2)}</code>
+      <code><pre>{JSON.stringify(user, null, 2)}</pre></code>
     </Fragment>
   );
 };
