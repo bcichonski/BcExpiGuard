@@ -19,24 +19,27 @@ const itemUnitChanged = (newUnit) => ({
     unit: newUnit
 })
 
+const dateError = ({
+    type: types.ITEM_EXPIRATION_DATE_CHANGED,
+    error: true
+})
+
 const itemExpirationDateChanged = (newDate) => {
     try {
-        if(newDate === null) {
+        /*if(newDate === null) {
             return {
                 type: types.ITEM_EXPIRATION_DATE_CHANGED,
                 date: ''
             }
-        }
+        }*/
         const dateFormatted = format(newDate, 'yyyy-MM-dd')
         return {
             type: types.ITEM_EXPIRATION_DATE_CHANGED,
-            date: dateFormatted
+            date: dateFormatted,
+            error: false
         }
     } catch {
-        return {
-            type: types.ITEM_EXPIRATION_DATE_CHANGED,
-            error: true
-        }
+        return dateError
     }
 }
 
@@ -61,14 +64,25 @@ const itemNameError = ({
 const itemToSave = () => (dispatch, getState) => {
     const state = getState()
     const name = state.itemEditReducer.name
+    const date = state.itemEditReducer.date
 
-    if(typeof name !== 'string' || name.length===0) {
+    let wasError = false
+    if (typeof name !== 'string' || name.length === 0) {
         dispatch(itemNameError)
-        return
+        wasError = true
+    }
+
+    if (typeof date !== 'string' || date.length === 0) {
+        dispatch(dateError)
+        wasError = true
+    }
+
+    if (wasError) {
+        return 
     }
 
     let itemData = {
-        date: state.itemEditReducer.date,
+        date,
         quantity: state.itemEditReducer.quantity,
         unit: state.itemEditReducer.unit,
     }

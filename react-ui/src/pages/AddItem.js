@@ -124,7 +124,7 @@ function AddItem(props) {
                             isMobile={mobile}
                             selectedDate={props.date}
                             error={props.dateError}
-                            helperText={props.dateError ? 'If you provide a date, pick a valid one' : ''}
+                            helperText={props.dateError ? 'Pick a valid date' : ''}
                         /></span>
                 </Grid>
                 <Grid item xs={12} sm={8} md={4} lg={3} xl={1}>
