@@ -112,7 +112,7 @@ function undoItemChangesInternal(item) {
     const newItem = Object.assign({}, item);
 
     newItem.quantity = item.previousQuantity
-    delete newItem.previousQuantity
+    newItem.previousQuantity = ''
     newItem.state = types.ITEM_ACTIVE
     newItem.changed_timestamp = new Date()
 

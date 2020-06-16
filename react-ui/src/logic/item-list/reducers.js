@@ -40,13 +40,12 @@ const itemsReducer = (state = [], action) => {
 
             return [
                 ...otherItems2,
-                action.payload.newItem
+                refresh(emptyItem, action.payload.newItem)
             ]
         case types.ITEM_REMOVED:
             const item3 = state.find(i => i.id === action.payload.id)
             const otherItems3 = state.filter(i => i.id !== action.payload.id)
-            const changedItem3 = Object.assign({}, item3)
-            changedItem3.state = types.ITEM_REMOVED
+            const changedItem3 = refresh(item3, {state: types.ITEM_REMOVED})
             return [
                 ...otherItems3,
                 changedItem3
