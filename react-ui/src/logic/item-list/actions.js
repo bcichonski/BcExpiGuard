@@ -40,6 +40,23 @@ const addItem = (itemData) => async (dispatch) => {
     await items.add(itemData)
 }
 
+const updateItem = (itemData) => async (dispatch) => {
+    if (!itemData.state) {
+        itemData.state = types.ITEM_ACTIVE
+    }
+
+    if (!itemData.changed_timestamp) {
+        itemData.changed_timestamp = nowISO()
+    }
+
+    dispatch({
+        type: types.ITEM_CHANGED,
+        payload: itemData
+    })
+
+    await items.update(itemData.id, itemData)
+}
+
 const addDummyItem = () => {
     return addItem(
         createData('8dff16a4-d502-4849-a50a-4c2ec38e732c', itemFirstToDo, '', '', daysFromNow(0))
@@ -99,7 +116,7 @@ const updateItemQuantity = (item, newQuantity) => async (dispatch) => {
         payload: { id: item.id, newItem }
     })
 
-    if (item.state !== newItem.quantity) {
+    if (item.state !== newItem.state) {
         await items.changeState(item.id, newItem.state)
     }
 
@@ -163,5 +180,6 @@ export default {
     removeItem,
     addDummyItem,
     load,
-    refresh
+    refresh,
+    updateItem
 }

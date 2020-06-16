@@ -31,6 +31,7 @@ import Menu from '@material-ui/core/Menu';
 import DealtWithDialog from '../components/DealtWithDialog'
 import { itemActions } from '../logic/item-list'
 import syncMonkey from '../common/syncMonkey'
+import { itemEditActions } from '../logic/item-edit-add';
 
 const tableIcons = {
     Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -88,7 +89,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => ({
     handleDialogDone: (item, value) => dispatch(itemActions.updateItemQuantity(item, value)),
-    handleItemRemoval: (id) => dispatch(itemActions.removeItem(id))
+    handleItemRemoval: (id) => dispatch(itemActions.removeItem(id)),
+    handleItemEdit: (item) => dispatch(itemEditActions.itemInEdit(item))
 })
 
 function BrowseItems(props) {
@@ -96,9 +98,8 @@ function BrowseItems(props) {
     const mobile = useMediaQuery(theme.breakpoints.down('sm'));
     const classes = useStyles({ isMobile: mobile })
     const [mainFilterValue, setMainFilterValue] = useState(itemTypes.ITEM_ACTIVE)
-
+    const [menuRowData, setMenuRowData] = React.useState(null);
     const filteredData = props.data.filter((item) => mainFilterValue === 'none' || item.state === mainFilterValue)
-
 
     syncMonkey.reset()
 
@@ -115,14 +116,15 @@ function BrowseItems(props) {
                 tooltip: 'Delete',
                 onClick: (event, rowData) => {
                     setMenuRowData(rowData)
-                    handleSelected('delete')
+                    handleSelected('delete', rowData)
                 }
             },
             {
                 icon: tableIcons.Edit,
                 tooltip: 'Edit',
                 onClick: (event, rowData) => {
-                    // Do save operation
+                    setMenuRowData(rowData)
+                    handleSelected('edit', rowData)
                 }
             },
             {
@@ -130,7 +132,7 @@ function BrowseItems(props) {
                 tooltip: 'Dealt with',
                 onClick: (event, rowData) => {
                     setMenuRowData(rowData)
-                    handleSelected('done')
+                    handleSelected('done', rowData)
                 }
             },
         ]
@@ -150,18 +152,21 @@ function BrowseItems(props) {
 
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [dialogOpen, setDialogOpen] = React.useState(false);
-    const [menuRowData, setMenuRowData] = React.useState(null);
     const [confirmDialogOpen, setConfirmDialogOpen] = React.useState(false);
-
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
 
-    const handleSelected = (action) => {
+    const handleSelected = (action, rowData) => {
+        if(!rowData) {
+            rowData = menuRowData
+        }
         if (action === 'delete') {
             setConfirmDialogOpen(true)
         } else if (action === 'done') {
             setDialogOpen(true)
+        } else if (action === 'edit') {
+            props.handleItemEdit(rowData)
         }
         setAnchorEl(null);
     }
@@ -182,8 +187,8 @@ function BrowseItems(props) {
         setConfirmDialogOpen(false)
     }
 
-    const cellStyle = { padding: mobile ? theme.spacing(0.5) : theme.spacing(1)}
-    const autoCellStyle = Object.assign({}, cellStyle, {width: 50})
+    const cellStyle = { padding: mobile ? theme.spacing(0.5) : theme.spacing(1) }
+    const autoCellStyle = Object.assign({}, cellStyle, { width: 50 })
 
     return (
         <Grid container direction='column'>
@@ -217,8 +222,8 @@ function BrowseItems(props) {
                     actions={actions}
                     columns={[
                         { title: 'Name', field: 'name', cellStyle },
-                        { title: mobile ? 'Qt.' : "Quantity", field: 'quantity', cellStyle : autoCellStyle },
-                        { title: 'Unit', field: 'unit', cellStyle : autoCellStyle },
+                        { title: mobile ? 'Qt.' : "Quantity", field: 'quantity', cellStyle: autoCellStyle },
+                        { title: 'Unit', field: 'unit', cellStyle: autoCellStyle },
                         { title: mobile ? 'Exp.' : "Expiration date", field: 'date', cellStyle }
                     ]}
                     localization={actionloc}
@@ -237,7 +242,7 @@ function BrowseItems(props) {
                                         onChange={(event) => setMainFilterValue(event.target.value)}
                                     >
                                         <MenuItem value={itemTypes.ITEM_ACTIVE}>Active</MenuItem>
-                                        <MenuItem value={itemTypes.ITEM_DONE}>Expired</MenuItem>
+                                        <MenuItem value={itemTypes.ITEM_DONE}>Done</MenuItem>
                                         <MenuItem value={itemTypes.ITEM_REMOVED}>Deleted</MenuItem>
                                         <MenuItem value='none'>None</MenuItem>
                                     </Select>

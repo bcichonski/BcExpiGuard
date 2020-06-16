@@ -13,6 +13,7 @@ function RouterSwitch(props) {
         <Router history={props.history}>
             <Restricted component={MainContent} path='/' />
             <Restricted component={AddItem} path='/item/add' />
+            <Restricted component={AddItem} path='/item/edit' />
             <Restricted component={BrowseItems} path='/items' />
             <Restricted path='/profile' component={Profile}>
             </Restricted>

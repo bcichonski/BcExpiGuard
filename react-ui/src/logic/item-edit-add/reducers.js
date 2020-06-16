@@ -31,11 +31,23 @@ const itemsAddEditReducer = (state = {
                 quantity: action.quantity
             }
             break;
-        case types.ITEM_IN_EDIT_MODE:
+        case types.ITEM_STATE_CHANGED:
             newState = {
-                state: types.ITEM_DIALOG_EDIT,
-                name: action.name,
-                date: action.date
+                itemState: action.payload
+            }
+            break;
+        case types.ITEM_IN_EDIT_MODE:
+            const item = action.payload
+            if (item) {
+                newState = {
+                    state: types.ITEM_DIALOG_EDIT,
+                    itemState: action.payload.state,
+                    id: action.payload.id,
+                    name: action.payload.name,
+                    date: action.payload.date,
+                    unit: action.payload.unit,
+                    quantity: action.payload.quantity,
+                }
             }
             break;
         case types.ITEM_DIALOG_ADD:
@@ -54,7 +66,12 @@ const itemsAddEditReducer = (state = {
             newState = {
                 state: types.ITEM_DIALOG_INACTIVE
             }
-            navigate('/')
+            if(state.state === types.ITEM_DIALOG_EDIT) {
+                navigate('/')
+            } else {
+                navigate('/items')
+            }
+            
             break;
         case types.ITEM_NAME_ERROR:
             newState = {

@@ -29,7 +29,7 @@ const changeState = async (id, newstate) => {
     }
 
     await dbprovider.local.items.upsert(id, stateDeltaFunction)
-    
+
     if (dbprovider?.remote?.items?.remote_table) {
         await dbprovider.remote.items.remote_table.upsert(id, stateDeltaFunction)
     }
@@ -38,9 +38,51 @@ const changeState = async (id, newstate) => {
 
 const changeQuantity = async (id, quantity) => {
     const stateDeltaFunction = (doc) => {
-        doc.previous_quantity = doc.quantity
-        doc.quantity = quantity
-        doc.changed_timestamp = nowISO()
+        if (doc.quantity !== quantity) {
+            doc.previous_quantity = doc.quantity
+            doc.quantity = quantity
+            doc.changed_timestamp = nowISO()
+        }
+        
+        return doc
+    }
+
+    await dbprovider.local.items.upsert(id, stateDeltaFunction)
+    if (dbprovider?.remote?.items?.remote_table) {
+        await dbprovider.remote.items.remote_table.upsert(id, stateDeltaFunction)
+    }
+    syncMonkey.reset()
+}
+
+const update = async (id, item) => {
+    const stateDeltaFunction = (doc) => {
+        let change = false;
+
+        if (doc.state !== item.state) {
+            doc.state = item.state
+            change = true
+        }
+
+        if (doc.name !== item.name) {
+            doc.name = item.name
+            change = true
+        }
+
+        if (doc.date !== item.date) {
+            doc.date = item.date
+            change = true
+        }
+
+        if (doc.quantity !== item.quantity) {
+            doc.previous_quantity = item.previous_quantity
+            doc.quantity = item.quantity
+            change = true
+        }
+
+        if(change) {
+            doc.changed_timestamp = item.changed_timestamp ?? nowISO()
+        }
+        
         return doc
     }
 
@@ -56,4 +98,10 @@ const getAll = async () => {
     return transfromFromPouch(all)
 }
 
-export default { add, getAll, changeState, changeQuantity }
+export default { 
+    add, 
+    getAll, 
+    changeState, 
+    changeQuantity, 
+    update 
+}
