@@ -4,6 +4,7 @@ import { DATE_FORMAT } from '../../constants/constants'
 import defaultCategory from '../categories/reducers'
 import { itemFirstToDo } from '../item-names/actions'
 import { items } from '../../persistence'
+import { nowISO } from '../../common/utils'
 
 function createData(id, nameItem, quantity, unit, date, state = types.ITEM_ACTIVE) {
     return {
@@ -14,7 +15,7 @@ function createData(id, nameItem, quantity, unit, date, state = types.ITEM_ACTIV
         unit,
         date,
         state,
-        creation_timestamp: new Date()
+        creation_timestamp: nowISO()
     };
 }
 
@@ -28,7 +29,7 @@ const addItem = (itemData) => async (dispatch) => {
     }
 
     if (!itemData.creation_timestamp) {
-        itemData.creation_timestamp = new Date()
+        itemData.creation_timestamp = nowISO()
     }
 
     dispatch({
@@ -56,7 +57,7 @@ function changeItem(item, value) {
 
     if (!item.quantity || typeof item.quantity !== 'string' ||isNaN(item.quantity)) {
         newItem.state = types.ITEM_DONE
-        newItem.changed_timestamp = new Date()
+        newItem.changed_timestamp = nowISO()
         return newItem
     }
 
@@ -78,7 +79,7 @@ function changeItem(item, value) {
             } else {
                 newItem.state = types.ITEM_CHANGED
             }
-            newItem.changed_timestamp = new Date()
+            newItem.changed_timestamp = nowISO()
             return newItem
         }
     }
@@ -86,7 +87,7 @@ function changeItem(item, value) {
     newItem.previousQuantity = item.quantity
     newItem.quantity = value
     newItem.state = (value === '' ? types.ITEM_DONE : types.ITEM_CHANGED)
-    newItem.changed_timestamp = new Date()
+    newItem.changed_timestamp = nowISO()
     return newItem
 }
 
@@ -114,7 +115,7 @@ function undoItemChangesInternal(item) {
     newItem.quantity = item.previousQuantity
     newItem.previousQuantity = ''
     newItem.state = types.ITEM_ACTIVE
-    newItem.changed_timestamp = new Date()
+    newItem.changed_timestamp = nowISO()
 
     return newItem
 }

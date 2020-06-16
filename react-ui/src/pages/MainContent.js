@@ -41,7 +41,7 @@ function onlyActive(item) {
 }
 
 function onlyExpired(today) {
-  return (item) => differenceInDays(parseISO(item.date), today) < 0 && (onlyActive(item) || (onlyNotRemoved(item) && changedLastQuarter(item, today)))
+  return (item) => differenceInDays(parseISO(item.date), today) < 0 && (onlyActive(item) || changedLastQuarter(item, today))
 }
 
 function changedLastQuarter(item, today) {
@@ -52,7 +52,7 @@ function changedLastQuarter(item, today) {
 function onlyExpiresWithinDays(today, from, to) {
   return (item) => {
     const diff = differenceInDays(parseISO(item.date), today)
-    return diff >= from && diff < to && (onlyActive(item) || (onlyNotRemoved(item) && changedLastQuarter(item, today)))
+    return diff >= from && diff < to && (onlyActive(item) || changedLastQuarter(item, today))
   }
 }
 

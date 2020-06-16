@@ -1,4 +1,5 @@
 import { v5 as uuidv5, v4 as uuidv4 } from 'uuid'
+import { formatISO } from 'date-fns'
 
 export const NAMESPACES = {
     ItemName: 'fb52d0d0-929b-11ea-bb37-0242ac130002',
@@ -65,4 +66,8 @@ export function refreshState(state = [], emptyItem = {}, payloadArg = {}) {
         }
     });
     return newState
+}
+
+export function nowISO() {
+    return formatISO(new Date())
 }

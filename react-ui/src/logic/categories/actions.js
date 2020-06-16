@@ -1,10 +1,11 @@
 import types from './types'
 import { categories } from '../../persistence'
+import { nowISO } from '../../common/utils'
 
 const addCategory = (payload) => {
     return async dispatch => {
         if(!payload.creation_timestamp) {
-            payload.creation_timestamp = new Date()
+            payload.creation_timestamp = nowISO()
         }
         
         await categories.add(payload)

@@ -1,4 +1,5 @@
 import types from './types'
+import { DATE_FORMAT } from '../../constants/constants'
 import { format } from 'date-fns'
 import { itemActions } from '../item-list'
 import { itemNameActions } from '../item-names'
@@ -32,7 +33,7 @@ const itemExpirationDateChanged = (newDate) => {
                 date: ''
             }
         }*/
-        const dateFormatted = format(newDate, 'yyyy-MM-dd')
+        const dateFormatted = format(newDate, DATE_FORMAT)
         return {
             type: types.ITEM_EXPIRATION_DATE_CHANGED,
             date: dateFormatted,

@@ -1,5 +1,5 @@
 import types from './types'
-import { NAMESPACES, createUUID } from '../../common/utils'
+import { NAMESPACES, createUUID, nowISO } from '../../common/utils'
 import dbProvider, { itemNames } from '../../persistence'
 
 const addItemName = (payload) => async (dispatch) => {
@@ -14,7 +14,7 @@ const addItemName = (payload) => async (dispatch) => {
 
 const addItemNameInternal = (payload) => {
     if(!payload.creation_timestamp) {
-        payload.creation_timestamp = new Date()
+        payload.creation_timestamp = nowISO()
     }
 
     return {

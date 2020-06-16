@@ -1,6 +1,7 @@
 import { ensureDb, toPouch_id, transfromFromPouch } from './validate'
 import dbprovider from '../persistence'
 import syncMonkey from '../common/syncMonkey'
+import { nowISO } from '../common/utils'
 
 const add = async (payload) => {
     ensureDb(dbprovider, 'items')
@@ -23,7 +24,7 @@ const add = async (payload) => {
 const changeState = async (id, newstate) => {
     const stateDeltaFunction = (doc) => {
         doc.state = newstate
-        doc.changed_timestamp = new Date()
+        doc.changed_timestamp = nowISO()
         return doc
     }
 
@@ -37,8 +38,9 @@ const changeState = async (id, newstate) => {
 
 const changeQuantity = async (id, quantity) => {
     const stateDeltaFunction = (doc) => {
+        doc.previous_quantity = doc.quantity
         doc.quantity = quantity
-        doc.changed_timestamp = new Date()
+        doc.changed_timestamp = nowISO()
         return doc
     }
 
