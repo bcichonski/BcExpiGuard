@@ -53,7 +53,7 @@ export function transfromFromPouch(pouchResult) {
     let rows = pouchResult.rows ?? [ pouchResult ]
     rows = rows.map(r => r.doc ?? r)
     rows.forEach((r) => fromPouch_id(r))
-    return rows.filter(r => !r.id.startsWith('_design'))
+    return rows.filter(r => !r.id.startsWith('_design') && !!r.date && !!r.nameID)
 }
 
 export default { ensureDb, toPouch_id, fromPouch_id, transfromFromPouch }

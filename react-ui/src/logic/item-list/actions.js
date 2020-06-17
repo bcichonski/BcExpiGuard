@@ -94,7 +94,7 @@ function changeItem(item, value) {
                 newItem.quantity = '0'
                 newItem.state = types.ITEM_DONE
             } else {
-                newItem.state = types.ITEM_CHANGED
+                newItem.state = types.ITEM_ACTIVE
             }
             newItem.changed_timestamp = nowISO()
             return newItem
@@ -103,7 +103,7 @@ function changeItem(item, value) {
 
     newItem.previousQuantity = item.quantity
     newItem.quantity = value
-    newItem.state = (value === '' ? types.ITEM_DONE : types.ITEM_CHANGED)
+    newItem.state = (value === '' ? types.ITEM_DONE : types.ITEM_ACTIVE)
     newItem.changed_timestamp = nowISO()
     return newItem
 }
@@ -126,7 +126,6 @@ const updateItemQuantity = (item, newQuantity) => async (dispatch) => {
 }
 
 function undoItemChangesInternal(item) {
-    if (item.state === types.ITEM_ACTIVE) return item;
     const newItem = Object.assign({}, item);
 
     newItem.quantity = item.previousQuantity

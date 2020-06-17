@@ -9,9 +9,10 @@ import AddIcon from '@material-ui/icons/Add';
 import { itemEditActions } from '../logic/item-edit-add'
 import { itemActions, itemTypes } from '../logic/item-list'
 import { connect } from 'react-redux';
-import { parseISO, differenceInDays, differenceInMinutes, formatDistanceToNow, isPast, isToday } from 'date-fns'
+import { parseISO, differenceInDays, formatDistanceToNow, isPast, isToday } from 'date-fns'
 import Title from '../components/Title'
 import syncMonkey from '../common/syncMonkey'
+import { changedLastQuarter } from '../common/utils'
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -44,11 +45,6 @@ function onlyExpired(today) {
   return (item) => differenceInDays(parseISO(item.date), today) < 0 && (onlyActive(item) || changedLastQuarter(item, today))
 }
 
-function changedLastQuarter(item, today) {
-  const diff = differenceInMinutes(parseISO(item.changed_timestamp), today)
-  return diff >= 0 && diff < 15
-}
-
 function onlyExpiresWithinDays(today, from, to) {
   return (item) => {
     const diff = differenceInDays(parseISO(item.date), today)
@@ -59,7 +55,7 @@ function onlyExpiresWithinDays(today, from, to) {
 function normalize(collection, state) {
   return collection.map(item => ({
     ...item,
-    name : state.itemNameReducer.find(nm => nm.id === item.nameID)?.name ?? item.nameID,
+    name: state.itemNameReducer.find(nm => nm.id === item.nameID)?.name ?? item.nameID,
   }))
 }
 
@@ -81,12 +77,12 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
 
 function formatDateText(datestr) {
   const date = parseISO(datestr)
-  if(isToday(date)) {
+  if (isToday(date)) {
     return 'today'
   }
   const dateformat = formatDistanceToNow(date)
-  if(isPast(date)) {
-    return dateformat+' ago'
+  if (isPast(date)) {
+    return dateformat + ' ago'
   }
   return dateformat
 }

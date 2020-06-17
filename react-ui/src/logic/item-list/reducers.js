@@ -10,7 +10,8 @@ const emptyItem = {
     unit: '',
     state: '',
     creation_timestamp:'',
-    changed_timestamp:''
+    changed_timestamp:'',
+    _deleted: false
 }
 
 const itemsReducer = (state = [], action) => {
@@ -51,7 +52,7 @@ const itemsReducer = (state = [], action) => {
                 changedItem3
             ]
         case types.ITEM_REFRESH:
-            const refreshedState = refreshState(state, emptyItem, action.payload)
+            const refreshedState = refreshState(state, emptyItem, action.payload, true)
             return refreshedState
         case types.ITEM_LOAD:
             return action.payload.map(item => refresh(emptyItem, item));

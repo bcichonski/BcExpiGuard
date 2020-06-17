@@ -1,4 +1,4 @@
-import { ensureDb, toPouch_id, transfromFromPouch } from './validate'
+import { ensureDb, transfromFromPouch } from './validate'
 import dbprovider from '../persistence'
 import syncMonkey from '../common/syncMonkey'
 
@@ -11,10 +11,29 @@ const add = async (payload) => {
 
     payload.userId = dbprovider.userId
 
-    const pouchPayload = toPouch_id(payload)
-    await dbprovider.local.item_names.putIfNotExists(pouchPayload)
-    if(dbprovider?.remote?.item_names?.remote_table) {
-        await dbprovider.remote.item_names.remote_table.putIfNotExists(pouchPayload)
+    const namesDeltaFunction = (doc) => {
+        if (!doc.name) {
+            doc.name = payload.name
+        }
+        
+        if(!doc.userId) {
+            doc.userId = payload.userId
+        }
+
+        if (!doc._id) {
+            doc._id = payload.id
+        }
+
+        if (doc._deleted) {
+            doc._deleted = false
+        }
+
+        return doc
+    }
+
+    await dbprovider.local.item_names.upsert(payload.id, namesDeltaFunction)
+    if (dbprovider?.remote?.item_names?.remote_table) {
+        await dbprovider.remote.item_names.remote_table.upsert(payload.id, namesDeltaFunction)
     }
     syncMonkey.reset()
 }

@@ -16,6 +16,7 @@ import UndoIcon from '@material-ui/icons/Undo';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useTheme } from '@material-ui/core/styles';
 import DealtWithDialog from './DealtWithDialog'
+import { changedLastQuarter } from '../common/utils'
 
 const useStyles = makeStyles((theme) => ({
   striked: {
@@ -30,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
   nopadding: props => ({
     padding: props.mobile ? 0 : theme.spacing(1)
   }),
-  verysmallpadding: props =>({
+  verysmallpadding: props => ({
     padding: props.mobile ? theme.spacing(0.5) : theme.spacing(1)
   })
 }))
@@ -54,19 +55,19 @@ function ActionsWithDialogs(props) {
   }
 
   const actions = []
-  if (props.item.state === itemTypes.ITEM_ACTIVE) {
-    actions.push((<Tooltip key={`${props.item.id}-done`} title="dealt with" aria-label="dealt with">
-      <IconButton onClick={handleDialogOpen}>
-        <AssignmentTurnedInOutlinedIcon />
-      </IconButton>
-    </Tooltip>))
-  } else {
+  if (!!props.item.previousQuantity && changedLastQuarter(props.item, props.today)) {
     actions.push(
       <Tooltip title="undo" key={`${props.item.id}-undo`} aria-label="undo">
         <IconButton onClick={handleUndo}>
           <UndoIcon />
         </IconButton>
       </Tooltip>)
+  } else {
+    actions.push((<Tooltip key={`${props.item.id}-done`} title="dealt with" aria-label="dealt with">
+      <IconButton onClick={handleDialogOpen}>
+        <AssignmentTurnedInOutlinedIcon />
+      </IconButton>
+    </Tooltip>))
   }
 
   return (
@@ -80,7 +81,8 @@ function ActionsWithDialogs(props) {
 function ExpireSoonList(props) {
   const theme = useTheme()
   const mobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const classes = useStyles({mobile});
+  const classes = useStyles({ mobile });
+  const today = new Date()
 
   let header
   if (props.showHeader) {
@@ -105,7 +107,11 @@ function ExpireSoonList(props) {
         <TableBody>
           {props.items.map((item) => (
             <TableRow hover key={item.id} className={clsx(item.state === itemTypes.ITEM_DONE && classes.striked)}>
-              <ActionsWithDialogs item={item} handleRemove={props.handleRemove} handleUndo={props.handleUndo} classes={classes}></ActionsWithDialogs>
+              <ActionsWithDialogs item={item}
+                handleRemove={props.handleRemove}
+                handleUndo={props.handleUndo}
+                classes={classes}
+                today={today}></ActionsWithDialogs>
               <TableCell className={clsx(classes.half, classes.verysmallpadding)}>{item.name}</TableCell>
               <TableCell className={clsx(classes.quater, classes.verysmallpadding)} align="right">{item.quantity}</TableCell>
               <TableCell className={clsx(classes.quater, classes.verysmallpadding)} align="left">{item.unit}</TableCell>

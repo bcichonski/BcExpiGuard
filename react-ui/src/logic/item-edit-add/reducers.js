@@ -67,9 +67,9 @@ const itemsAddEditReducer = (state = {
                 state: types.ITEM_DIALOG_INACTIVE
             }
             if(state.state === types.ITEM_DIALOG_EDIT) {
-                navigate('/')
-            } else {
                 navigate('/items')
+            } else {
+                navigate('/')
             }
             
             break;
