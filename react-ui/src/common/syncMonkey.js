@@ -94,7 +94,8 @@ class SyncMonkey {
             } else {
                 this.backoff()
             }
-        } catch {
+        } catch(err) {
+            dbProvider.resetReplication()
             this.backoff()
         }
         if (this.resetAfterSync) {

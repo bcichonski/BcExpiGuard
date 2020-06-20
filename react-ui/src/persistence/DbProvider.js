@@ -34,6 +34,12 @@ class DbProvider {
         return this;
     }
 
+    resetReplication() {
+        if(this.inReplication) {
+            this.inReplication = false
+        }
+    }
+
     setSyncHooks(syncHooks) {
         this.syncHooks = syncHooks
     }
