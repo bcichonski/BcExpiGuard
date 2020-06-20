@@ -192,7 +192,7 @@ function AddItem(props) {
                         <Button variant='contained'
                             className={spacingTopLeft}
                             disabled={anError}
-                            onClick={props.handleAddItemClick} color={(anError ? undefined : "primary")}>Add new item</Button>
+                            onClick={props.handleAddItemClick} color={(anError ? undefined : "primary")}>{props.edit ? 'Save' : 'Add new item'}</Button>
                     </Grid>
                 </Grid>
             </Grid>

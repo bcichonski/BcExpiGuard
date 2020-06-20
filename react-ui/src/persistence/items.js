@@ -79,6 +79,11 @@ const update = async (id, item) => {
             change = true
         }
 
+        if (doc.unit !== item.unit) {
+            doc.unit = item.unit
+            change = true
+        }
+
         if(change) {
             doc.changed_timestamp = item.changed_timestamp ?? nowISO()
         }
@@ -95,7 +100,7 @@ const update = async (id, item) => {
 
 const getAll = async () => {
     const all = await dbprovider.local.items.allDocs({ include_docs: true });
-    return transfromFromPouch(all)
+    return transfromFromPouch(all).filter(it => !!it.date && !!it.nameID)
 }
 
 export default { 

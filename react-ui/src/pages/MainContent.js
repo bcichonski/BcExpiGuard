@@ -9,7 +9,7 @@ import AddIcon from '@material-ui/icons/Add';
 import { itemEditActions } from '../logic/item-edit-add'
 import { itemActions, itemTypes } from '../logic/item-list'
 import { connect } from 'react-redux';
-import { parseISO, differenceInDays, formatDistanceToNow, isPast, isToday } from 'date-fns'
+import { parseISO, differenceInDays, formatDistanceToNow, isPast, isToday, compareAsc } from 'date-fns'
 import Title from '../components/Title'
 import syncMonkey from '../common/syncMonkey'
 import { changedLastQuarter } from '../common/utils'
@@ -41,30 +41,38 @@ function onlyActive(item) {
   return onlyNotRemoved(item) && item.state !== itemTypes.ITEM_DONE;
 }
 
-function onlyExpired(today) {
-  return (item) => differenceInDays(parseISO(item.date), today) < 0 && (onlyActive(item) || changedLastQuarter(item, today))
+function onlyExpired() {
+  return (item) => item.daydiff < 0
 }
 
-function onlyExpiresWithinDays(today, from, to) {
+function onlyExpiresWithinDays(from, to) {
   return (item) => {
-    const diff = differenceInDays(parseISO(item.date), today)
-    return diff >= from && diff < to && (onlyActive(item) || changedLastQuarter(item, today))
+    return item.daydiff >= from && item.daydiff < to
   }
 }
 
-function normalize(collection, state) {
-  return collection.map(item => ({
-    ...item,
-    name: state.itemNameReducer.find(nm => nm.id === item.nameID)?.name ?? item.nameID,
-  }))
+function normalize(collection, state, today) {
+  return collection
+    .filter(item => (onlyActive(item) || changedLastQuarter(item, today)))
+    .map(item => ({
+      ...item,
+      daydiff: differenceInDays(parseISO(item.date), today),
+      name: state.itemNameReducer
+        .find(nm => nm.id === item.nameID)?.name ?? item.nameID
+    }))
+    .sort((a, b) => compareAsc(a.daydiff, b.daydiff))
 }
 
 const mapStateToProps = (state, ownProps) => {
   const today = new Date()
-  const expired = normalize(state.itemReducer.filter(onlyExpired(today)), state)
-  const expiresToday = normalize(state.itemReducer.filter(onlyExpiresWithinDays(today, 0, 1)), state);
-  const expiresInAWeek = normalize(state.itemReducer.filter(onlyExpiresWithinDays(today, 1, 7)), state);
-  const expiresInAMonth = normalize(state.itemReducer.filter(onlyExpiresWithinDays(today, 7, 30)), state);
+  const expired = normalize(state.itemReducer, state, today)
+    .filter(onlyExpired())
+  const expiresToday = normalize(state.itemReducer, state, today)
+    .filter(onlyExpiresWithinDays(0, 1))
+  const expiresInAWeek = normalize(state.itemReducer, state, today)
+    .filter(onlyExpiresWithinDays(1, 7))
+  const expiresInAMonth = normalize(state.itemReducer, state, today)
+    .filter(onlyExpiresWithinDays(7, 30))
 
   return { expired, expiresToday, expiresInAWeek, expiresInAMonth }
 }

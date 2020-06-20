@@ -66,8 +66,6 @@ const addDummyItem = () => {
 function changeItem(item, value) {
     const newItem = Object.assign({}, item);
 
-    if (value === 'cancel' || value === false) return item
-
     if (value === 'all') {
         value = item.quantity
     }
@@ -109,6 +107,8 @@ function changeItem(item, value) {
 }
 
 const updateItemQuantity = (item, newQuantity) => async (dispatch) => {
+    if (newQuantity === 'cancel' || newQuantity === false) return item
+
     const newItem = changeItem(item, newQuantity)
 
     dispatch({

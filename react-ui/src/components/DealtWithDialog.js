@@ -14,7 +14,7 @@ function generateChoices(item) {
     }
 
     let plural = 's'
-    if (quantity <= 1) {
+    if (quantity <= 1 || typeof item.unit === 'undefined' || item.unit === '') {
         plural = ''
     }
 

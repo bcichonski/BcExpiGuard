@@ -37,7 +37,11 @@ export const Auth0Provider = ({
         setUser(user);
       }
 
-      setLoading(false);
+      try {
+        setLoading(false);
+      } catch {
+        //we are gonna be just fine
+      }
     };
     initAuth0();
     // eslint-disable-next-line

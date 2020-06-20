@@ -11,7 +11,9 @@ function Autocomplete(props) {
       freeSolo
       inputValue={props.value}
       onInputChange={(event, newValue, kind) => {
-        if (kind !== 'reset' && (!!newValue || !!props.value)) {
+        if (kind === 'reset' && props.value !== '' && newValue === '') {
+          props.setValue(props.value);
+        } else {
           props.setValue(newValue);
         }
       }}

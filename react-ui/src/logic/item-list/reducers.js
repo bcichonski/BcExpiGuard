@@ -34,7 +34,7 @@ const itemsReducer = (state = [], action) => {
 
             return [
                 ...otherItems,
-                action.payload.newItem
+                action.payload
             ]
         case types.ITEM_UNDO:
             const otherItems2 = state.filter(i => i.id !== action.payload.id)
