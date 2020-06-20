@@ -113,7 +113,7 @@ const updateItemQuantity = (item, newQuantity) => async (dispatch) => {
 
     dispatch({
         type: types.ITEM_CHANGED,
-        payload: { id: item.id, newItem }
+        payload: newItem
     })
 
     if (item.state !== newItem.state) {

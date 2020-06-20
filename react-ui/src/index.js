@@ -8,6 +8,7 @@ import store from './common/store'
 import config from "./constants/auth_config.json";
 import { Auth0Provider } from "./common/auth0";
 import { createBrowserHistory } from "history";
+import syncMonkey from './common/syncMonkey'
 
 const customHistory = createBrowserHistory();
 
@@ -19,6 +20,18 @@ const onRedirectCallback = appState => {
       : window.location.pathname
   );
 };
+
+const wakeUpHook = (fn) => {
+  document.addEventListener('mousemove', fn)
+  document.addEventListener('touchmove', fn)
+}
+
+const wakeUpClean = (fn) => {
+  document.removeEventListener('mousemove', fn)
+  document.removeEventListener('touchmove', fn)
+}
+
+syncMonkey.setWakeUpHooks(wakeUpHook, wakeUpClean)
 
 ReactDOM.render(
   /*<React.StrictMode>*/

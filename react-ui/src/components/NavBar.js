@@ -142,6 +142,65 @@ const NavBar = (props) => {
     setAnchorEl(null);
   };
 
+  let authWidget = null
+  if (isAuthenticated) {
+    authWidget = (
+      <Fragment>
+        <span className={classes.toolbar}>
+          <SyncState state={props.state} hint={props.hint} />
+        </span>
+        <Tooltip title={user.name} id='login_tooltip'>
+          <Button
+            id = 'account_button'
+            onClick={handleClick}
+            color="secondary"
+            variant="contained"
+            startIcon={
+              <Avatar alt={user.name} src={user.picture} />
+            }
+            endIcon={<MoreVertIcon />}
+          >
+          </Button>
+        </Tooltip>
+        <StyledMenu
+          id="user-menu"
+          anchorEl={anchorEl}
+          keepMounted
+          open={Boolean(anchorEl)}
+          onClose={handleClose}
+        >
+          <StyledMenuItem onClick={(event) => handleMenuItemClick(event, 'profile')}>
+            <ListItemIcon>
+              <AccountBoxOutlinedIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText primary="Profile" />
+          </StyledMenuItem>
+          <StyledMenuItem onClick={(event) => handleMenuItemClick(event, 'logout')}>
+            <ListItemIcon>
+              <ExitToAppIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText primary="Log out" />
+          </StyledMenuItem>
+        </StyledMenu>
+      </Fragment>
+    )
+  } else {
+    authWidget = (
+      <Fragment>
+        <Button
+          variant="contained"
+          color="secondary"
+          size="small"
+          className={classes.button}
+          onClick={() => loginWithRedirect({})}
+          startIcon={<AccountCircleIcon />}
+        >
+          Log in
+      </Button>
+      </Fragment>
+    )
+  }
+
 
   return (
     <AppBar position="absolute" className={clsx(classes.appBar, props.open && classes.appBarShift)}>
@@ -158,59 +217,7 @@ const NavBar = (props) => {
         <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
           ExpiGuard
       </Typography>
-
-        {!isAuthenticated && (
-          <Fragment>
-            <Button
-              variant="contained"
-              color="secondary"
-              size="small"
-              className={classes.button}
-              onClick={() => loginWithRedirect({})}
-              startIcon={<AccountCircleIcon />}
-            >
-              Log in
-      </Button>
-          </Fragment>
-
-        )}
-        {isAuthenticated && <Fragment>
-          <span className={classes.toolbar}>
-            <SyncState state={props.state} hint={props.hint} />
-          </span>
-          <Tooltip title={user.name}>
-            <Button
-              onClick={handleClick}
-              color="secondary"
-              variant="contained"
-              startIcon={
-                <Avatar alt={user.name} src={user.picture} />
-              }
-              endIcon={<MoreVertIcon />}
-            >
-            </Button>
-          </Tooltip>
-          <StyledMenu
-            id="user-menu"
-            anchorEl={anchorEl}
-            keepMounted
-            open={Boolean(anchorEl)}
-            onClose={handleClose}
-          >
-            <StyledMenuItem onClick={(event) => handleMenuItemClick(event, 'profile')}>
-              <ListItemIcon>
-                <AccountBoxOutlinedIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText primary="Profile" />
-            </StyledMenuItem>
-            <StyledMenuItem onClick={(event) => handleMenuItemClick(event, 'logout')}>
-              <ListItemIcon>
-                <ExitToAppIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText primary="Log out" />
-            </StyledMenuItem>
-          </StyledMenu>
-        </Fragment>}
+        {authWidget}
       </Toolbar>
     </AppBar>
   );

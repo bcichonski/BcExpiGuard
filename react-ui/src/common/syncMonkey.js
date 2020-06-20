@@ -20,6 +20,11 @@ class SyncMonkey {
         }
     }
 
+    setWakeUpHooks(hookFn, cleanFn) {
+        this.hookFn = hookFn
+        this.cleanFn = cleanFn
+    }
+
     getSalt(min, max) {
         min = Math.ceil(min);
         max = Math.floor(max);
@@ -34,8 +39,14 @@ class SyncMonkey {
 
     setTimeout(value) {
         if (this.timeout !== value) {
-            console.log(`sync monkey will wake up every ${Math.round(value / 1000)} seconds`)
+            console.log(`sync monkey will wake up after ${Math.round(value / 1000)} seconds`)
             this.timeout = value
+            if(this.timeout > 60*1000 && this.hookFn && this.cleanFn) {
+                this.hookFn(()=>{
+                    this.reset()
+                    this.cleanFn()
+                })
+            }
         }
     }
 
