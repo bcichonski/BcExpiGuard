@@ -10,17 +10,6 @@ class DbProvider {
         }
 
         this.dbSyncState = {}
-
-        const users = new PouchDB('users')
-        const item_names = new PouchDB('item_names')
-        const items = new PouchDB('items')
-        const groups = new PouchDB('groups')
-        this.local = {
-            users,
-            item_names,
-            items,
-            groups
-        }
     }
 
     async useUserAsync(isAuth, user, getToken) {
@@ -50,14 +39,15 @@ class DbProvider {
     }
 
     replicate(dbName) {
+        if(!this.logged) {
+            return
+        }
         if (this.inReplication) {
             console.log('already in progress')
             return
         }
 
         this.inReplication = true
-
-
 
         const remoteDb = this.remote[dbName]?.remote_table;
         const remoteFilterParams = this.remote[dbName]?.filter_params;
@@ -152,6 +142,17 @@ class DbProvider {
         this.opts.headers.Authorization = 'Bearer ' + token
         this.userId = userFuncs.getId(user)
         this.groupId = this.userId
+
+        const users = new PouchDB(`users_${this.userId}`)
+        const item_names = new PouchDB(`item_names_${this.userId}`)
+        const items = new PouchDB(`items_${this.userId}`)
+        const groups = new PouchDB(`groups_${this.userId}`)
+        this.local = {
+            users,
+            item_names,
+            items,
+            groups
+        }
 
         this.remote = {
             users: this.CreateRemoteDb('users', { user: this.userId }),

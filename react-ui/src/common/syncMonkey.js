@@ -56,11 +56,11 @@ class SyncMonkey {
             return
         }
 
-        let ratio = 1.2
+        let ratio = 1.1
         if(this.timeout > this.max_timeout_ms / 4) {
-            ratio = 1.5
+            ratio = 1.6
         } else if(this.timeout > this.max_timeout_ms / 2) {
-            ratio = 1.1
+            ratio = 1.3
         }
 
         let newtimeout = Math.round(this.timeout * ratio) + this.getSalt(10, 1000)
