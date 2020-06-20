@@ -17,6 +17,10 @@ const emptyItem = {
 const itemsReducer = (state = [], action) => {
     switch (action.type) {
         case types.ITEM_ADD:
+            const exists = state.find(it => it.id === action.data.id)
+            if(exists) {
+                return state
+            }
             return [
                 ...state,
                 {
