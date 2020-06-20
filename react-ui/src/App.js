@@ -11,7 +11,7 @@ import { connect } from 'react-redux';
 import { appActions } from './logic/appstate'
 
 const mapDispatchToProps = (dispatch) => ({
-  appInitialize: (syncHooks) => dispatch(appActions.initialize(syncHooks)),
+  appInitialize: (syncHooks) => dbProvider.onLogin(() => dispatch(appActions.initialize(syncHooks))),
   changeSyncState: (state, key) => dispatch(appActions.changeSyncState(state, key)),
   refreshData: (key) => dispatch(appActions.syncChanges(key)),
 })
@@ -23,10 +23,15 @@ function App(props) {
   const [appInitialization, setAppInitialization] = useState(false);
   const [useMoreElves, setUseMoreElves] = useState(false)
 
-  if (!appInitialization) {
-    props.appInitialize({ changeSyncState: props.changeSyncState, refreshData: props.refreshData });
-
-    setAppInitialization(true);
+  if (isAuthenticated) {
+    if (!appInitialization) {
+      props.appInitialize({ changeSyncState: props.changeSyncState, refreshData: props.refreshData });
+      setAppInitialization(true);
+    }
+  } else {
+    if (appInitialization) {
+      setAppInitialization(false);
+    }
   }
 
   dbProvider.UseUser(isAuthenticated, user, getTokenSilently)

@@ -138,6 +138,10 @@ class DbProvider {
         }
     }
 
+    onLogin(fn) {
+        this.onLoginFn = fn
+    }
+
     Login(user, token) {
         this.opts.headers.Authorization = 'Bearer ' + token
         this.userId = userFuncs.getId(user)
@@ -164,6 +168,8 @@ class DbProvider {
         this.logged = true
 
         userFuncs.add(user)
+
+        this.onLoginFn()
     }
 
     async Clear(remoteDbMetadata) {
