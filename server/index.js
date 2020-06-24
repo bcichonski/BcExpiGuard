@@ -22,6 +22,14 @@ if (!isDev && cluster.isMaster) {
 } else {
   const app = express();
 
+  app.enable('trust proxy');
+  app.use('*', (req, res, next) => {
+    if (req.secure) {
+      return next();
+    }
+    res.redirect(`https://${req.hostname}${req.url}`);
+  });
+
   // Priority serve any static files.
   app.use(express.static(path.resolve(__dirname, '../react-ui/build')));
 
