@@ -9,7 +9,7 @@ export default function Copyright() {
           Bartosz Cichonski
         </Link>{' '}
         {new Date().getFullYear()}
-        {'.'}
+        . Version 1.0
       </Typography>
     );
   }
