@@ -68,8 +68,8 @@ const useStyles = makeStyles((theme) => ({
     }),
   },
   appBarShift: {
-    marginLeft: drawerWidth,
-    width: `calc(100% - ${drawerWidth}px)`,
+    marginLeft: (props) => drawerWidth(props.isMobile),
+    width: props => `calc(100% - ${drawerWidth(props.isMobile)}px)`,
     transition: theme.transitions.create(['width', 'margin'], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
@@ -121,7 +121,7 @@ const mapStateToProps = (state, ownProps) => ({
 })
 
 const NavBar = (props) => {
-  const classes = useStyles();
+  const classes = useStyles({isMobile: props.isMobile});
   const { isAuthenticated, loginWithRedirect, logout, user } = useAuth0();
   const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -225,7 +225,8 @@ const NavBar = (props) => {
 
 NavBar.propTypes = {
   open: PropTypes.bool,
-  handleDrawerOpen: PropTypes.func
+  handleDrawerOpen: PropTypes.func,
+  isMobile: PropTypes.bool
 }
 
 export default connect(mapStateToProps, null)(NavBar);

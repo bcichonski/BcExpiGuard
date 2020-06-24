@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
   drawerPaper: {
     position: 'relative',
     whiteSpace: 'nowrap',
-    width: drawerWidth,
+    width: (props) => drawerWidth(props.isMobile),
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
@@ -125,7 +125,7 @@ function Layout(props) {
   return (
     <div className={classes.root}>
       <CssBaseline />
-      <NavBar open={open} handleDrawerOpen={handleDrawerOpen} />
+      <NavBar open={open} handleDrawerOpen={handleDrawerOpen} isMobile={props.isMobile}/>
       <Drawer
         variant="permanent"
         classes={{
