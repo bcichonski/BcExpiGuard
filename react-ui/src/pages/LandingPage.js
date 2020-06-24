@@ -19,7 +19,7 @@ const LandingPage = () => {
       <h1>Welcome!</h1>
       <h2>What is this?</h2>
       <div>Put all your stuff that will not last forever in one place.
-      Allways know what to use or do to avoid unnecessary waste or stress. Keep your data synchronized across multiple devices,
+      Always know what to use or do to avoid unnecessary waste or stress. Keep your data synchronized across multiple devices,
       web, desktop or mobile.
       </div>
       <h2>Why should I use that?</h2>
@@ -30,7 +30,7 @@ const LandingPage = () => {
         And since it is not-so-serious project I can choose tech stack freely and experiment with stuff like PWA, couchdb and more.
       </div>
       <h3>A sort of legal-ish note</h3>
-      <div>Software is provided as is, without any kind of promisses to be usefull. 
+      <div>Software is provided as is, without any kind of promisses to be useful. 
         By logging you are giving consent to this terms. 
         Google account is necessary in order to log in. 
         You are responsible for all the content that you put into the app and share with other people. 
