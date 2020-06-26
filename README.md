@@ -1,4 +1,4 @@
-<a href="https://bcexpiguard.herokuapp.com"><img src="react-ui/public/images/icons/icon-152x152.png?raw=true" title="BcExpiGuard" alt="BcExpiGuard"></a>
+<a href="https://bcexpiguard.herokuapp.com"><img src="react-ui/public/images/icons/icon-152x152.png?raw=true" title="BcExpiGuard" alt="BcExpiGuard" style='font-size: large'>DEMO</a>
 
 # BcExpiGuard
 
