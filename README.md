@@ -10,9 +10,10 @@
 
 ***Screenshots***
 
-[![Main page](doc/screenshots/main2.png)](doc/screenshots)
-[![Main page](doc/screenshots/add1.PNG)](doc/screenshots)
-[![Main page](doc/screenshots/browse.png)](doc/screenshots)
+[![Main page](doc/screenshots/main2-small.png)](doc/screenshots/main2.png)
+[![Main page](doc/screenshots/add1-small.PNG)](doc/screenshots/add1.PNG)
+[![Main page](doc/screenshots/browse-small.png)](doc/screenshots/browse.png)
+[More](doc/screenshots/)
 
 ---
 
@@ -57,7 +58,7 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
 ## Technologies
 
 * This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app)
-* It utilizes [React](https://reactjs.org/), [Redux](https://redux.js.org) & [bunch of additions](/package.json)
+* It utilizes [React](https://reactjs.org/), [Redux](https://redux.js.org) & [bunch of additions](/react-ui/package.json)
 * [MATERIAL-UI](https://material-ui.com) for the UI
 * [PouchDb](https://pouchdb.com) / [CouchDb](https://couchdb.apache.org/) for storing data
 * [Auth0](https://auth0.com) integration for handling auth-related stuff
