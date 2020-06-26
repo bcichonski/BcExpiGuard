@@ -33,7 +33,7 @@ export const appBarItemsSecondary = (classes, props) => (
       <ListItemIcon>
         <AddIcon />
       </ListItemIcon>
-      <ListItemText primary="Add new item" />
+      <ListItemText primary="Add" />
     </ListItem>
   </div>
 );
