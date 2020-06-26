@@ -10,9 +10,8 @@
 
 ***Screenshots***
 
-[![Main page](doc/screenshots/main2-small.png)](doc/screenshots/main2.png)
-[![Main page](doc/screenshots/add1-small.PNG)](doc/screenshots/add1.PNG)
-[![Main page](doc/screenshots/browse-small.png)](doc/screenshots/browse.png)
+[![Main page](doc/screenshots/screens.png)](doc/screenshots)
+
 [More](doc/screenshots/)
 
 ---
