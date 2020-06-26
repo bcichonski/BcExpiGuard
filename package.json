@@ -1,6 +1,6 @@
 {
   "name": "BcExpiGuard_backend",
-  "version": "0.1.0",
+  "version": "1.0.1",
   "description": "Keep things from getting expired, learn React and stuff at the same time",
   "engines": {
     "node": "12.x"
