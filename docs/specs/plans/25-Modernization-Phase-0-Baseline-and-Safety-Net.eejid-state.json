@@ -24,12 +24,19 @@
       "reason": "T6 (CI workflow) is implemented and verified locally but cannot be delivered: the sandbox GitHub token lacks the `workflow` scope, so GitHub rejects any push containing .github/workflows/ci.yml. The file is kept as a separate local-only commit on the branch and its content is in the PR description."
     },
     "finalize": {
-      "status": "in_progress",
-      "pr_urls": []
+      "status": "done",
+      "mode": "bail-out",
+      "pr_urls": [
+        {
+          "repo": "BcExpiGuard",
+          "pr_url": "https://github.com/bcichonski/BcExpiGuard/pull/33"
+        }
+      ]
     },
     "pr_monitor": {
       "status": "pending",
-      "repos": {}
+      "repos": {},
+      "reason": "skipped: bail-out draft PR, and no workflow exists on the branch"
     }
   },
   "github": {
