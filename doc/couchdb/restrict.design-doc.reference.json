@@ -1,0 +1,8 @@
+{
+  "_id": "_design/restrict",
+  "unverified_reference": "Reconstructed from client requirements, NOT exported from the live server. Replace with the real export (see README.md in this folder).",
+  "language": "javascript",
+  "filters": {
+    "restrict": "function (doc, req) { if (doc._id.indexOf('_design/') === 0) { return false; } var q = req.query || {}; var asList = function (v) { if (typeof v === 'string') { try { v = JSON.parse(v); } catch (e) { v = [v]; } } return Array.isArray(v) ? v : [v]; }; if (q.user) { return doc._id === q.user; } if (q.users) { return asList(q.users).some(function (u) { return (doc.users || []).indexOf(u) !== -1; }); } if (q.groups) { return asList(q.groups).indexOf(doc.groupId) !== -1; } return false; }"
+  }
+}
