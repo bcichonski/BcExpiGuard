@@ -3,7 +3,7 @@
   "version": "1.0.1",
   "description": "Keep things from getting expired, learn React and stuff at the same time",
   "engines": {
-    "node": "12.x"
+    "node": ">=24"
   },
   "scripts": {
     "start": "node server",

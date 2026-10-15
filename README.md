@@ -8,6 +8,19 @@
 
 [![License](http://img.shields.io/:license-mit-blue.svg?style=flat-square)](http://badges.mit-license.org)
 
+---
+
+### Prerequisites
+
+- **Node.js**: This project requires Node.js 24 or later. See [`.nvmrc`](.nvmrc) for the exact version.
+- **Build workaround** (temporary until Phase 1): When building in `react-ui`, use:
+  ```bash
+  NODE_OPTIONS=--openssl-legacy-provider npm run build
+  ```
+  This is required due to webpack 4 compatibility with modern Node versions and will be removed in the next modernization phase.
+
+---
+
 ***Screenshots***
 
 [![Main page](doc/screenshots/screens.png)](doc/screenshots)
@@ -28,7 +41,7 @@
 to run NodeJS Express server to host the website
 
 
-##### `npm build`
+##### `npm run build`
 to prepare scripts for production
 
 #### In the `react-ui` subdirectory, you can run:
@@ -59,7 +72,7 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
 * This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app)
 * It utilizes [React](https://reactjs.org/), [Redux](https://redux.js.org) & [bunch of additions](/react-ui/package.json)
 * [MATERIAL-UI](https://material-ui.com) for the UI
-* [PouchDb](https://pouchdb.com) / [CouchDb](https://couchdb.apache.org/) for storing data
+* [PouchDb](https://pouchdb.com) / [CouchDb](https://couchdb.apache.org/) for storing data ([server setup notes](doc/couchdb/README.md))
 * [Auth0](https://auth0.com) integration for handling auth-related stuff
 * Hosting provided by [Heroku](https://www.heroku.com/)
 
