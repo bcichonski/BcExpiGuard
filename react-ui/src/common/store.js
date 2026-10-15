@@ -4,7 +4,7 @@ import thunk from 'redux-thunk';
 
 const store = configureStore({
     reducer: appReducer,
-    devTools: process.env.NODE_ENV !== 'production',
+    devTools: !import.meta.env.PROD,
     middleware: [ thunk ]
 })
 

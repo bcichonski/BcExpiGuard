@@ -4,7 +4,7 @@ The app syncs PouchDB (browser) with a self-hosted CouchDB. This page separates 
 
 ## 1. Facts proven by the client code
 
-Sources: `react-ui/src/persistence/DbProvider.js`, `react-ui/src/constants/constants.js`, `react-ui/src/constants/auth_config.json`.
+Sources: `react-ui/src/persistence/DbProvider.js`, `react-ui/src/constants/config.js`, `react-ui/.env.production`.
 
 **Server address.** `REMOTE_API_ADDRESS = https://expiguard.bartq.toh.info/` (a commented-out dev alternative is `http://malina:5984/`). Remote DB URL = address + DB name.
 

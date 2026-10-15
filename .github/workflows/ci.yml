@@ -32,12 +32,13 @@ jobs:
         working-directory: react-ui
       - name: Build
         working-directory: react-ui
-        env:
-          NODE_OPTIONS: --openssl-legacy-provider
         run: npm run build
       - name: Test
         working-directory: react-ui
-        run: CI=true npm test -- --watchAll=false
+        run: npm test
+      - name: Lint
+        working-directory: react-ui
+        run: npm run lint
 
   server:
     runs-on: ubuntu-latest

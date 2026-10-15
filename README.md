@@ -13,11 +13,6 @@
 ### Prerequisites
 
 - **Node.js**: This project requires Node.js 24 or later. See [`.nvmrc`](.nvmrc) for the exact version.
-- **Build workaround** (temporary until Phase 1): When building in `react-ui`, use:
-  ```bash
-  NODE_OPTIONS=--openssl-legacy-provider npm run build
-  ```
-  This is required due to webpack 4 compatibility with modern Node versions and will be removed in the next modernization phase.
 
 ---
 
@@ -46,31 +41,50 @@ to prepare scripts for production
 
 #### In the `react-ui` subdirectory, you can run:
 
-##### `npm start`
+##### `npm start` (or `npm run dev`)
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
-Make sure to unregister the service worker.
+Starts the Vite development server on [http://localhost:3000](http://localhost:3000). The app reloads automatically when you save changes.
 
 ##### `npm run build`
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Builds the app for production to the `build` folder. The build is minified and optimized for best performance.
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+##### `npm run preview`
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Locally preview the production build on [http://localhost:3000](http://localhost:3000).
+
+##### `npm test`
+
+Runs the test suite once with Vitest.
+
+##### `npm run test:watch`
+
+Runs tests in watch mode.
+
+##### `npm run lint`
+
+Lints the code with ESLint.
+
+### Configuration
+
+Local development and production configuration is managed via environment variables:
+
+1. **Local Development**: Copy `react-ui/.env.example` to `react-ui/.env.local` and customize as needed.
+2. **Production**: `react-ui/.env.production` contains the production values.
+
+The following variables are required:
+
+- `VITE_COUCH_URL` — CouchDB server URL (e.g., `https://expiguard.bartq.toh.info/`)
+- `VITE_AUTH0_DOMAIN` — Auth0 tenant domain (e.g., `bcexpiguard.eu.auth0.com`)
+- `VITE_AUTH0_CLIENT_ID` — Auth0 SPA application client ID
+- `VITE_AUTH0_AUDIENCE` — Auth0 API audience (e.g., `https://expiguard.bartq.toh.info`)
 
 ---
 
 ## Technologies
 
-* This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app)
-* It utilizes [React](https://reactjs.org/), [Redux](https://redux.js.org) & [bunch of additions](/react-ui/package.json)
+* Frontend built with [Vite](https://vitejs.dev/) and [React](https://reactjs.org/)
+* [Redux](https://redux.js.org) for state management
 * [MATERIAL-UI](https://material-ui.com) for the UI
 * [PouchDb](https://pouchdb.com) / [CouchDb](https://couchdb.apache.org/) for storing data ([server setup notes](doc/couchdb/README.md))
 * [Auth0](https://auth0.com) integration for handling auth-related stuff

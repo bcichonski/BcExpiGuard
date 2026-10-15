@@ -1,5 +1,5 @@
 import PouchDB from 'pouchdb';
-import { REMOTE_API_ADDRESS } from '../constants/constants'
+import { REMOTE_API_ADDRESS } from '../constants/config'
 import userFuncs from './users'
 
 class DbProvider {
