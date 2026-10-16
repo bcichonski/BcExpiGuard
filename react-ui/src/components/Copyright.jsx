@@ -1,10 +1,10 @@
 import React from 'react';
-import Link from '@material-ui/core/Link';
-import Typography from '@material-ui/core/Typography';
+import Link from '@mui/material/Link';
+import Typography from '@mui/material/Typography';
 
 export default function Copyright() {
     return (
-      <Typography variant="body2" color="textSecondary" align="center">
+      <Typography variant="body2" color="text.secondary" align="center">
         <Link color="inherit" href="https://github.com/bcichonski/BcExpiGuard">
           Bartosz Cichonski
         </Link>{' '}

@@ -1,9 +1,13 @@
 import React from 'react';
-import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField'
-import { makeStyles } from '@material-ui/core/styles';
+import Grid from '@mui/material/Grid';
+import Paper from '@mui/material/Paper';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField'
+import Select from '@mui/material/Select';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem'
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { styled, useTheme } from '@mui/material/styles';
 import Autocomplete from '../components/Autocomplete'
 import Datepicker from '../components/DatePicker'
 import { connect } from 'react-redux'
@@ -11,34 +15,23 @@ import { itemEditActions, itemEditTypes } from '../logic/item-edit-add'
 import { itemTypes } from '../logic/item-list'
 import dbProvider from '../persistence'
 import Title from '../components/Title';
-import clsx from 'clsx';
 import syncMonkey from '../common/syncMonkey'
-import useMediaQuery from '@material-ui/core/useMediaQuery';
-import { useTheme } from '@material-ui/core/styles';
-import { Select, InputLabel } from '@material-ui/core';
-import MenuItem from '@material-ui/core/MenuItem'
 
-const useStyles = makeStyles((theme) => ({
-    paper: {
-        padding: theme.spacing(2),
-        overflow: 'auto',
-    },
-    spacer1: {
-        marginTop: theme.spacing(1)
-    },
-    spacer2: {
-        marginTop: theme.spacing(2)
-    },
-    spacingLeft: {
-        marginLeft: theme.spacing(2),
-    },
-    spacingRight: {
-        marginRight: theme.spacing(1),
-    },
-    expand: {
-        display: 'grid'
-    }
-}))
+// v4 Grid items under a non-container parent were sized as a share of the parent's width; v7 Grid sizes need a
+// container, so the same widths (12-column share per breakpoint) are applied here directly.
+const share = (columns) => `${(columns / 12) * 100}%`
+const Column = styled('div', { shouldForwardProp: (prop) => prop !== 'sm' })(({ theme, sm }) => ({
+    [theme.breakpoints.up('xs')]: { width: share(12) },
+    [theme.breakpoints.up('sm')]: { width: share(sm) },
+    [theme.breakpoints.up('md')]: { width: share(4) },
+    [theme.breakpoints.up('lg')]: { width: share(3) },
+    [theme.breakpoints.up('xl')]: { width: share(1) },
+}));
+
+const FormPaper = styled(Paper)(({ theme }) => ({
+    padding: theme.spacing(2),
+    overflow: 'auto',
+}));
 
 const mapStateToProps = (state /*, ownProps*/) => {
     return ({
@@ -97,9 +90,8 @@ const units = [
 
 function AddItem(props) {
     const theme = useTheme()
-    const mobile = useMediaQuery(theme.breakpoints.down('sm'));
-    const classes = useStyles();
-    const spacingTopLeft = clsx(classes.spacer2, classes.spacingLeft)
+    // v4 down('sm') meant < 960px; with the theme's v4 breakpoint values that is down('md') in MUI v7
+    const mobile = useMediaQuery(theme.breakpoints.down('md'));
 
     syncMonkey.reset()
 
@@ -110,9 +102,9 @@ function AddItem(props) {
     let editOptions = null;
     if (props.edit) {
         editOptions = (
-            <Grid item xs={12} sm={6} md={4} lg={3} xl={1}>
+            <Column sm={6}>
                 <Grid container direction='row'>
-                    <Grid item className={classes.spacer2}>
+                    <Grid sx={{ mt: 2 }}>
                         <InputLabel htmlFor="item-state">Age</InputLabel>
                         <Select
                             autoWidth
@@ -127,17 +119,17 @@ function AddItem(props) {
                             <MenuItem value={itemTypes.ITEM_REMOVED}>Deleted</MenuItem>
                         </Select></Grid>
                 </Grid>
-            </Grid >
+            </Column>
         )
     }
 
     const unitsGroupingFunction = (el) => el.group
     const anError = !!(props.dateError || props.nameError)
     return (
-        <Paper className={classes.paper}>
+        <FormPaper>
             <Title>{props.edit ? `Edit '${props.name}'` : 'Add new item'}</Title>
             <Grid>
-                <Grid item xs={12} sm={8} md={4} lg={3} xl={1}>
+                <Column sm={8}>
                     <Autocomplete options={props.allNames(dbProvider.userId)}
                         label='Name'
                         value={props.name}
@@ -147,9 +139,9 @@ function AddItem(props) {
                         helperText={props.nameError ? 'You cannot add an item without a name' : ''}
                         autoFocus
                     />
-                </Grid>
-                <Grid item xs={12} sm={8} md={4} lg={3} xl={1}>
-                    <span className={classes.expand}>
+                </Column>
+                <Column sm={8}>
+                    <span style={{ display: 'grid' }}>
                         <Datepicker label='Expiration date'
                             setDate={(value) => {
                                 props.setDate(value)
@@ -159,44 +151,44 @@ function AddItem(props) {
                             error={props.dateError}
                             helperText={props.dateError ? 'Pick a valid date' : ''}
                         /></span>
-                </Grid>
-                <Grid item xs={12} sm={8} md={4} lg={3} xl={1}>
+                </Column>
+                <Column sm={8}>
                     <Grid container direction='row'>
-                        <Grid item xs={6}>
+                        <Grid size={6}>
                             <TextField
                                 id="tfQuantity"
                                 label="Quantity"
                                 type="number"
                                 value={props.quantity}
                                 margin='normal'
-                                className={classes.spacingRight}
+                                sx={{ mr: 1 }}
                                 onChange={(event) => props.setQuantity(event.target.value)}
                             />
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid size={6}>
                             <Autocomplete options={units}
                                 label="Unit"
                                 value={props.unit}
-                                className={classes.spacingLeft}
                                 groupBy={unitsGroupingFunction}
                                 setValue={props.setUnit} />
                         </Grid>
                     </Grid>
-                </Grid>
+                </Column>
                 {editOptions}
-                <Grid item xs={12} sm={6} md={4} lg={3} xl={1}>
-                    <Grid container justify="flex-end" direction='row'>
+                <Column sm={6}>
+                    <Grid container justifyContent="flex-end" direction='row'>
                         <Button variant='contained'
-                            className={classes.spacer2}
+                            color='inherit'
+                            sx={{ mt: 2 }}
                             onClick={props.handleCancelClick}>Cancel</Button>
                         <Button variant='contained'
-                            className={spacingTopLeft}
+                            sx={{ mt: 2, ml: 2 }}
                             disabled={anError}
-                            onClick={props.handleAddItemClick} color={(anError ? undefined : "primary")}>{props.edit ? 'Save' : 'Add new item'}</Button>
+                            onClick={props.handleAddItemClick} color={(anError ? "inherit" : "primary")}>{props.edit ? 'Save' : 'Add new item'}</Button>
                     </Grid>
-                </Grid>
+                </Column>
             </Grid>
-        </Paper>
+        </FormPaper>
     )
 }
 

@@ -1,79 +1,46 @@
-import { makeStyles } from '@material-ui/core/styles';
-import AddBox from '@material-ui/icons/AddBox';
-import ArrowDownward from '@material-ui/icons/ArrowDownward';
-import Check from '@material-ui/icons/Check';
-import ConfirmDialog from '../components/ConfirmDialog'
-import Clear from '@material-ui/icons/Clear';
-import DeleteOutline from '@material-ui/icons/DeleteOutline';
-import FilterList from '@material-ui/icons/FilterList';
-import Paper from '@material-ui/core/Paper'
-import Remove from '@material-ui/icons/Remove';
-import SaveAlt from '@material-ui/icons/SaveAlt';
-import Search from '@material-ui/icons/Search';
-import ViewColumn from '@material-ui/icons/ViewColumn';
-import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
-import MoreVertOutlinedIcon from '@material-ui/icons/MoreVertOutlined';
-// @ts-ignore
-import MaterialTable, { MTableToolbar } from 'material-table'
-import Title from '../components/Title'
-import React, { forwardRef, useState } from 'react';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
-import { Grid } from '@material-ui/core';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import Select from '@material-ui/core/Select';
-import { itemTypes } from '../logic/item-list'
-import useMediaQuery from '@material-ui/core/useMediaQuery';
-import { useTheme } from '@material-ui/core/styles';
-import clsx from 'clsx';
-import AssignmentTurnedInOutlinedIcon from '@material-ui/icons/AssignmentTurnedInOutlined';
-import Menu from '@material-ui/core/Menu';
+import PropTypes from 'prop-types';
+import Grid from '@mui/material/Grid';
+import Paper from '@mui/material/Paper';
+import Box from '@mui/material/Box';
+import IconButton from '@mui/material/IconButton';
+import InputAdornment from '@mui/material/InputAdornment';
+import InputLabel from '@mui/material/InputLabel';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import TextField from '@mui/material/TextField';
+import Tooltip from '@mui/material/Tooltip';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { styled, useTheme } from '@mui/material/styles';
+import { DataGrid, QuickFilter, QuickFilterClear, QuickFilterControl } from '@mui/x-data-grid';
+import AssignmentTurnedInOutlinedIcon from '@mui/icons-material/AssignmentTurnedInOutlined';
+import ClearIcon from '@mui/icons-material/Clear';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import MoreVertOutlinedIcon from '@mui/icons-material/MoreVertOutlined';
+import SearchIcon from '@mui/icons-material/Search';
+import ConfirmDialog from '../components/ConfirmDialog'
 import DealtWithDialog from '../components/DealtWithDialog'
-import { itemActions } from '../logic/item-list'
-import syncMonkey from '../common/syncMonkey'
+import Title from '../components/Title'
+import { itemActions, itemTypes } from '../logic/item-list'
 import { itemEditActions } from '../logic/item-edit-add';
+import syncMonkey from '../common/syncMonkey'
 
-const tableIcons = {
-    Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
-    Check: forwardRef((props, ref) => <Check {...props} ref={ref} />),
-    Clear: forwardRef((props, ref) => <Clear {...props} ref={ref} />),
-    Delete: forwardRef((props, ref) => <DeleteOutline {...props} ref={ref} />),
-    Save: forwardRef((props, ref) => <SaveAlt {...props} ref={ref} />),
-    Edit: forwardRef((props, ref) => <EditOutlinedIcon {...props} ref={ref} />),
-    Export: forwardRef((props, ref) => <SaveAlt {...props} ref={ref} />),
-    Filter: forwardRef((props, ref) => <FilterList {...props} ref={ref} />),
-    //FirstPage: forwardRef((props, ref) => <FirstPage {...props} ref={ref} />),
-    //LastPage: forwardRef((props, ref) => <LastPage {...props} ref={ref} />),
-    //NextPage: forwardRef((props, ref) => <ChevronRight {...props} ref={ref} />),
-    //PreviousPage: forwardRef((props, ref) => <ChevronLeft {...props} ref={ref} />),
-    ResetSearch: forwardRef((props, ref) => <Clear {...props} ref={ref} />),
-    Search: forwardRef((props, ref) => <Search {...props} ref={ref} />),
-    SortArrow: forwardRef((props, ref) => <ArrowDownward {...props} ref={ref} />),
-    ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} />),
-    ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />),
-    MoreVertOutlined: forwardRef((props, ref) => <MoreVertOutlinedIcon {...props} ref={ref} />),
-    AssignmentTurnedInOutlined: forwardRef((props, ref) => <AssignmentTurnedInOutlinedIcon {...props} ref={ref} />),
-};
+// The MIT DataGrid caps the page size at 100; the old table showed every row unpaged.
+const PAGE_SIZE = 100
+const PAGE_SIZE_OPTIONS = [25, 50, 100]
 
+const TitlePaper = styled(Paper)(({ theme }) => ({
+    padding: theme.spacing(2),
+    flexGrow: 1,
+    overflow: 'auto',
+}));
 
-const useStyles = makeStyles((theme) => ({
-    spacingLeftRight: {
-        '& div.MuiGrid-root': {
-            paddingLeft: theme.spacing(2),
-            paddingRight: theme.spacing(2)
-        }
-    },
-    spacing: {
-        padding: theme.spacing(2),
-        flexGrow: 1,
-        overflow: 'auto',
-    },
-    hovered: {
-        '& tbody>.MuiTableRow-root:hover': {
-            background: theme.palette.action.hover
-        }
-    },
-}))
+// The old table searched for the whole typed text (case-insensitive, in any column); the DataGrid's
+// default parser would split it into words that must each match.
+const quickFilterParser = (input) => (input === '' ? [] : [input])
 
 function normalize(collection, state) {
     return collection.map(item => ({
@@ -93,62 +60,87 @@ const mapDispatchToProps = (dispatch) => ({
     handleItemEdit: (item) => dispatch(itemEditActions.itemInEdit(item))
 })
 
+// Grid toolbar: the state filter on the left, the grid's quick-filter search box on the right
+// (the old table layout: Filter select + search box).
+function BrowseToolbar(props) {
+    const { filterValue, onFilterChange, mobile } = props
+    return (
+        <Box sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'flex-end',
+            pt: 3,
+            pb: 2,
+            pl: 4,
+            pr: 5,
+        }}>
+            <div>
+                <InputLabel id="main-filter-label">Filter</InputLabel>
+                <Select
+                    labelId="main-filter-label"
+                    id="main-filter"
+                    value={filterValue}
+                    onChange={(event) => onFilterChange(event.target.value)}
+                >
+                    <MenuItem value={itemTypes.ITEM_ACTIVE}>Active</MenuItem>
+                    <MenuItem value={itemTypes.ITEM_DONE}>Done</MenuItem>
+                    <MenuItem value={itemTypes.ITEM_REMOVED}>Deleted</MenuItem>
+                    <MenuItem value='none'>None</MenuItem>
+                </Select>
+            </div>
+            <QuickFilter expanded parser={quickFilterParser}>
+                <QuickFilterControl
+                    render={({ ref, ...controlProps }, state) => (
+                        <TextField
+                            {...controlProps}
+                            inputRef={ref}
+                            variant="standard"
+                            placeholder="Search"
+                            sx={{ width: mobile ? 137 : 287 }}
+                            slotProps={{
+                                ...controlProps.slotProps,
+                                htmlInput: { ...controlProps.slotProps?.htmlInput, 'aria-label': 'Search' },
+                                input: {
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <SearchIcon fontSize="small" />
+                                        </InputAdornment>
+                                    ),
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <QuickFilterClear
+                                                render={<IconButton size="small" aria-label="Clear search" disabled={!state.value} />}
+                                            >
+                                                <ClearIcon fontSize="small" />
+                                            </QuickFilterClear>
+                                        </InputAdornment>
+                                    ),
+                                },
+                            }}
+                        />
+                    )}
+                />
+            </QuickFilter>
+        </Box>
+    )
+}
+
+BrowseToolbar.propTypes = {
+    filterValue: PropTypes.string.isRequired,
+    onFilterChange: PropTypes.func.isRequired,
+    mobile: PropTypes.bool,
+}
+
 function BrowseItems(props) {
     const theme = useTheme()
-    const mobile = useMediaQuery(theme.breakpoints.down('sm'));
-    const classes = useStyles({ isMobile: mobile })
+    // v4 down('sm') (< 960px) is down('md') with the app's v4 breakpoint values
+    const mobile = useMediaQuery(theme.breakpoints.down('md'));
     const [mainFilterValue, setMainFilterValue] = useState(itemTypes.ITEM_ACTIVE)
     const [menuRowData, setMenuRowData] = React.useState(null);
     const filteredData = props.data.filter((item) => mainFilterValue === 'none' || item.state === mainFilterValue)
 
     syncMonkey.reset()
-
-    let actions = []
-    let actionloc = {
-        header: {
-            actions: ''
-        }
-    }
-    if (!mobile) {
-        actions = [
-            {
-                icon: tableIcons.Delete,
-                tooltip: 'Delete',
-                onClick: (event, rowData) => {
-                    setMenuRowData(rowData)
-                    handleSelected('delete', rowData)
-                }
-            },
-            {
-                icon: tableIcons.Edit,
-                tooltip: 'Edit',
-                onClick: (event, rowData) => {
-                    setMenuRowData(rowData)
-                    handleSelected('edit', rowData)
-                }
-            },
-            {
-                icon: tableIcons.AssignmentTurnedInOutlined,
-                tooltip: 'Dealt with',
-                onClick: (event, rowData) => {
-                    setMenuRowData(rowData)
-                    handleSelected('done', rowData)
-                }
-            },
-        ]
-        actionloc = {}
-    } else {
-        actions = [
-            {
-                icon: tableIcons.MoreVertOutlined,
-                tooltip: 'Actions',
-                onClick: (event, rowData) => {
-                    setMenuRowData(rowData)
-                    handleClick(event)
-                }
-            }
-        ]
-    }
 
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [dialogOpen, setDialogOpen] = React.useState(false);
@@ -187,17 +179,73 @@ function BrowseItems(props) {
         setConfirmDialogOpen(false)
     }
 
-    const cellStyle = { padding: mobile ? theme.spacing(0.5) : theme.spacing(1) }
-    const autoCellStyle = Object.assign({}, cellStyle, { width: 50 })
+    const rowAction = (action, row) => {
+        setMenuRowData(row)
+        handleSelected(action, row)
+    }
+
+    const renderActions = ({ row }) => {
+        if (mobile) {
+            return (
+                <Tooltip title="Actions">
+                    <IconButton color="inherit" aria-label="Actions" onClick={(event) => {
+                        setMenuRowData(row)
+                        handleClick(event)
+                    }}>
+                        <MoreVertOutlinedIcon />
+                    </IconButton>
+                </Tooltip>
+            )
+        }
+        return (
+            <React.Fragment>
+                <Tooltip title="Delete">
+                    <IconButton color="inherit" aria-label="Delete" onClick={() => rowAction('delete', row)}>
+                        <DeleteOutlineIcon />
+                    </IconButton>
+                </Tooltip>
+                <Tooltip title="Edit">
+                    <IconButton color="inherit" aria-label="Edit" onClick={() => rowAction('edit', row)}>
+                        <EditOutlinedIcon />
+                    </IconButton>
+                </Tooltip>
+                <Tooltip title="Dealt with">
+                    <IconButton color="inherit" aria-label="Dealt with" onClick={() => rowAction('done', row)}>
+                        <AssignmentTurnedInOutlinedIcon />
+                    </IconButton>
+                </Tooltip>
+            </React.Fragment>
+        )
+    }
+
+    // Equal shares on desktop; on mobile Name gets more room, as the old auto-sized table gave it.
+    const columns = [
+        {
+            field: 'actions',
+            headerName: mobile ? '' : 'Actions',
+            width: mobile ? 56 : 152,
+            sortable: false,
+            filterable: false,
+            headerAlign: 'center',
+            renderCell: renderActions,
+            cellClassName: 'browse-actions-cell',
+        },
+        { field: 'name', headerName: 'Name', flex: mobile ? 1.5 : 1, minWidth: 0 },
+        { field: 'quantity', headerName: mobile ? 'Qt.' : 'Quantity', flex: 1, minWidth: 0 },
+        { field: 'unit', headerName: 'Unit', flex: 1, minWidth: 0 },
+        { field: 'date', headerName: mobile ? 'Exp.' : 'Expiration date', flex: 1, minWidth: 0 },
+    ]
+
+    const cellPadding = mobile ? theme.spacing(0.5) : theme.spacing(1)
 
     return (
         <Grid container direction='column'>
-            <Grid item>
-                <Paper className={classes.spacing}>
+            <Grid size={12}>
+                <TitlePaper>
                     <Title>Browse</Title>
-                </Paper>
+                </TitlePaper>
             </Grid>
-            <Grid item className={clsx(classes.hovered, classes.spacingLeftRight)}>
+            <Grid size={12}>
                 <Menu
                     id="actions-menu"
                     anchorEl={anchorEl}
@@ -213,51 +261,61 @@ function BrowseItems(props) {
                 <ConfirmDialog title="Item removal"
                     descript="Please confirm action. You can restore item at any time using 'deleted' filter option."
                     open={confirmDialogOpen} onClose={handleConfirmDialogClose} />
-                <MaterialTable
-                    options={{
-                        paging: false,
-                        filtering: false,
-                        headerStyle: autoCellStyle
-                    }}
-                    actions={actions}
-                    columns={[
-                        { title: 'Name', field: 'name', cellStyle },
-                        { title: mobile ? 'Qt.' : "Quantity", field: 'quantity', cellStyle: autoCellStyle },
-                        { title: 'Unit', field: 'unit', cellStyle: autoCellStyle },
-                        { title: mobile ? 'Exp.' : "Expiration date", field: 'date', cellStyle }
-                    ]}
-                    localization={actionloc}
-                    data={filteredData}
-                    title=""
-                    icons={tableIcons}
-                    components={{
-                        Toolbar: props => (
-                            <Grid container direction='row' justify='space-between' alignItems='flex-end'>
-                                <Grid item sm={3} xs={3} className={classes.spacing}>
-                                    <InputLabel id="main-filter-label">Filter</InputLabel>
-                                    <Select
-                                        labelId="main-filter-label"
-                                        id="main-filter"
-                                        value={mainFilterValue}
-                                        onChange={(event) => setMainFilterValue(event.target.value)}
-                                    >
-                                        <MenuItem value={itemTypes.ITEM_ACTIVE}>Active</MenuItem>
-                                        <MenuItem value={itemTypes.ITEM_DONE}>Done</MenuItem>
-                                        <MenuItem value={itemTypes.ITEM_REMOVED}>Deleted</MenuItem>
-                                        <MenuItem value='none'>None</MenuItem>
-                                    </Select>
-                                </Grid>
-                                <Grid item sm={8} xs={8} className={classes.spacing}>
-                                    <MTableToolbar {...props} />
-                                </Grid>
-                            </Grid>
-                        )
-                    }}
-                />
+                <Paper elevation={2}>
+                    <DataGrid
+                        rows={filteredData}
+                        columns={columns}
+                        autoHeight
+                        getRowHeight={() => 'auto'}
+                        columnHeaderHeight={mobile ? 36 : 40}
+                        showToolbar
+                        slots={{ toolbar: BrowseToolbar }}
+                        slotProps={{
+                            toolbar: { filterValue: mainFilterValue, onFilterChange: setMainFilterValue, mobile },
+                        }}
+                        initialState={{ pagination: { paginationModel: { pageSize: PAGE_SIZE } } }}
+                        pageSizeOptions={PAGE_SIZE_OPTIONS}
+                        disableColumnMenu
+                        disableColumnResize
+                        disableColumnSelector
+                        disableDensitySelector
+                        disableRowSelectionOnClick
+                        sx={{
+                            border: 0,
+                            '& .MuiDataGrid-columnHeader, & .MuiDataGrid-cell': {
+                                px: cellPadding,
+                            },
+                            '& .MuiDataGrid-cell': {
+                                py: cellPadding,
+                                display: 'flex',
+                                alignItems: 'center',
+                                whiteSpace: 'normal',
+                                overflowWrap: 'break-word',
+                            },
+                            '& .MuiDataGrid-cell.browse-actions-cell': {
+                                p: 0,
+                                justifyContent: 'center',
+                            },
+                            // The old table had no cell/header focus ring; the action buttons keep their own.
+                            '& .MuiDataGrid-cell:focus, & .MuiDataGrid-cell:focus-within, & .MuiDataGrid-columnHeader:focus, & .MuiDataGrid-columnHeader:focus-within': {
+                                outline: 'none',
+                            },
+                            '& .MuiDataGrid-columnSeparator': {
+                                display: 'none',
+                            },
+                        }}
+                    />
+                </Paper>
             </Grid>
         </Grid>
     )
 }
 
+BrowseItems.propTypes = {
+    data: PropTypes.arrayOf(PropTypes.object).isRequired,
+    handleDialogDone: PropTypes.func.isRequired,
+    handleItemRemoval: PropTypes.func.isRequired,
+    handleItemEdit: PropTypes.func.isRequired,
+}
 
 export default connect(mapStateToProps, mapDispatchToProps)(BrowseItems);
