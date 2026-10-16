@@ -1,13 +1,11 @@
-import Box from '@material-ui/core/Box';
-import Container from '@material-ui/core/Container';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import Divider from '@material-ui/core/Divider';
-import Drawer from '@material-ui/core/Drawer';
-import IconButton from '@material-ui/core/IconButton';
-import List from '@material-ui/core/List';
-import { makeStyles } from '@material-ui/core/styles';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import clsx from 'clsx';
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
+import Divider from '@mui/material/Divider';
+import MuiDrawer from '@mui/material/Drawer';
+import IconButton from '@mui/material/IconButton';
+import List from '@mui/material/List';
+import { styled } from '@mui/material/styles';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
@@ -17,63 +15,55 @@ import { appBarItemsPrimary, appBarItemsSecondary } from '../constants/appBarIte
 import { itemEditActions } from '../logic/item-edit-add';
 import NavBar from '../components/NavBar'
 import { drawerWidth } from '../constants/constants'
-import MuiAlert from '@material-ui/lab/Alert';
-import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
 import { navigate } from "@reach/router"
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    display: 'flex',
-  },
-  drawerPaper: {
-    position: 'relative',
-    whiteSpace: 'nowrap',
-    width: (props) => drawerWidth(props.isMobile),
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  drawerPaperClose: {
-    overflowX: 'hidden',
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    width: props => props.isMobile ? theme.spacing(0) : theme.spacing(7),
-    [theme.breakpoints.up('sm')]: {
-      width: theme.spacing(9),
+// Permanent drawer that is wide when open and collapses to an icon rail (or nothing on mobile) when closed.
+const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'isMobile' })(
+  ({ theme, open, isMobile }) => ({
+    '& .MuiDrawer-paper': {
+      position: 'relative',
+      whiteSpace: 'nowrap',
+      width: drawerWidth(isMobile),
+      transition: theme.transitions.create('width', {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+      ...(!open && {
+        overflowX: 'hidden',
+        transition: theme.transitions.create('width', {
+          easing: theme.transitions.easing.sharp,
+          duration: theme.transitions.duration.leavingScreen,
+        }),
+        // v4 also had an up('sm') 72px rule, but its prop-driven width (a later dynamic JSS sheet) always won,
+        // so the rendered rail was 56px (0 on mobile). Keep what was rendered.
+        width: isMobile ? theme.spacing(0) : theme.spacing(7),
+      }),
     },
-  },
-  appBarSpacer: theme.mixins.toolbar,
-  content: {
-    flexGrow: 1,
-    height: '100vh',
-    overflow: 'auto',
-  },
-  container: {
-    paddingTop: theme.spacing(4),
-    paddingBottom: theme.spacing(4),
-  },
-  menuBtn: {
-    textDecoration: 'none',
-    color: theme.palette.text.primary
-  },
-  toolbar: {
-    paddingRight: 24, // keep right padding when drawer closed
-  },
-  toolbarIcon: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    padding: '0 8px',
-    ...theme.mixins.toolbar,
-  },
-  alertSpacer: {
-    width: '100%',
-    '& > * + *': {
-      marginTop: theme.spacing(2),
-    },
+  })
+);
+
+const ToolbarIcon = styled('div')(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'flex-end',
+  padding: '0 8px',
+  ...theme.mixins.toolbar,
+}));
+
+const AppBarSpacer = styled('div')(({ theme }) => theme.mixins.toolbar);
+
+const Content = styled('main')({
+  flexGrow: 1,
+  height: '100vh',
+  overflow: 'auto',
+});
+
+const AlertSpacer = styled('div')(({ theme }) => ({
+  width: '100%',
+  '& > * + *': {
+    marginTop: theme.spacing(2),
   },
 }));
 
@@ -92,8 +82,6 @@ function Alert(props) {
 }
 
 function Layout(props) {
-  const classes = useStyles(props);
-
   const [open, setOpen] = React.useState(false);
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -123,44 +111,37 @@ function Layout(props) {
   })
 
   return (
-    <div className={classes.root}>
-      <CssBaseline />
+    <Box sx={{ display: 'flex' }}>
       <NavBar open={open} handleDrawerOpen={handleDrawerOpen} isMobile={props.isMobile}/>
-      <Drawer
-        variant="permanent"
-        classes={{
-          paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose),
-        }}
-        open={open}
-      >
-        <div className={classes.toolbarIcon}>
-          <IconButton onClick={handleDrawerClose}>
+      <Drawer variant="permanent" open={open} isMobile={props.isMobile}>
+        <ToolbarIcon>
+          <IconButton onClick={handleDrawerClose} aria-label="close drawer">
             <ChevronLeftIcon />
           </IconButton>
-        </div>
+        </ToolbarIcon>
         <Divider />
-        <List className={classes.appBarNav}>{appBarItemsPrimary(classes, listProps)}</List>
+        <List>{appBarItemsPrimary(listProps)}</List>
         <Divider />
-        <List className={classes.appBarNav}>{appBarItemsSecondary(classes, listProps)}</List>
+        <List>{appBarItemsSecondary(listProps)}</List>
       </Drawer>
-      <main className={classes.content}>
-        <div className={classes.alertSpacer} >
+      <Content>
+        <AlertSpacer>
           <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleAlertClose}
             anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
             <Alert onClose={handleAlertClose} severity="error">
               {props.errorMessage}
             </Alert>
           </Snackbar>
-        </div>
-        <div className={classes.appBarSpacer} />
-        <Container maxWidth="xl" className={classes.container}>
+        </AlertSpacer>
+        <AppBarSpacer />
+        <Container maxWidth="xl" sx={{ pt: 4, pb: 4 }}>
           <RouterSwitch history={props.history} />
           <Box pt={4}>
             <Copyright />
           </Box>
         </Container>
-      </main>
-    </div>
+      </Content>
+    </Box>
   );
 }
 

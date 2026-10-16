@@ -85,7 +85,7 @@ The following variables are required:
 
 * Frontend built with [Vite](https://vitejs.dev/) and [React](https://reactjs.org/)
 * [Redux](https://redux.js.org) for state management
-* [MATERIAL-UI](https://material-ui.com) for the UI
+* [MUI](https://mui.com) v7 (Material UI, Emotion) with MUI X data grid and date pickers for the UI, [Recharts](https://recharts.org) for charts
 * [PouchDb](https://pouchdb.com) / [CouchDb](https://couchdb.apache.org/) for storing data ([server setup notes](doc/couchdb/README.md))
 * [Auth0](https://auth0.com) integration for handling auth-related stuff
 * Hosting provided by [Heroku](https://www.heroku.com/)

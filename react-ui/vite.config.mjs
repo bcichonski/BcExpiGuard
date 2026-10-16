@@ -36,12 +36,6 @@ export default defineConfig({
   define: {
     global: 'globalThis',
   },
-  resolve: {
-    // material-table 1.69 nests @material-ui/pickers 3.2.2, whose ESM index re-exports type-only names
-    // (e.g. DateTimePickerProps) that Rolldown rejects as MISSING_EXPORT. Resolve every import of pickers
-    // to the single top-level copy (3.3.x), which is API-compatible and what the app itself uses.
-    dedupe: ['@material-ui/pickers'],
-  },
   server: {
     port: 3000,
   },
@@ -53,7 +47,9 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./src/setupTests.js'],
     // spinners-react is type:module but its "main" is a UMD file; let Vite resolve its ESM "module" entry.
-    server: { deps: { inline: ['spinners-react'] } },
+    // MUI v7's ESM imports `react/jsx-runtime`, which Node cannot resolve in React 17 (no "exports" map);
+    // inlining lets Vite resolve it.
+    server: { deps: { inline: ['spinners-react', /@mui\//] } },
     include: ['src/**/*.test.{js,jsx}'],
     // Test values so the suite never depends on .env.production / .env.local.
     env: {

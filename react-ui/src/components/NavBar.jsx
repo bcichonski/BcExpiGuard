@@ -1,40 +1,33 @@
 import React from "react";
 import { Fragment } from 'react'
 import { useAuth0 } from "../common/auth0";
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import MenuIcon from '@material-ui/icons/Menu';
-//import NotificationsIcon from '@material-ui/icons/Notifications';
-import AppBar from '@material-ui/core/AppBar';
-import clsx from 'clsx';
-import { makeStyles } from '@material-ui/core/styles';
-import IconButton from '@material-ui/core/IconButton';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import MenuIcon from '@mui/icons-material/Menu';
+import MuiAppBar from '@mui/material/AppBar';
+import { styled } from '@mui/material/styles';
+import IconButton from '@mui/material/IconButton';
 import { drawerWidth } from '../constants/constants'
 import PropTypes from 'prop-types';
-import AccountCircleIcon from '@material-ui/icons/AccountCircle';
-import Button from '@material-ui/core/Button';
-import { withStyles } from '@material-ui/core/styles';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
-import ExitToAppIcon from '@material-ui/icons/ExitToApp';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import Avatar from '@material-ui/core/Avatar';
-import AccountBoxOutlinedIcon from '@material-ui/icons/AccountBoxOutlined';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Avatar from '@mui/material/Avatar';
+import AccountBoxOutlinedIcon from '@mui/icons-material/AccountBoxOutlined';
 import { navigate } from "@reach/router"
 import SyncState from "./SyncState";
 import { connect } from 'react-redux'
-import MoreVertIcon from '@material-ui/icons/MoreVert';
-import Tooltip from '@material-ui/core/Tooltip'
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import Tooltip from '@mui/material/Tooltip'
 
-const StyledMenu = withStyles({
-  paper: {
-    border: '1px solid #d3d4d5',
-  },
-})((props) => (
+const StyledMenu = styled((props) => (
   <Menu
     elevation={0}
-    getContentAnchorEl={null}
     anchorOrigin={{
       vertical: 'bottom',
       horizontal: 'center',
@@ -45,59 +38,39 @@ const StyledMenu = withStyles({
     }}
     {...props}
   />
-));
+))({
+  '& .MuiMenu-paper': {
+    border: '1px solid #d3d4d5',
+  },
+});
 
-const StyledMenuItem = withStyles((theme) => ({
-  root: {
-    '&:focus': {
-      backgroundColor: theme.palette.primary.main,
-      '& .MuiListItemIcon-root, & .MuiListItemText-primary': {
-        color: theme.palette.common.white,
-      },
+const StyledMenuItem = styled(MenuItem)(({ theme }) => ({
+  '&:focus': {
+    backgroundColor: theme.palette.primary.main,
+    '& .MuiListItemIcon-root, & .MuiListItemText-primary': {
+      color: theme.palette.common.white,
     },
   },
-}))(MenuItem);
+}));
 
-
-const useStyles = makeStyles((theme) => ({
-  appBar: {
+// Sits above the drawer; when the drawer opens it shifts right and narrows by the drawer width.
+const AppBar = styled(MuiAppBar, { shouldForwardProp: (prop) => prop !== 'open' && prop !== 'isMobile' })(
+  ({ theme, open, isMobile }) => ({
     zIndex: theme.zIndex.drawer + 1,
     transition: theme.transitions.create(['width', 'margin'], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-  },
-  appBarShift: {
-    marginLeft: (props) => drawerWidth(props.isMobile),
-    width: props => `calc(100% - ${drawerWidth(props.isMobile)}px)`,
-    transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
+    ...(open && {
+      marginLeft: drawerWidth(isMobile),
+      width: `calc(100% - ${drawerWidth(isMobile)}px)`,
+      transition: theme.transitions.create(['width', 'margin'], {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
     }),
-  },
-  toolbar: {
-    paddingRight: 24, // keep right padding when drawer closed
-  },
-  toolbarIcon: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    padding: '0 8px',
-    ...theme.mixins.toolbar,
-  },
-  menuButton: {
-    marginRight: 36
-  },
-  menuButtonHidden: {
-    display: 'none',
-  },
-  title: {
-    flexGrow: 1,
-  },
-  button: {
-    margin: theme.spacing(1),
-  },
-}))
+  })
+);
 
 function getHintFromState(state) {
   if (state === 'ok') {
@@ -121,7 +94,6 @@ const mapStateToProps = (state, ownProps) => ({
 })
 
 const NavBar = (props) => {
-  const classes = useStyles({isMobile: props.isMobile});
   const { isAuthenticated, loginWithRedirect, logout, user } = useAuth0();
   const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -146,9 +118,9 @@ const NavBar = (props) => {
   if (isAuthenticated) {
     authWidget = (
       <Fragment>
-        <span className={classes.toolbar}>
+        <Box component="span" sx={{ pr: 3 }}>
           <SyncState state={props.state} hint={props.hint} />
-        </span>
+        </Box>
         <Tooltip title={user.name} id='login_tooltip'>
           <Button
             id = 'account_button'
@@ -191,7 +163,7 @@ const NavBar = (props) => {
           variant="contained"
           color="secondary"
           size="small"
-          className={classes.button}
+          sx={{ m: 1 }}
           onClick={() => loginWithRedirect({})}
           startIcon={<AccountCircleIcon />}
         >
@@ -203,18 +175,18 @@ const NavBar = (props) => {
 
 
   return (
-    <AppBar position="absolute" className={clsx(classes.appBar, props.open && classes.appBarShift)}>
-      <Toolbar className={classes.toolbar}>
+    <AppBar position="absolute" open={props.open} isMobile={props.isMobile}>
+      <Toolbar sx={{ pr: 3 }}>
         <IconButton
           edge="start"
           color="inherit"
           aria-label="open drawer"
           onClick={props.handleDrawerOpen}
-          className={clsx(classes.menuButton, props.open && classes.menuButtonHidden)}
+          sx={{ mr: '36px', ...(props.open && { display: 'none' }) }}
         >
           <MenuIcon />
         </IconButton>
-        <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
+        <Typography component="h1" variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
           ExpiGuard
       </Typography>
         {authWidget}

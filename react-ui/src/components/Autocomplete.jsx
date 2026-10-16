@@ -1,13 +1,13 @@
 import React from 'react';
-import TextField from '@material-ui/core/TextField';
-import { Autocomplete as LabAutocomplete } from '@material-ui/lab';
+import TextField from '@mui/material/TextField';
+import MuiAutocomplete from '@mui/material/Autocomplete';
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
 import PropTypes from 'prop-types'
 
 function Autocomplete(props) {
   return (
-    <LabAutocomplete
+    <MuiAutocomplete
       freeSolo
       inputValue={props.value}
       onInputChange={(event, newValue, kind) => {
@@ -23,18 +23,21 @@ function Autocomplete(props) {
       renderInput={(params) => (
         <TextField {...params} label={props.label} margin="normal" helperText={props.helperText} error={props.error} autoFocus={props.autoFocus} />
       )}
-      renderOption={(option, { inputValue }) => {
+      renderOption={(optionProps, option, { inputValue }) => {
+        const { key, ...liProps } = optionProps;
         const matches = match(option.name, inputValue);
         const parts = parse(option.name, matches);
 
         return (
-          <div>
-            {parts.map((part, index) => (
-              <span key={index} style={{ fontWeight: part.highlight ? 700 : 400 }}>
-                {part.text}
-              </span>
-            ))}
-          </div>
+          <li key={key} {...liProps}>
+            <div>
+              {parts.map((part, index) => (
+                <span key={index} style={{ fontWeight: part.highlight ? 700 : 400 }}>
+                  {part.text}
+                </span>
+              ))}
+            </div>
+          </li>
         );
       }}
     />

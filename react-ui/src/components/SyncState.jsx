@@ -1,11 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import SyncAltIcon from '@material-ui/icons/SyncAlt';
-import Tooltip from '@material-ui/core/Tooltip'
-import SyncIcon from '@material-ui/icons/Sync';
-import SyncProblemIcon from '@material-ui/icons/SyncProblem';
-import SyncDisabledIcon from '@material-ui/icons/SyncDisabled';
-import Badge from '@material-ui/core/Badge';
+import SyncAltIcon from '@mui/icons-material/SyncAlt';
+import Tooltip from '@mui/material/Tooltip'
+import SyncIcon from '@mui/icons-material/Sync';
+import SyncProblemIcon from '@mui/icons-material/SyncProblem';
+import SyncDisabledIcon from '@mui/icons-material/SyncDisabled';
+import Badge from '@mui/material/Badge';
 
 const SyncState = (props) => {
     let icon = (

@@ -1,11 +1,10 @@
 import React, { Fragment } from 'react';
-//import clsx from 'clsx';
-import { makeStyles } from '@material-ui/core/styles';
-import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
+import Grid from '@mui/material/Grid';
+import Paper from '@mui/material/Paper';
+import { styled } from '@mui/material/styles';
 import ExpireSoonList from '../components/ExpireSoonList';
-import Fab from '@material-ui/core/Fab';
-import AddIcon from '@material-ui/icons/Add';
+import Fab from '@mui/material/Fab';
+import AddIcon from '@mui/icons-material/Add';
 import { itemEditActions } from '../logic/item-edit-add'
 import { itemActions, itemTypes } from '../logic/item-list'
 import { connect } from 'react-redux';
@@ -14,23 +13,19 @@ import Title from '../components/Title'
 import syncMonkey from '../common/syncMonkey'
 import { changedLastQuarter } from '../common/utils'
 
-const useStyles = makeStyles((theme) => ({
-  paper: {
-    padding: theme.spacing(2),
-    display: 'flex',
-    overflow: 'auto',
-    flexDirection: 'column',
-  },
-  fixedHeight: {
-    height: 240,
-  },
-  floatRight: {
-    position: 'fixed',
-    marginRight: theme.spacing(1),
-    marginBottom: theme.spacing(1),
-    right: theme.spacing(2),
-    bottom: theme.spacing(1)
-  }
+const ContentPaper = styled(Paper)(({ theme }) => ({
+  padding: theme.spacing(2),
+  display: 'flex',
+  overflow: 'auto',
+  flexDirection: 'column',
+}));
+
+const AddFab = styled(Fab)(({ theme }) => ({
+  position: 'fixed',
+  marginRight: theme.spacing(1),
+  marginBottom: theme.spacing(1),
+  right: theme.spacing(2),
+  bottom: theme.spacing(1),
 }));
 
 function onlyNotRemoved(item) {
@@ -98,7 +93,7 @@ function formatDateText(datestr) {
 function createWidgetIfNotEmpty(title, items, handleDone, handleUndo, hideHeader) {
   if (items && items.length > 0) {
     return (
-      <Grid item xs={12}>
+      <Grid size={12}>
         <ExpireSoonList title={title} handleRemove={handleDone} handleUndo={handleUndo} showHeader={!hideHeader}
           items={items.map(i => Object.assign({}, i, { datedescript: formatDateText(i.date) }))}
         />
@@ -108,8 +103,6 @@ function createWidgetIfNotEmpty(title, items, handleDone, handleUndo, hideHeader
 }
 
 function MainContent(props) {
-  const classes = useStyles();
-  //const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
   syncMonkey.reset()
   const { expired, handleDone, handleUndo, expiresToday, expiresInAWeek, expiresInAMonth } = props
   let anyItems = false;
@@ -126,7 +119,7 @@ function MainContent(props) {
   let superWidget
   if (!anyWidget) {
     superWidget = (
-      <Grid item xs={12}>
+      <Grid size={12}>
         <Title>Great news!</Title>
         <Fragment>
           No items will expire in the nearest future. You are really lucky.
@@ -137,7 +130,7 @@ function MainContent(props) {
 
   return (
     <div>
-      <Paper className={classes.paper}>
+      <ContentPaper>
         <Grid container spacing={3}>
           {/* Chart }
         <Grid item xs={12} md={8} lg={9}>
@@ -158,10 +151,10 @@ function MainContent(props) {
           {expiresMonthWidget}
           {superWidget}
         </Grid>
-      </Paper>
-      <Fab color="primary" aria-label="add" className={classes.floatRight} onClick={props.handleAddNew}>
+      </ContentPaper>
+      <AddFab color="primary" aria-label="add" onClick={props.handleAddNew}>
         <AddIcon />
-      </Fab>
+      </AddFab>
     </div>
   )
 }

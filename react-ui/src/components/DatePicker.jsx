@@ -1,45 +1,43 @@
 import React from 'react';
-import TextField from '@material-ui/core/TextField'
-import { DatePicker, KeyboardDatePicker } from "@material-ui/pickers";
+import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
+import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
+import { parse, isValid } from 'date-fns';
 import PropTypes from 'prop-types'
 import { DATE_FORMAT } from '../constants/constants'
 
+// The store keeps the date as a DATE_FORMAT string; the picker works with Date objects.
+const toDate = (text) => {
+    if (!text) {
+        return null
+    }
+    const date = parse(text, DATE_FORMAT, new Date())
+    return isValid(date) ? date : null
+}
+
 function Datepicker(props) {
     const today = new Date()
+    const Picker = props.isMobile ? MobileDatePicker : DesktopDatePicker
 
-    if (props.isMobile) {
-        return (
-            <DatePicker
-                shrink
-                autoOk={true}
-                disableToolbar
-                variant="dialog"
-                label={props.label}
-                helperText={props.helperText}
-                value={props.selectedDate ?? null}
-                onChange={date => props.setDate(date)}
-                error={props.error}
-                TextFieldComponent={(props) => <TextField error={props.error} {...props} />}
-                format={DATE_FORMAT}
-                minDate={today}
-            />
-        )
-    } else {
-        return (
-            <KeyboardDatePicker
-                autoOk={true}
-                variant="inline"
-                label={props.label}
-                value={props.selectedDate ?? null}
-                onChange={date => props.setDate(date)}
-                helperText={props.helperText}
-                format={DATE_FORMAT}
-                minDate={today}
-                error={props.error}
-                TextFieldComponent={(props) => <TextField error={props.error} {...props} />}
-            />
-        )
-    }
+    return (
+        <Picker
+            label={props.label}
+            value={toDate(props.selectedDate)}
+            // whatever the picker emits (Date, null or an invalid Date while typing) goes to the store logic unchanged
+            onChange={date => props.setDate(date)}
+            format={DATE_FORMAT}
+            minDate={today}
+            closeOnSelect
+            // plain <input> inside the regular TextField (theme's standard variant), like the v4 keyboard picker
+            enableAccessibleFieldDOMStructure={false}
+            slotProps={{
+                textField: {
+                    error: props.error,
+                    helperText: props.helperText
+                },
+                ...(props.isMobile ? { toolbar: { hidden: true }, actionBar: { actions: ['cancel', 'accept'] } } : {})
+            }}
+        />
+    )
 }
 
 Datepicker.propTypes = {
