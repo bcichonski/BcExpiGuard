@@ -35,7 +35,7 @@
     "redux-devtools-extension": "^2.13.8",
     "redux-thunk": "^2.3.0",
     "spinners-react": "^1.0.4",
-    "uuid": "^8.0.0"
+    "uuid": "^14.0.0"
   },
   "scripts": {
     "start": "vite",
