@@ -2,10 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
-import * as serviceWorker from './serviceWorker';
+import { registerSW } from 'virtual:pwa-register';
 import { Provider } from 'react-redux'
 import store from './common/store'
-import config from "./constants/auth_config.json";
+import { AUTH0_DOMAIN, AUTH0_CLIENT_ID, AUTH0_AUDIENCE } from "./constants/config";
 import { Auth0Provider } from "./common/auth0";
 import { createBrowserHistory } from "history";
 import syncMonkey from './common/syncMonkey'
@@ -13,7 +13,6 @@ import syncMonkey from './common/syncMonkey'
 const customHistory = createBrowserHistory();
 
 const onRedirectCallback = appState => {
-  // eslint-disable-next-line
   customHistory.push(
     appState && appState.targetUrl
       ? appState.targetUrl
@@ -36,9 +35,9 @@ syncMonkey.setWakeUpHooks(wakeUpHook, wakeUpClean)
 ReactDOM.render(
   /*<React.StrictMode>*/
   <Auth0Provider
-    domain={config.domain}
-    client_id={config.clientId}
-    audience={config.audience}
+    domain={AUTH0_DOMAIN}
+    client_id={AUTH0_CLIENT_ID}
+    audience={AUTH0_AUDIENCE}
     redirect_uri={window.location.origin}
     onRedirectCallback={onRedirectCallback}
   >
@@ -50,7 +49,6 @@ ReactDOM.render(
   document.getElementById('root')
 );
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.register();
+// Registers /service-worker.js (vite-plugin-pwa, auto-update): a new worker activates immediately
+// and replaces the previous one, including the worker installed by the former CRA build.
+registerSW({ immediate: true });

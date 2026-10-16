@@ -1,39 +1,41 @@
 // Characterization tests for common/syncMonkey.js: they pin today's behaviour,
 // including oddities (called out in comments), and do not fix anything.
 
+import { vi } from 'vitest'
+
 describe('syncMonkey', () => {
     let monkey
     let dbProvider
     let randomSpy
     let logSpy
 
-    beforeEach(() => {
-        jest.resetModules()
-        jest.useFakeTimers()
+    beforeEach(async () => {
+        vi.resetModules()
+        vi.useFakeTimers()
         // The real persistence module instantiates PouchDB, so replace it.
-        jest.doMock('../../persistence', () => ({
+        vi.doMock('../../persistence', () => ({
             __esModule: true,
             default: {
-                replicate: jest.fn(),
-                resetReplication: jest.fn()
+                replicate: vi.fn(),
+                resetReplication: vi.fn()
             }
         }))
         // Math.random() === 0 makes every salt equal its minimum:
         // getSalt(10, 100) === 10 and getSalt(10, 1000) === 10.
-        randomSpy = jest.spyOn(Math, 'random').mockReturnValue(0)
-        logSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
-        dbProvider = require('../../persistence').default
+        randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0)
+        logSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
+        dbProvider = (await import('../../persistence')).default
         // The module exports a singleton, so reload it for each test.
-        monkey = require('../../common/syncMonkey').default
+        monkey = (await import('../../common/syncMonkey')).default
     })
 
     afterEach(() => {
         monkey.stop()
-        jest.clearAllTimers()
-        jest.useRealTimers()
+        vi.clearAllTimers()
+        vi.useRealTimers()
         randomSpy.mockRestore()
         logSpy.mockRestore()
-        jest.dontMock('../../persistence')
+        vi.doUnmock('../../persistence')
     })
 
     describe('initial state', () => {
@@ -43,7 +45,7 @@ describe('syncMonkey', () => {
             expect(monkey.max_timeout_ms).toBe(300000)
             expect(monkey.inSync).toBe(false)
             expect(monkey.handle).toBeUndefined()
-            expect(jest.getTimerCount()).toBe(0)
+            expect(vi.getTimerCount()).toBe(0)
         })
     })
 
@@ -64,26 +66,26 @@ describe('syncMonkey', () => {
 
     describe('start / stop', () => {
         it('schedules sync after timeout plus salt', () => {
-            const syncSpy = jest.spyOn(monkey, 'sync').mockImplementation(() => {})
+            const syncSpy = vi.spyOn(monkey, 'sync').mockImplementation(() => {})
             monkey.start()
-            jest.advanceTimersByTime(1009)
+            vi.advanceTimersByTime(1009)
             expect(syncSpy).not.toHaveBeenCalled()
-            jest.advanceTimersByTime(1)
+            vi.advanceTimersByTime(1)
             expect(syncSpy).toHaveBeenCalledTimes(1)
         })
 
         it('keeps only one pending timer when started twice', () => {
             monkey.start()
             monkey.start()
-            expect(jest.getTimerCount()).toBe(1)
+            expect(vi.getTimerCount()).toBe(1)
         })
 
         it('stop cancels the pending timer and clears the handle', () => {
-            const syncSpy = jest.spyOn(monkey, 'sync').mockImplementation(() => {})
+            const syncSpy = vi.spyOn(monkey, 'sync').mockImplementation(() => {})
             monkey.start()
             monkey.stop()
             expect(monkey.handle).toBeNull()
-            jest.advanceTimersByTime(10000)
+            vi.advanceTimersByTime(10000)
             expect(syncSpy).not.toHaveBeenCalled()
         })
 
@@ -128,7 +130,7 @@ describe('syncMonkey', () => {
             monkey.timeout = 500
             monkey.backoff()
             expect(monkey.timeout).toBe(1000)
-            expect(jest.getTimerCount()).toBe(1) // reset restarts the timer
+            expect(vi.getTimerCount()).toBe(1) // reset restarts the timer
         })
 
         it('resets to the minimum when the timeout is not a number', () => {
@@ -144,7 +146,7 @@ describe('syncMonkey', () => {
             monkey.reset()
             expect(monkey.timeout).toBe(1000)
             expect(monkey.handle).toBeTruthy()
-            expect(jest.getTimerCount()).toBe(1)
+            expect(vi.getTimerCount()).toBe(1)
         })
 
         it('is deferred while a sync is running', () => {
@@ -153,21 +155,21 @@ describe('syncMonkey', () => {
             monkey.reset()
             expect(monkey.resetAfterSync).toBe(true)
             expect(monkey.timeout).toBe(50000)
-            expect(jest.getTimerCount()).toBe(0)
+            expect(vi.getTimerCount()).toBe(0)
         })
     })
 
     describe('wake-up hooks', () => {
         it('does not call the hook at or below one minute', () => {
-            const hookFn = jest.fn()
-            monkey.setWakeUpHooks(hookFn, jest.fn())
+            const hookFn = vi.fn()
+            monkey.setWakeUpHooks(hookFn, vi.fn())
             monkey.setTimeout(60000)
             expect(hookFn).not.toHaveBeenCalled()
         })
 
         it('calls the hook once the timeout exceeds one minute', () => {
-            const hookFn = jest.fn()
-            const cleanFn = jest.fn()
+            const hookFn = vi.fn()
+            const cleanFn = vi.fn()
             monkey.setWakeUpHooks(hookFn, cleanFn)
             monkey.setTimeout(60001)
             expect(hookFn).toHaveBeenCalledTimes(1)
@@ -179,15 +181,15 @@ describe('syncMonkey', () => {
         })
 
         it('needs both hooks to be installed', () => {
-            const hookFn = jest.fn()
+            const hookFn = vi.fn()
             monkey.setWakeUpHooks(hookFn, undefined)
             monkey.setTimeout(120000)
             expect(hookFn).not.toHaveBeenCalled()
         })
 
         it('does nothing when the timeout value is unchanged', () => {
-            const hookFn = jest.fn()
-            monkey.setWakeUpHooks(hookFn, jest.fn())
+            const hookFn = vi.fn()
+            monkey.setWakeUpHooks(hookFn, vi.fn())
             monkey.setTimeout(120000)
             monkey.setTimeout(120000)
             expect(hookFn).toHaveBeenCalledTimes(1)
@@ -202,7 +204,7 @@ describe('syncMonkey', () => {
             expect(dbProvider.replicate).toHaveBeenNthCalledWith(2, 'items')
             expect(monkey.timeout).toBe(1110)
             expect(monkey.inSync).toBe(false)
-            expect(jest.getTimerCount()).toBe(1)
+            expect(vi.getTimerCount()).toBe(1)
         })
 
         it('returns to the minimum timeout when items changed', async () => {
@@ -211,7 +213,7 @@ describe('syncMonkey', () => {
             await monkey.sync()
             expect(monkey.timeout).toBe(1000)
             expect(monkey.resetAfterSync).toBe(false)
-            expect(jest.getTimerCount()).toBe(1)
+            expect(vi.getTimerCount()).toBe(1)
         })
 
         it('returns to the minimum timeout when only item names changed', async () => {
@@ -228,7 +230,7 @@ describe('syncMonkey', () => {
             expect(dbProvider.resetReplication).toHaveBeenCalledTimes(1)
             expect(monkey.timeout).toBe(1110)
             expect(monkey.inSync).toBe(false)
-            expect(jest.getTimerCount()).toBe(1)
+            expect(vi.getTimerCount()).toBe(1)
         })
 
         it('applies a reset requested mid-sync after the backoff', async () => {
@@ -249,14 +251,14 @@ describe('syncMonkey', () => {
             expect(monkey.timeout).toBe(1000)
             expect(monkey.resetAfterSync).toBe(false)
             expect(monkey.inSync).toBe(false)
-            expect(jest.getTimerCount()).toBe(1)
+            expect(vi.getTimerCount()).toBe(1)
         })
 
         it('runs again when the scheduled timer fires', async () => {
             dbProvider.replicate.mockResolvedValue(false)
             await monkey.sync()
             const callsAfterFirst = dbProvider.replicate.mock.calls.length
-            jest.advanceTimersByTime(1110 + 100)
+            vi.advanceTimersByTime(1110 + 100)
             expect(dbProvider.replicate.mock.calls.length).toBeGreaterThan(callsAfterFirst)
         })
     })

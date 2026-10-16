@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import React from 'react';
 import { render, cleanup } from '@testing-library/react';
 import { Provider } from 'react-redux';
@@ -6,9 +7,9 @@ import store from '../common/store';
 import { Auth0Context } from '../common/auth0';
 
 // Keep PouchDB and the network out of the smoke test.
-jest.mock('../persistence', () => ({
+vi.mock('../persistence', () => ({
   __esModule: true,
-  default: { UseUser: jest.fn(), onLogin: jest.fn() },
+  default: { UseUser: vi.fn(), onLogin: vi.fn() },
   users: {},
   categories: {},
   itemNames: {},
@@ -28,21 +29,21 @@ const auth0Value = (overrides) => ({
   loading: false,
   isAuthenticated: false,
   user: undefined,
-  getTokenSilently: jest.fn(),
-  loginWithPopup: jest.fn(),
-  loginWithRedirect: jest.fn(),
-  logout: jest.fn(),
+  getTokenSilently: vi.fn(),
+  loginWithPopup: vi.fn(),
+  loginWithRedirect: vi.fn(),
+  logout: vi.fn(),
   ...overrides,
 });
 
 beforeEach(() => {
-  jest.useFakeTimers();
+  vi.useFakeTimers();
 });
 
 afterEach(() => {
   cleanup();
-  jest.clearAllTimers();
-  jest.useRealTimers();
+  vi.clearAllTimers();
+  vi.useRealTimers();
 });
 
 test('renders the app layout for an unauthenticated, not-loading user', () => {
@@ -50,7 +51,7 @@ test('renders the app layout for an unauthenticated, not-loading user', () => {
 
   expect(container.querySelector('.App')).toBeInTheDocument();
   expect(queryByRole('progressbar')).not.toBeInTheDocument();
-  expect(container).not.toBeEmpty();
+  expect(container).not.toBeEmptyDOMElement();
 });
 
 test('renders the loading panel while auth0 is loading', () => {
