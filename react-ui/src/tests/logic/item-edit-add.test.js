@@ -1,9 +1,9 @@
 import { vi } from 'vitest'
-import { navigate } from '@reach/router'
+import { navigate } from '../../common/navigation'
 import reducer from '../../logic/item-edit-add/reducers'
 import types from '../../logic/item-edit-add/types'
 
-vi.mock('@reach/router', () => ({ navigate: vi.fn() }))
+vi.mock('../../common/navigation', () => ({ navigate: vi.fn() }))
 
 const initial = { state: types.ITEM_DIALOG_INACTIVE, nameError: false, date: null, dateError: false }
 

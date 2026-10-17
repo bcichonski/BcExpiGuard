@@ -1,4 +1,3 @@
-import React from 'react';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
 import { parse, isValid } from 'date-fns';
@@ -14,7 +13,8 @@ const toDate = (text) => {
     return isValid(date) ? date : null
 }
 
-function Datepicker(props) {
+function Datepicker({ isMobile = false, ...rest }) {
+    const props = { ...rest, isMobile }
     const today = new Date()
     const Picker = props.isMobile ? MobileDatePicker : DesktopDatePicker
 
@@ -47,10 +47,6 @@ Datepicker.propTypes = {
     setDate: PropTypes.func,
     selectedDate: PropTypes.string,
     error: PropTypes.bool
-}
-
-Datepicker.defaultProps = {
-    isMobile: false
 }
 
 export default Datepicker;

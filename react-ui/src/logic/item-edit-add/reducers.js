@@ -1,5 +1,5 @@
 import types from './types'
-import { navigate } from "@reach/router"
+import { navigate } from "../../common/navigation"
 
 const itemsAddEditReducer = (state = {
     state: types.ITEM_DIALOG_INACTIVE,

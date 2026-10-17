@@ -1,11 +1,11 @@
-import React from 'react';
 import TextField from '@mui/material/TextField';
 import MuiAutocomplete from '@mui/material/Autocomplete';
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
 import PropTypes from 'prop-types'
 
-function Autocomplete(props) {
+function Autocomplete({ autoFocus = false, ...rest }) {
+  const props = { ...rest, autoFocus }
   return (
     <MuiAutocomplete
       freeSolo
@@ -52,10 +52,6 @@ Autocomplete.propTypes = {
   groupBy: PropTypes.func,
   error: PropTypes.bool,
   autoFocus: PropTypes.bool
-}
-
-Autocomplete.defaultProps = {
-  autoFocus: false
 }
 
 export default Autocomplete;

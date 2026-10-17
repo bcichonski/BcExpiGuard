@@ -1,5 +1,4 @@
 import { vi } from 'vitest';
-import React from 'react';
 import { render, cleanup, fireEvent } from '@testing-library/react';
 import { ThemeProvider } from '@mui/material/styles';
 import Autocomplete from '../components/Autocomplete';
@@ -68,4 +67,12 @@ test('options are grouped with groupBy', () => {
 
   expect(getByText('A')).toBeInTheDocument();
   expect(getByText('B')).toBeInTheDocument();
+});
+
+test('autoFocus defaults to false: the input is focused only when autoFocus is passed', () => {
+  const unfocused = renderAutocomplete();
+  expect(unfocused.getByLabelText('Name')).not.toHaveFocus();
+  cleanup();
+  const focused = renderAutocomplete({ autoFocus: true });
+  expect(focused.getByLabelText('Name')).toHaveFocus();
 });

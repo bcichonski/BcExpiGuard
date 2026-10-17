@@ -83,11 +83,13 @@ The following variables are required:
 
 ## Technologies
 
-* Frontend built with [Vite](https://vitejs.dev/) and [React](https://reactjs.org/)
-* [Redux](https://redux.js.org) for state management
+* Frontend built with [Vite](https://vitejs.dev/) and [React](https://react.dev/) 19
+* [React Router](https://reactrouter.com) 7 for routing
+* [Redux Toolkit](https://redux-toolkit.js.org) 2 with react-redux 9 for state management
+* [date-fns](https://date-fns.org) 4 for dates
 * [MUI](https://mui.com) v7 (Material UI, Emotion) with MUI X data grid and date pickers for the UI, [Recharts](https://recharts.org) for charts
 * [PouchDb](https://pouchdb.com) / [CouchDb](https://couchdb.apache.org/) for storing data ([server setup notes](doc/couchdb/README.md))
-* [Auth0](https://auth0.com) integration for handling auth-related stuff
+* [Auth0](https://auth0.com) integration (Auth0 React SDK v2) for handling auth-related stuff
 * Hosting provided by [Heroku](https://www.heroku.com/)
 
 ---

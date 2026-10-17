@@ -19,10 +19,11 @@ export default [
       react,
       'react-hooks': reactHooks,
     },
-    settings: { react: { version: '16.13' } },
+    settings: { react: { version: 'detect' } },
     rules: {
       ...react.configs.flat.recommended.rules,
-      // Classic JSX runtime (React 16): react/jsx-runtime preset intentionally NOT enabled.
+      // Automatic JSX runtime: no React import needed in scope.
+      ...react.configs.flat['jsx-runtime'].rules,
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
       // Legacy code has many untyped components; rewriting is out of scope.

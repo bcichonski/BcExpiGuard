@@ -1,5 +1,4 @@
 import { vi } from 'vitest';
-import React from 'react';
 import { render, cleanup } from '@testing-library/react';
 import { ThemeProvider } from '@mui/material/styles';
 import ExpireSoonList from '../components/ExpireSoonList';

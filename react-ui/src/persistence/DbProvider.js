@@ -10,17 +10,41 @@ class DbProvider {
         }
 
         this.dbSyncState = {}
+
+        // Login is async (it awaits the token), and StrictMode runs effects twice, so concurrent
+        // useUserAsync calls must share one in-flight login. A logout bumps the generation, which
+        // cancels a login still waiting for its token.
+        this.pendingLogin = null
+        this.authGeneration = 0
     }
 
     async useUserAsync(isAuth, user, getToken) {
-        if (isAuth && user && !this.logged) {
-            this.Login(user, await getToken())
-        }
-        if ((!isAuth || !user) && this.logged) {
+        if (isAuth && user) {
+            if (!this.logged && !this.pendingLogin) {
+                this.pendingLogin = this.loginWithTokenAsync(user, getToken)
+            }
+            if (this.pendingLogin) {
+                await this.pendingLogin
+            }
+        } else {
             await this.Logout()
         }
 
         return this;
+    }
+
+    async loginWithTokenAsync(user, getToken) {
+        const generation = this.authGeneration
+        try {
+            const token = await getToken()
+            if (generation === this.authGeneration && !this.logged) {
+                this.Login(user, token)
+            }
+        } finally {
+            if (generation === this.authGeneration) {
+                this.pendingLogin = null
+            }
+        }
     }
 
     resetReplication() {
@@ -179,20 +203,24 @@ class DbProvider {
     }
 
     async Logout() {
-        try {
-            if (this.logged) {
-                delete this.opts.headers.Authorization;
-                delete this.userId;
+        // Cancel a login that is still waiting for its token; safe to call repeatedly.
+        this.authGeneration++
+        this.pendingLogin = null
 
-                await this.Clear(this.remote.users)
-                await this.Clear(this.remote.items)
-                await this.Clear(this.remote.itemNames)
-                await this.Clear(this.remote.groups)
-            }
-        } finally {
-            this.logged = false
+        if (!this.logged) {
+            return
         }
 
+        // Flip the state before awaiting, so a login started while the remote tables close is not skipped.
+        this.logged = false
+        const remote = this.remote
+        delete this.opts.headers.Authorization;
+        delete this.userId;
+
+        await this.Clear(remote.users)
+        await this.Clear(remote.items)
+        await this.Clear(remote.itemNames)
+        await this.Clear(remote.groups)
     }
 }
 

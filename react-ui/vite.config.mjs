@@ -3,9 +3,9 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
-  // React 16.13 has no react/jsx-runtime; every JSX file imports React (classic runtime, as with CRA 3).
+  // Automatic JSX runtime (React 19 warns about the classic transform).
   plugins: [
-    react({ jsxRuntime: 'classic' }),
+    react(),
     // The service worker is irrelevant under Vitest; skip the plugin to keep test runs fast.
     ...(process.env.VITEST ? [] : [VitePWA({
       strategies: 'generateSW',
@@ -47,8 +47,7 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./src/setupTests.js'],
     // spinners-react is type:module but its "main" is a UMD file; let Vite resolve its ESM "module" entry.
-    // MUI v7's ESM imports `react/jsx-runtime`, which Node cannot resolve in React 17 (no "exports" map);
-    // inlining lets Vite resolve it.
+    // MUI v7 is inlined so Vite (not Node) resolves its ESM imports.
     server: { deps: { inline: ['spinners-react', /@mui\//] } },
     include: ['src/**/*.test.{js,jsx}'],
     // Test values so the suite never depends on .env.production / .env.local.

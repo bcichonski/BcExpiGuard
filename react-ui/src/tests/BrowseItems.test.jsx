@@ -1,8 +1,7 @@
 import { vi } from 'vitest';
-import React from 'react';
-import { render, cleanup, fireEvent, within, wait } from '@testing-library/react';
+import { render, cleanup, fireEvent, within, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
-import { createStore } from 'redux';
+import { configureStore } from '@reduxjs/toolkit';
 import { ThemeProvider } from '@mui/material/styles';
 import BrowseItems from '../pages/BrowseItems';
 import { itemActions, itemTypes } from '../logic/item-list';
@@ -61,9 +60,11 @@ let dispatched;
 const renderBrowse = (mobile = false) => {
   mockViewport(mobile);
   dispatched = [];
-  const store = createStore((state = { itemReducer: items, itemNameReducer: names }, action) => {
-    dispatched.push(action);
-    return state;
+  const store = configureStore({
+    reducer: (state = { itemReducer: items, itemNameReducer: names }, action) => {
+      dispatched.push(action);
+      return state;
+    },
   });
   return render(
     <Provider store={store}>
@@ -122,7 +123,7 @@ test('the quick filter narrows the rows by name', async () => {
 
   fireEvent.change(getByLabelText('Search'), { target: { value: 'che' } });
 
-  await wait(() => expect(rowNames(container)).toEqual(['Cheese']));
+  await waitFor(() => expect(rowNames(container)).toEqual(['Cheese']));
 });
 
 test('columns sort when the header is clicked', async () => {
@@ -130,7 +131,7 @@ test('columns sort when the header is clicked', async () => {
 
   fireEvent.click(getByText('Name'));
 
-  await wait(() => expect(rowNames(container)).toEqual(['Eggs', 'Milk']));
+  await waitFor(() => expect(rowNames(container)).toEqual(['Eggs', 'Milk']));
 });
 
 test('desktop shows the three row actions and the full column labels', () => {

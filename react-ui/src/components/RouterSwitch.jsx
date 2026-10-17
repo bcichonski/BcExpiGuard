@@ -1,29 +1,22 @@
-import React from 'react';
-import { Router } from '@reach/router'
+import { Routes, Route } from 'react-router'
 import MainContent from '../pages/MainContent'
 import AddItem from '../pages/AddItem'
 import BrowseItems from '../pages/BrowseItems'
 import Profile from '../pages/Profile'
 import LandingPage from '../pages/LandingPage'
 import Restricted from './Restricted'
-import PropTypes from 'prop-types';
 
-function RouterSwitch(props) {
+function RouterSwitch() {
     return (
-        <Router history={props.history}>
-            <Restricted component={MainContent} path='/' />
-            <Restricted component={AddItem} path='/item/add' />
-            <Restricted component={AddItem} path='/item/edit' />
-            <Restricted component={BrowseItems} path='/items' />
-            <Restricted path='/profile' component={Profile}>
-            </Restricted>
-            <LandingPage path='/welcome' />
-        </Router>
+        <Routes>
+            <Route path='/' element={<Restricted component={MainContent} />} />
+            <Route path='/item/add' element={<Restricted component={AddItem} />} />
+            <Route path='/item/edit' element={<Restricted component={AddItem} />} />
+            <Route path='/items' element={<Restricted component={BrowseItems} />} />
+            <Route path='/profile' element={<Restricted component={Profile} />} />
+            <Route path='/welcome' element={<LandingPage />} />
+        </Routes>
     );
-}
-
-RouterSwitch.propTypes = {
-    history: PropTypes.object
 }
 
 export default RouterSwitch

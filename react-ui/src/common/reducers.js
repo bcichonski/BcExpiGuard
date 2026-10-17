@@ -1,4 +1,4 @@
-import { combineReducers } from 'redux'
+import { combineReducers } from '@reduxjs/toolkit'
 import itemReducer from '../logic/item-list'
 import itemEditReducer from '../logic/item-edit-add'
 import categoryReducer from '../logic/categories'

@@ -1,4 +1,3 @@
-import React from 'react'
 import { SpinnerRoundOutlined  } from 'spinners-react';
 import Backdrop from '@mui/material/Backdrop';
 

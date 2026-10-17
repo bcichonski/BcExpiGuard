@@ -1,4 +1,3 @@
-import React from 'react'
 import PropTypes from 'prop-types'
 import SyncAltIcon from '@mui/icons-material/SyncAlt';
 import Tooltip from '@mui/material/Tooltip'

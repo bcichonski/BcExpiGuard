@@ -1,6 +1,5 @@
-import React from "react";
-import { useAuth0 } from "../common/auth0";
-import { Redirect } from "@reach/router"
+import { useAuth0 } from "@auth0/auth0-react";
+import { Navigate } from "react-router"
 
 function Restricted({component : Component, ...rest}) {
     const { isAuthenticated } = useAuth0();
@@ -10,7 +9,7 @@ function Restricted({component : Component, ...rest}) {
             <Component {...rest}/>
         )
     } else {
-        return (<Redirect to="/welcome" noThrow />);
+        return (<Navigate to="/welcome" replace />);
     }
 }
 
