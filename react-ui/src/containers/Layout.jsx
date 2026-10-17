@@ -17,7 +17,7 @@ import NavBar from '../components/NavBar'
 import { drawerWidth } from '../constants/constants'
 import MuiAlert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
-import { navigate } from "@reach/router"
+import { useNavigate } from 'react-router';
 
 // Permanent drawer that is wide when open and collapses to an icon rail (or nothing on mobile) when closed.
 const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'isMobile' })(
@@ -82,6 +82,7 @@ function Alert(props) {
 }
 
 function Layout(props) {
+  const navigate = useNavigate();
   const [open, setOpen] = React.useState(false);
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -135,7 +136,7 @@ function Layout(props) {
         </AlertSpacer>
         <AppBarSpacer />
         <Container maxWidth="xl" sx={{ pt: 4, pb: 4 }}>
-          <RouterSwitch history={props.history} />
+          <RouterSwitch />
           <Box pt={4}>
             <Copyright />
           </Box>
@@ -146,8 +147,7 @@ function Layout(props) {
 }
 
 Layout.propTypes = {
-  isMobile: PropTypes.bool,
-  history: PropTypes.object
+  isMobile: PropTypes.bool
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Layout)

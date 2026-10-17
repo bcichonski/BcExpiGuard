@@ -25,12 +25,13 @@ describe('appStateReducer', () => {
             expect(s2).not.toBe(s1)
         })
 
-        it('ODDITY: mutates the errors array shared with the previous state (shallow copy)', () => {
+        it('does not modify the previous state or its errors array', () => {
             const s1 = reducer(undefined, { type: types.ERROR, payload: { message: 'a' } })
             const s2 = reducer(s1, { type: types.ERROR, payload: { message: 'b' } })
-            expect(s2.errors).toBe(s1.errors)
-            expect(s1.errors).toEqual(['a', 'b'])
+            expect(s2.errors).not.toBe(s1.errors)
+            expect(s1.errors).toEqual(['a'])
             expect(s1.lastError).toBe('a')
+            expect(s2.errors).toEqual(['a', 'b'])
         })
     })
 

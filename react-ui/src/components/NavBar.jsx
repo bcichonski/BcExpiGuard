@@ -1,6 +1,6 @@
 import React from "react";
 import { Fragment } from 'react'
-import { useAuth0 } from "../common/auth0";
+import { useAuth0 } from "@auth0/auth0-react";
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -19,7 +19,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Avatar from '@mui/material/Avatar';
 import AccountBoxOutlinedIcon from '@mui/icons-material/AccountBoxOutlined';
-import { navigate } from "@reach/router"
+import { useNavigate } from "react-router"
 import SyncState from "./SyncState";
 import { connect } from 'react-redux'
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -95,6 +95,7 @@ const mapStateToProps = (state, ownProps) => ({
 
 const NavBar = (props) => {
   const { isAuthenticated, loginWithRedirect, logout, user } = useAuth0();
+  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   const handleClick = (event) => {

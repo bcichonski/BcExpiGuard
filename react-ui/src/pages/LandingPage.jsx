@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect } from "react";
 import dbProvider from '../persistence'
-import { useAuth0 } from "../common/auth0";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const LandingPage = () => {
   const { isAuthenticated } = useAuth0();

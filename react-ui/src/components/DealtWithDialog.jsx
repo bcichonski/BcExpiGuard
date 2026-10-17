@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import ChoiceDialog from './ChoiceDialog'
 import ConfirmDialog from './ConfirmDialog'
 import PropTypes from 'prop-types';

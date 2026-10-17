@@ -4,7 +4,7 @@ import { format } from 'date-fns'
 import { itemActions } from '../item-list'
 import { itemNameActions } from '../item-names'
 import { NAMESPACES, createUUID, newUUID } from '../../common/utils'
-import { navigate } from '@reach/router'
+import { navigate } from '../../common/navigation'
 
 const itemNameChanged = (newName) => ({
     type: types.ITEM_NAME_CHANGED,

@@ -1,9 +1,8 @@
 import { vi } from 'vitest';
-import React from 'react';
-import { render, cleanup, fireEvent, within, wait } from '@testing-library/react';
+import { render, cleanup, fireEvent, within, waitFor } from '@testing-library/react';
 import { ThemeProvider } from '@mui/material/styles';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV2';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { addDays, format } from 'date-fns';
 import DatePicker from '../components/DatePicker';
 import theme from '../theme';
@@ -57,7 +56,7 @@ test('picking a day in the mobile dialog calls setDate with that Date and closes
   fireEvent.click(days[days.length - 1]);
   expect(setDate).toHaveBeenCalled();
   expect(setDate.mock.calls[0][0]).toBeInstanceOf(Date);
-  await wait(() => expect(queryByRole('dialog')).toBeNull());
+  await waitFor(() => expect(queryByRole('dialog')).toBeNull());
 });
 
 test('dates before today are disabled in the picker', async () => {
@@ -74,4 +73,16 @@ test('the error state and helper text are shown', () => {
   const { getByText, getByLabelText } = renderPicker({ error: true, helperText: 'Pick a valid date' });
   expect(getByText('Pick a valid date')).toBeTruthy();
   expect(getByLabelText('Expiration date').getAttribute('aria-invalid')).toBe('true');
+});
+
+test('isMobile defaults to false: omitted renders the desktop picker (no Cancel/OK action bar), true the mobile one', async () => {
+  const desktop = renderPicker({ selectedDate: futureText });
+  fireEvent.click(desktop.getByRole('button', { name: /choose date/i }));
+  await desktop.findByRole('dialog');
+  expect(desktop.queryByRole('button', { name: /cancel/i })).toBeNull();
+  cleanup();
+  const mobile = renderPicker({ selectedDate: futureText, isMobile: true });
+  fireEvent.click(mobile.getByRole('button', { name: /choose date/i }));
+  await mobile.findByRole('dialog');
+  expect(mobile.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
 });
