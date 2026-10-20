@@ -2,7 +2,6 @@ import types from './types'
 import { itemNameActions } from '../item-names'
 import { itemActions } from '../item-list'
 import dbProvider, { itemNames, items } from '../../persistence'
-import syncMonkey from '../../common/syncMonkey'
 
 const appError = (message) => ({
     type: types.ERROR,
@@ -51,7 +50,8 @@ const initialize = (syncHooks) => async (dispatch) => {
     } catch (err) {
         dispatch(appError(err.message))
     }
-    syncMonkey.start()
+    // Live sync starts once the local data is loaded; a repeated initialize does not start it twice.
+    dbProvider.startSync()
 }
 
 export default {

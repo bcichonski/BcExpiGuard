@@ -10,7 +10,6 @@ import { itemActions, itemTypes } from '../logic/item-list'
 import { connect } from 'react-redux';
 import { parseISO, differenceInDays, formatDistanceToNow, isPast, isToday, compareAsc } from 'date-fns'
 import Title from '../components/Title'
-import syncMonkey from '../common/syncMonkey'
 import { changedLastQuarter } from '../common/utils'
 
 const ContentPaper = styled(Paper)(({ theme }) => ({
@@ -103,7 +102,6 @@ function createWidgetIfNotEmpty(title, items, handleDone, handleUndo, hideHeader
 }
 
 function MainContent(props) {
-  syncMonkey.reset()
   const { expired, handleDone, handleUndo, expiresToday, expiresInAWeek, expiresInAMonth } = props
   let anyItems = false;
   const expiredWidget = createWidgetIfNotEmpty('Already expired', expired, handleDone, handleUndo, anyItems)

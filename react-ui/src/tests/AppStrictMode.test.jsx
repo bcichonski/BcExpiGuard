@@ -17,6 +17,7 @@ vi.mock('pouchdb', () => ({
   default: vi.fn(function PouchDB(name) {
     this.name = name;
     this.close = vi.fn().mockResolvedValue(undefined);
+    this.destroy = vi.fn().mockResolvedValue(undefined);
   }),
 }));
 
@@ -90,7 +91,7 @@ test('logs in and initializes once under StrictMode, without console warnings', 
 
   expect(value.getAccessTokenSilently).toHaveBeenCalledTimes(1);
   expect(dbProvider.Login).toHaveBeenCalledTimes(1);
-  expect(dbProvider.Login).toHaveBeenCalledWith(user, 'token-1');
+  expect(dbProvider.Login).toHaveBeenCalledWith(user, value.getAccessTokenSilently);
   expect(appActions.initialize).toHaveBeenCalledTimes(1);
   expect(appActions.initialize).toHaveBeenCalledWith({
     changeSyncState: expect.any(Function),

@@ -1,11 +1,12 @@
 import { vi } from 'vitest';
-import { render, cleanup, fireEvent } from '@testing-library/react';
+import { render, cleanup, fireEvent, act } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { MemoryRouter, useLocation } from 'react-router';
 import { ThemeProvider } from '@mui/material/styles';
 import Layout from '../containers/Layout';
 import store from '../common/store';
 import theme from '../theme';
+import { appActions } from '../logic/appstate';
 import { useAuth0 } from '@auth0/auth0-react';
 
 vi.mock('@auth0/auth0-react', () => ({ useAuth0: vi.fn() }));
@@ -126,4 +127,20 @@ test('the NavBar Log out menu item calls logout without arguments', () => {
 
   expect(auth0Value.logout).toHaveBeenCalledTimes(1);
   expect(auth0Value.logout).toHaveBeenCalledWith();
+});
+
+test('the NavBar sync icon follows the sync state', () => {
+  const authenticated = { ...auth0Value, isAuthenticated: true, user: { name: 'Jane', picture: '' } };
+  const { queryByTestId } = renderLayout(false, authenticated);
+
+  try {
+    expect(queryByTestId('SyncAltIcon')).toBeInTheDocument();
+
+    for (const [state, icon] of [['changed', 'SyncIcon'], ['error', 'SyncProblemIcon'], ['disabled', 'SyncDisabledIcon'], ['ok', 'SyncAltIcon']]) {
+      act(() => { store.dispatch(appActions.changeSyncState(state)); });
+      expect(queryByTestId(icon)).toBeInTheDocument();
+    }
+  } finally {
+    act(() => { store.dispatch(appActions.changeSyncState('ok')); });
+  }
 });

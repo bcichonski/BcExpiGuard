@@ -14,7 +14,6 @@ import { itemEditActions, itemEditTypes } from '../logic/item-edit-add'
 import { itemTypes } from '../logic/item-list'
 import dbProvider from '../persistence'
 import Title from '../components/Title';
-import syncMonkey from '../common/syncMonkey'
 
 // v4 Grid items under a non-container parent were sized as a share of the parent's width; v7 Grid sizes need a
 // container, so the same widths (12-column share per breakpoint) are applied here directly.
@@ -91,8 +90,6 @@ function AddItem(props) {
     const theme = useTheme()
     // v4 down('sm') meant < 960px; with the theme's v4 breakpoint values that is down('md') in MUI v7
     const mobile = useMediaQuery(theme.breakpoints.down('md'));
-
-    syncMonkey.reset()
 
     const namesGroupingFunction = (el) => {
         return (el.userId === dbProvider.userId) ? 'Your items' : 'Suggestions'

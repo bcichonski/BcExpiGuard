@@ -18,11 +18,6 @@ vi.mock('../persistence', () => ({
   groups: {},
 }));
 
-vi.mock('../common/syncMonkey', () => ({
-  __esModule: true,
-  default: { reset: vi.fn() },
-}));
-
 // jsdom has no layout, so the grid would measure a zero-sized viewport and render no rows.
 vi.mock('@mui/x-data-grid', async (importOriginal) => {
   const actual = await importOriginal();

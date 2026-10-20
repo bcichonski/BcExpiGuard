@@ -1,6 +1,5 @@
 import { ensureDb, transfromFromPouch } from './validate'
 import dbprovider from '../persistence'
-import syncMonkey from '../common/syncMonkey'
 
 const add = async (payload) => {
     ensureDb(dbprovider, 'item_names')
@@ -32,10 +31,6 @@ const add = async (payload) => {
     }
 
     await dbprovider.local.item_names.upsert(payload.id, namesDeltaFunction)
-    if (dbprovider?.remote?.item_names?.remote_table) {
-        await dbprovider.remote.item_names.remote_table.upsert(payload.id, namesDeltaFunction)
-    }
-    syncMonkey.reset()
 }
 
 const getAll = async () => {
