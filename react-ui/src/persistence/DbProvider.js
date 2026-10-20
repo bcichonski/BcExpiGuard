@@ -41,7 +41,7 @@ class DbProvider {
         try {
             // One token up front: a user without a valid Auth0 session never logs in.
             await getToken()
-            // Same-named local DBs of a previous session must be fully destroyed before they are reopened.
+            // Same-named local DBs of a previous session must be fully closed before they are reopened.
             if (this.teardownPromise) {
                 await this.teardownPromise
             }
@@ -185,13 +185,14 @@ class DbProvider {
         }
     }
 
-    // Order: stop sync (already done by Logout) -> close remotes -> destroy locals (D6).
+    // Order: stop sync (already done by Logout) -> close remotes -> close locals.
+    // Local data is kept on purpose: offline edits not yet pushed must survive a logout.
     async teardownAsync(remote, local) {
         for (const [name, metadata] of Object.entries(remote ?? {})) {
             await this.safely(`close remote ${name}`, () => this.Clear(metadata))
         }
         for (const [name, db] of Object.entries(local ?? {})) {
-            await this.safely(`destroy local ${name}`, () => db.destroy())
+            await this.safely(`close local ${name}`, () => db.close())
         }
     }
 }

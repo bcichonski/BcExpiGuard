@@ -275,39 +275,40 @@ describe('DbProvider login/logout', () => {
             return { remote: provider.remote, local: provider.local }
         }
 
-        it('closes all four remotes and destroys all four locals', async () => {
+        it('closes all four remotes and all four locals without destroying them', async () => {
             const { remote, local } = await login()
 
             await provider.Logout()
 
             for (const name of ['users', 'items', 'item_names', 'groups']) {
                 expect(remote[name].remote_table.close).toHaveBeenCalledTimes(1)
-                expect(local[name].destroy).toHaveBeenCalledTimes(1)
+                expect(local[name].close).toHaveBeenCalledTimes(1)
+                expect(local[name].destroy).not.toHaveBeenCalled()
             }
             expect(provider.local).toBeUndefined()
             expect(provider.remote).toBeUndefined()
             expect(provider.userId).toBeUndefined()
         })
 
-        it('destroys locals only after the remotes are closed', async () => {
+        it('closes locals only after the remotes are closed', async () => {
             const { remote, local } = await login()
             const order = []
             for (const name of Object.keys(remote)) {
                 remote[name].remote_table.close.mockImplementation(async () => { order.push(`close ${name}`) })
-                local[name].destroy.mockImplementation(async () => { order.push(`destroy ${name}`) })
+                local[name].close.mockImplementation(async () => { order.push(`close local ${name}`) })
             }
 
             await provider.Logout()
 
             expect(order).toHaveLength(8)
-            expect(order.slice(0, 4).every((e) => e.startsWith('close'))).toBe(true)
-            expect(order.slice(4).every((e) => e.startsWith('destroy'))).toBe(true)
+            expect(order.slice(0, 4).every((e) => !e.startsWith('close local'))).toBe(true)
+            expect(order.slice(4).every((e) => e.startsWith('close local'))).toBe(true)
         })
 
-        it('keeps tearing down when a close or a destroy rejects', async () => {
+        it('keeps tearing down when a remote or a local close rejects', async () => {
             const { remote, local } = await login()
             remote.items.remote_table.close.mockRejectedValue(new Error('close failed'))
-            local.users.destroy.mockRejectedValue(new Error('destroy failed'))
+            local.users.close.mockRejectedValue(new Error('local close failed'))
             const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
 
             await expect(provider.Logout()).resolves.toBeUndefined()
@@ -315,7 +316,7 @@ describe('DbProvider login/logout', () => {
             expect(remote.item_names.remote_table.close).toHaveBeenCalledTimes(1)
             expect(remote.groups.remote_table.close).toHaveBeenCalledTimes(1)
             for (const name of ['users', 'items', 'item_names', 'groups']) {
-                expect(local[name].destroy).toHaveBeenCalledTimes(1)
+                expect(local[name].close).toHaveBeenCalledTimes(1)
             }
             expect(warn).toHaveBeenCalled()
             warn.mockRestore()
@@ -328,7 +329,7 @@ describe('DbProvider login/logout', () => {
             await provider.Logout()
 
             expect(remote.item_names.remote_table.close).toHaveBeenCalledTimes(1)
-            expect(local.items.destroy).toHaveBeenCalledTimes(1)
+            expect(local.items.close).toHaveBeenCalledTimes(1)
         })
 
         it('a login racing a logout keeps its own DBs', async () => {
@@ -349,8 +350,8 @@ describe('DbProvider login/logout', () => {
             expect(provider.logged).toBe(true)
             expect(provider.local).not.toBe(oldLocal)
             for (const name of ['users', 'items', 'item_names', 'groups']) {
-                expect(oldLocal[name].destroy).toHaveBeenCalledTimes(1)
-                expect(provider.local[name].destroy).not.toHaveBeenCalled()
+                expect(oldLocal[name].close).toHaveBeenCalledTimes(1)
+                expect(provider.local[name].close).not.toHaveBeenCalled()
                 expect(provider.remote[name].remote_table.close).not.toHaveBeenCalled()
             }
         })
