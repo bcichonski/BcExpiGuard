@@ -1,0 +1,16 @@
+**/node_modules
+react-ui/build
+react-ui/nm-trash-delete-me
+.git
+.github
+.claude
+docs
+doc
+*.md
+**/*.local
+**/.env.local
+**/.env.*.local
+npm-debug.log
+Dockerfile
+docker-compose.yml
+.dockerignore

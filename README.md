@@ -1,4 +1,4 @@
-<a href="https://bcexpiguard.herokuapp.com"><img src="react-ui/public/images/icons/icon-152x152.png?raw=true" title="BcExpiGuard" alt="BcExpiGuard" style='font-size: large'>DEMO</a>
+<a href="https://github.com/bcichonski/BcExpiGuard"><img src="react-ui/public/images/icons/icon-152x152.png?raw=true" title="BcExpiGuard" alt="BcExpiGuard" style='font-size: large'></a>
 
 # BcExpiGuard
 
@@ -28,16 +28,37 @@
 
 - Clone this repo to your local machine using `https://github.com/bcichonski/BcExpiGuard.git`
 
+### Run with Docker
+
+Each push to `master` publishes a container image to GitHub Container Registry: `ghcr.io/bcichonski/bcexpiguard`, tagged `latest` and `sha-<short>`.
+
+```sh
+docker run -p 5000:5000 ghcr.io/bcichonski/bcexpiguard:latest
+```
+
+Then open [http://localhost:5000](http://localhost:5000).
+
+To build the image locally and run it with Compose (serves on port 5000):
+
+```sh
+docker compose up --build
+```
+
+For production (TLS proxy, `FORCE_HTTPS`, updates, rollback, Auth0 and CouchDB checklists), see [`doc/deployment.md`](doc/deployment.md).
+
 ### Available Scripts
 
 #### In the `main` directory, you can run:
 
 ##### `npm start`
-to run NodeJS Express server to host the website
+to run the Express server (port `5000`, or `PORT`) that serves the built website from `react-ui/build`. Run `npm run build` first.
 
 
 ##### `npm run build`
-to prepare scripts for production
+to build the `react-ui` app for production into `react-ui/build`
+
+##### `npm test`
+to run the server tests (Node's built-in test runner)
 
 #### In the `react-ui` subdirectory, you can run:
 
@@ -90,7 +111,7 @@ The following variables are required:
 * [MUI](https://mui.com) v7 (Material UI, Emotion) with MUI X data grid and date pickers for the UI, [Recharts](https://recharts.org) for charts
 * [PouchDb](https://pouchdb.com) 9 / [CouchDb](https://couchdb.apache.org/) for storing data with live sync ([server setup notes](doc/couchdb/README.md))
 * [Auth0](https://auth0.com) integration (Auth0 React SDK v2) for handling auth-related stuff
-* Hosting provided by [Heroku](https://www.heroku.com/)
+* Hosting: Docker container image (Node 24, Express) published to GitHub Container Registry (`ghcr.io/bcichonski/bcexpiguard`); see [`doc/deployment.md`](doc/deployment.md)
 
 ---
 

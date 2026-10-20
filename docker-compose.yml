@@ -1,0 +1,11 @@
+services:
+  app:
+    build:
+      context: .
+    image: bcexpiguard
+    ports:
+      - "5000:5000"
+    environment:
+      PORT: "5000"
+      FORCE_HTTPS: "false"
+    restart: unless-stopped
