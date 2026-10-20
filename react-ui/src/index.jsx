@@ -11,19 +11,6 @@ import { Provider } from 'react-redux'
 import store from './common/store'
 import Auth0ProviderWithNavigate from './components/Auth0ProviderWithNavigate';
 import { BrowserRouter } from "react-router";
-import syncMonkey from './common/syncMonkey'
-
-const wakeUpHook = (fn) => {
-  document.addEventListener('mousemove', fn)
-  document.addEventListener('touchmove', fn)
-}
-
-const wakeUpClean = (fn) => {
-  document.removeEventListener('mousemove', fn)
-  document.removeEventListener('touchmove', fn)
-}
-
-syncMonkey.setWakeUpHooks(wakeUpHook, wakeUpClean)
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

@@ -2,20 +2,15 @@ import { vi } from 'vitest';
 
 vi.mock('../../persistence', () => ({
   __esModule: true,
-  default: { setSyncHooks: vi.fn() },
+  default: { setSyncHooks: vi.fn(), startSync: vi.fn() },
   itemNames: { getAll: vi.fn(), add: vi.fn().mockResolvedValue(undefined) },
   items: { getAll: vi.fn(), add: vi.fn().mockResolvedValue(undefined) },
-}));
-
-vi.mock('../../common/syncMonkey', () => ({
-  __esModule: true,
-  default: { start: vi.fn(), reset: vi.fn() },
 }));
 
 import store from '../../common/store';
 import { appActions } from '../../logic/appstate';
 import { itemNames, items } from '../../persistence';
-import syncMonkey from '../../common/syncMonkey';
+import dbProvider from '../../persistence';
 
 const storedNames = [{ id: 'n1', name: 'Milk' }];
 const storedItems = [{ id: 'i1', nameID: 'n1', date: '2030-01-01', quantity: 1, unit: 'l', state: 'active' }];
@@ -43,7 +38,7 @@ describe('store', () => {
     const state = store.getState();
     expect(state.itemNameReducer).toEqual([expect.objectContaining({ id: 'n1', name: 'Milk' })]);
     expect(state.itemReducer).toEqual([expect.objectContaining({ id: 'i1', nameID: 'n1' })]);
-    expect(syncMonkey.start).toHaveBeenCalled();
+    expect(dbProvider.startSync).toHaveBeenCalledTimes(1);
   });
 
   it('accumulates errors through the real store without tripping the dev mutation check', async () => {

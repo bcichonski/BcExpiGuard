@@ -32,7 +32,8 @@ export default defineConfig({
       },
     })]),
   ],
-  // PouchDB 7 (and some of its CJS deps) reference Node's `global`, which Vite does not polyfill.
+  // Still required with PouchDB 9: its browser build bundles `immediate`, whose code references a bare `global`
+  // (global.MutationObserver / global.setImmediate), which Vite does not polyfill.
   define: {
     global: 'globalThis',
   },

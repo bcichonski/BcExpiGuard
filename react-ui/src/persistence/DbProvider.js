@@ -1,21 +1,24 @@
 import PouchDB from 'pouchdb';
 import { REMOTE_API_ADDRESS } from '../constants/config'
 import userFuncs from './users'
+import logger from '../common/logger'
+import { createAuthFetch } from './authFetch'
+import LiveSync, { SYNCED_DBS } from './liveSync'
 
 class DbProvider {
     constructor() {
         this.logged = false;
-        this.opts = {
-            headers: {}
-        }
+        // The current session's token source for remote requests; see createAuthFetch.
+        this.session = undefined
 
-        this.dbSyncState = {}
+        this.liveSync = new LiveSync()
 
         // Login is async (it awaits the token), and StrictMode runs effects twice, so concurrent
         // useUserAsync calls must share one in-flight login. A logout bumps the generation, which
         // cancels a login still waiting for its token.
         this.pendingLogin = null
         this.authGeneration = 0
+        this.teardownPromise = null
     }
 
     async useUserAsync(isAuth, user, getToken) {
@@ -36,20 +39,19 @@ class DbProvider {
     async loginWithTokenAsync(user, getToken) {
         const generation = this.authGeneration
         try {
-            const token = await getToken()
+            // One token up front: a user without a valid Auth0 session never logs in.
+            await getToken()
+            // Same-named local DBs of a previous session must be fully destroyed before they are reopened.
+            if (this.teardownPromise) {
+                await this.teardownPromise
+            }
             if (generation === this.authGeneration && !this.logged) {
-                this.Login(user, token)
+                this.Login(user, getToken)
             }
         } finally {
             if (generation === this.authGeneration) {
                 this.pendingLogin = null
             }
-        }
-    }
-
-    resetReplication() {
-        if(this.inReplication) {
-            this.inReplication = false
         }
     }
 
@@ -62,93 +64,21 @@ class DbProvider {
         return this;
     }
 
-    replicate(dbName) {
-        if(!this.logged) {
+    // Starts the live sync of the synced DBs (items, item_names); idempotent, and a no-op while logged out.
+    startSync() {
+        if (!this.logged) {
             return
         }
-        if (this.inReplication) {
-            console.log('already in progress')
-            return
+        const databases = {}
+        for (const dbName of SYNCED_DBS) {
+            databases[dbName] = { local: this.local[dbName], remote: this.remote[dbName] }
         }
-
-        this.inReplication = true
-
-        const remoteDb = this.remote[dbName]?.remote_table;
-        const remoteFilterParams = this.remote[dbName]?.filter_params;
-        const remoteFilterName = this.remote[dbName]?.filter_name;
-
-        const replFiltered = {
-            filter: remoteFilterName,
-            query_params: remoteFilterParams,
-        }
-
-        const localDb = this.local[dbName]
-        if (!remoteDb) {
-            console.warn(`No remote db ${dbName} found`)
-        }
-        if (!localDb) {
-            console.warn(`No local db ${dbName} found`)
-        }
-
-        const self = this
-        const promise = new Promise(
-            (resolve, reject) => {
-                let wasChanges = false
-                remoteDb.replicate.to(localDb, replFiltered)
-                    .on('change', function (change) {
-                        console.log(`XXX remote ${dbName}: change`)
-                        wasChanges = true
-                    }).on('paused', function (info) {
-                        console.log(`XXX remote ${dbName}: paused`)
-                    }).on('active', function (info) {
-                        console.log(`XXX remote ${dbName}: active`)
-                    }).on('error', function (err) {
-                        console.log(err)
-                        reject(err)
-                    }).on('denied', function (err) {
-                        console.log(err)
-                        reject(err)
-                    }).on('complete', function (info) {
-                        resolve(wasChanges)
-                    })
-            }
-        ).then((wasChanges) => {
-            if (wasChanges) {
-                try {
-                    this.syncHooks.refreshData(dbName)
-                } catch (err) {
-                    self.inReplication = false
-                    return new Promise((resolve, reject) => reject(err))
-                }
-            }
-
-            return new Promise((resolve, reject) => {
-                localDb.replicate.to(remoteDb)
-                    .on('change', function (change) {
-                        console.log(`XXX local ${dbName}: change`)
-                    }).on('paused', function (info) {
-                        console.log(`XXX local ${dbName}: paused`)
-                    }).on('active', function (info) {
-                        console.log(`XXX local ${dbName}: active`)
-                    }).on('error', function (err) {
-                        console.log(err)
-                        reject(err)
-                    }).on('denied', function (err) {
-                        console.log(err)
-                        reject(err)
-                    }).on('complete', function (info) {
-                        resolve(wasChanges)
-                    })
-            })
-        }).finally(() => {
-            self.inReplication = false
-        })
-
-        return promise
+        this.liveSync.start(databases, this.syncHooks)
     }
 
     CreateRemoteDb(dbName, filterParams, filterName = 'restrict/restrict') {
-        const remoteDb = new PouchDB(`${REMOTE_API_ADDRESS}${dbName}`, this.opts)
+        // No fixed Authorization header: the fetch wrapper attaches a fresh token per request.
+        const remoteDb = new PouchDB(`${REMOTE_API_ADDRESS}${dbName}`, { fetch: this.remoteFetch })
         const localDb = this.local[dbName]
 
         if (!localDb) {
@@ -166,8 +96,9 @@ class DbProvider {
         this.onLoginFn = fn
     }
 
-    Login(user, token) {
-        this.opts.headers.Authorization = 'Bearer ' + token
+    Login(user, getToken) {
+        this.session = { getToken }
+        this.remoteFetch = createAuthFetch(this.session)
         this.userId = userFuncs.getId(user)
         this.groupId = this.userId
 
@@ -202,25 +133,66 @@ class DbProvider {
         }
     }
 
+    // Runs one teardown step; a failure is logged and never stops the remaining steps.
+    async safely(description, fn) {
+        try {
+            await fn()
+        } catch (err) {
+            logger.warn(`Logout: failed to ${description}`, err)
+        }
+    }
+
     async Logout() {
         // Cancel a login that is still waiting for its token; safe to call repeatedly.
         this.authGeneration++
         this.pendingLogin = null
 
         if (!this.logged) {
+            // A repeated or concurrent logout waits for the teardown already running.
+            if (this.teardownPromise) {
+                await this.teardownPromise
+            }
             return
         }
 
-        // Flip the state before awaiting, so a login started while the remote tables close is not skipped.
+        // Flip the state and detach the instances before awaiting, so a login started during teardown
+        // is not skipped and its new DBs are never touched: only the captured instances are torn down.
         this.logged = false
+        // Step 1 of the teardown (stop sync), done synchronously: a login started during the teardown
+        // must never have its new sync stopped. No sync hook runs after this.
+        this.liveSync.stop()
         const remote = this.remote
-        delete this.opts.headers.Authorization;
+        const local = this.local
+        // Ends the session: remote requests of this user now fail fast without a token.
+        if (this.session) {
+            this.session.getToken = null
+        }
+        this.session = undefined
+        this.remoteFetch = undefined
         delete this.userId;
+        delete this.groupId;
+        this.remote = undefined
+        this.local = undefined
 
-        await this.Clear(remote.users)
-        await this.Clear(remote.items)
-        await this.Clear(remote.itemNames)
-        await this.Clear(remote.groups)
+        const teardown = this.teardownAsync(remote, local)
+        this.teardownPromise = teardown
+        try {
+            await teardown
+        } finally {
+            if (this.teardownPromise === teardown) {
+                this.teardownPromise = null
+            }
+        }
+    }
+
+    // Order: stop sync (already done by Logout) -> close remotes -> destroy locals (D6).
+    async teardownAsync(remote, local) {
+        for (const [name, metadata] of Object.entries(remote ?? {})) {
+            await this.safely(`close remote ${name}`, () => this.Clear(metadata))
+        }
+        for (const [name, db] of Object.entries(local ?? {})) {
+            await this.safely(`destroy local ${name}`, () => db.destroy())
+        }
     }
 }
 

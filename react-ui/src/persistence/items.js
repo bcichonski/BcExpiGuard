@@ -1,6 +1,5 @@
 import { ensureDb, toPouch_id, transfromFromPouch } from './validate'
 import dbprovider from '../persistence'
-import syncMonkey from '../common/syncMonkey'
 import { nowISO } from '../common/utils'
 
 const add = async (payload) => {
@@ -15,10 +14,6 @@ const add = async (payload) => {
 
     const pouchPayload = toPouch_id(payload)
     await dbprovider.local.items.putIfNotExists(pouchPayload)
-    if (dbprovider?.remote?.items?.remote_table) {
-        await dbprovider.remote.items.remote_table.putIfNotExists(pouchPayload)
-    }
-    syncMonkey.reset()
 }
 
 const changeState = async (id, newstate) => {
@@ -29,11 +24,6 @@ const changeState = async (id, newstate) => {
     }
 
     await dbprovider.local.items.upsert(id, stateDeltaFunction)
-
-    if (dbprovider?.remote?.items?.remote_table) {
-        await dbprovider.remote.items.remote_table.upsert(id, stateDeltaFunction)
-    }
-    syncMonkey.reset()
 }
 
 const changeQuantity = async (id, quantity) => {
@@ -48,10 +38,6 @@ const changeQuantity = async (id, quantity) => {
     }
 
     await dbprovider.local.items.upsert(id, stateDeltaFunction)
-    if (dbprovider?.remote?.items?.remote_table) {
-        await dbprovider.remote.items.remote_table.upsert(id, stateDeltaFunction)
-    }
-    syncMonkey.reset()
 }
 
 const update = async (id, item) => {
@@ -92,10 +78,6 @@ const update = async (id, item) => {
     }
 
     await dbprovider.local.items.upsert(id, stateDeltaFunction)
-    if (dbprovider?.remote?.items?.remote_table) {
-        await dbprovider.remote.items.remote_table.upsert(id, stateDeltaFunction)
-    }
-    syncMonkey.reset()
 }
 
 const getAll = async () => {

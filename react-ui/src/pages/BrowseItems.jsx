@@ -26,7 +26,6 @@ import DealtWithDialog from '../components/DealtWithDialog'
 import Title from '../components/Title'
 import { itemActions, itemTypes } from '../logic/item-list'
 import { itemEditActions } from '../logic/item-edit-add';
-import syncMonkey from '../common/syncMonkey'
 
 // The MIT DataGrid caps the page size at 100; the old table showed every row unpaged.
 const PAGE_SIZE = 100
@@ -139,8 +138,6 @@ function BrowseItems(props) {
     const [mainFilterValue, setMainFilterValue] = useState(itemTypes.ITEM_ACTIVE)
     const [menuRowData, setMenuRowData] = React.useState(null);
     const filteredData = props.data.filter((item) => mainFilterValue === 'none' || item.state === mainFilterValue)
-
-    syncMonkey.reset()
 
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [dialogOpen, setDialogOpen] = React.useState(false);
