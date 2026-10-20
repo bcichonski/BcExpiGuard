@@ -21,7 +21,8 @@ function loadConfig(env = process.env, envFile = DEFAULT_ENV_FILE) {
 
   return {
     port: Number(env.PORT) || 5000,
-    forceHttps: env.FORCE_HTTPS === 'true',
+    // HTTPS is enforced by default in production; only an explicit FORCE_HTTPS=false turns it off.
+    forceHttps: env.FORCE_HTTPS ? env.FORCE_HTTPS !== 'false' : env.NODE_ENV === 'production',
     staticDir: DEFAULT_STATIC_DIR,
     auth0Domain: pick('VITE_AUTH0_DOMAIN'),
     couchUrl: pick('VITE_COUCH_URL'),

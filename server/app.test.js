@@ -104,3 +104,12 @@ test('loadConfig prefers env over env file and falls back to the file', () => {
   assert.equal(fromEnv.forceHttps, true);
   assert.equal(fromEnv.port, 8080);
 });
+
+test('loadConfig enforces HTTPS by default in production and only an explicit false turns it off', () => {
+  const file = path.join(dir, 'missing.env');
+  assert.equal(loadConfig({ NODE_ENV: 'production' }, file).forceHttps, true);
+  assert.equal(loadConfig({ NODE_ENV: 'production', FORCE_HTTPS: 'false' }, file).forceHttps, false);
+  assert.equal(loadConfig({ NODE_ENV: 'production', FORCE_HTTPS: '1' }, file).forceHttps, true);
+  assert.equal(loadConfig({}, file).forceHttps, false);
+  assert.equal(loadConfig({ FORCE_HTTPS: 'true' }, file).forceHttps, true);
+});

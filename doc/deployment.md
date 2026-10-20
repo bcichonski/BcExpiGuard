@@ -17,7 +17,6 @@ docker pull ghcr.io/bcichonski/bcexpiguard:latest
 docker run -d --name bcexpiguard \
   --restart unless-stopped \
   -p 127.0.0.1:5000:5000 \
-  -e FORCE_HTTPS=true \
   ghcr.io/bcichonski/bcexpiguard:latest
 ```
 
@@ -33,7 +32,7 @@ Production runs behind a proxy (for example Caddy, nginx, Traefik or a cloud loa
 2. forwards requests to `http://127.0.0.1:5000` (or to the container on the same Docker network);
 3. sets the `X-Forwarded-Proto` header to the scheme the client used.
 
-The server trusts `X-Forwarded-Proto` (it runs with Express `trust proxy`). With `FORCE_HTTPS=true`, a plain-HTTP request is redirected to `https://`, and HSTS and `upgrade-insecure-requests` are sent. Only expose the container through the proxy. Do not publish port 5000 directly to the internet, because a client could then send a forged `X-Forwarded-Proto: https` header.
+The server trusts `X-Forwarded-Proto` (it runs with Express `trust proxy`). HTTPS is enforced by default: a plain-HTTP request is redirected to `https://`, and HSTS and `upgrade-insecure-requests` are sent. The image sets `FORCE_HTTPS=true`, and the server also defaults to it whenever `NODE_ENV=production`. Only expose the container through the proxy. Do not publish port 5000 directly to the internet, because a client could then send a forged `X-Forwarded-Proto: https` header.
 
 Example nginx location (placeholders only):
 
@@ -57,7 +56,7 @@ server {
 docker compose up --build
 ```
 
-This builds the image from the working tree and serves the app at [http://localhost:5000](http://localhost:5000). Compose sets `FORCE_HTTPS=false`, so local HTTP works.
+This builds the image from the working tree and serves the app at [http://localhost:5000](http://localhost:5000). Compose sets `FORCE_HTTPS=false`, so local HTTP works. This is the only place HTTPS enforcement is switched off. Never set `FORCE_HTTPS=false` on a production container.
 
 ## 2. Environment variables
 
@@ -68,7 +67,7 @@ Build-time values are baked into the JavaScript bundle when the image is built. 
 | Variable | Default | Purpose |
 | :--- | :--- | :--- |
 | `PORT` | `5000` | Port the server listens on inside the container. |
-| `FORCE_HTTPS` | off | Set to `true` in production. Turns on the HTTPS redirect, HSTS and `upgrade-insecure-requests`. Keep it off for plain-HTTP local runs. |
+| `FORCE_HTTPS` | `true` (image and any `NODE_ENV=production` run) | HTTPS redirect, HSTS and `upgrade-insecure-requests`. Only the exact value `false` turns them off, for plain-HTTP local runs such as Compose. |
 | `VITE_AUTH0_DOMAIN` | from `react-ui/.env.production` | Used only to build the Content-Security-Policy (`connect-src`, `frame-src`). |
 | `VITE_COUCH_URL` | from `react-ui/.env.production` | Used only to build the Content-Security-Policy (`connect-src`). |
 
@@ -102,7 +101,7 @@ Pull the new image and recreate the container:
 docker pull ghcr.io/bcichonski/bcexpiguard:latest
 docker stop bcexpiguard && docker rm bcexpiguard
 docker run -d --name bcexpiguard --restart unless-stopped \
-  -p 127.0.0.1:5000:5000 -e FORCE_HTTPS=true \
+  -p 127.0.0.1:5000:5000 \
   ghcr.io/bcichonski/bcexpiguard:latest
 ```
 
@@ -112,7 +111,7 @@ With Watchtower or a similar tool, the same pull-and-restart happens automatical
 
 ```sh
 docker run -d --name bcexpiguard --restart unless-stopped \
-  -p 127.0.0.1:5000:5000 -e FORCE_HTTPS=true \
+  -p 127.0.0.1:5000:5000 \
   ghcr.io/bcichonski/bcexpiguard:sha-<short>
 ```
 

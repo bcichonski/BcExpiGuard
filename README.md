@@ -33,10 +33,10 @@
 Each push to `master` publishes a container image to GitHub Container Registry: `ghcr.io/bcichonski/bcexpiguard`, tagged `latest` and `sha-<short>`.
 
 ```sh
-docker run -p 5000:5000 ghcr.io/bcichonski/bcexpiguard:latest
+docker run -p 5000:5000 -e FORCE_HTTPS=false ghcr.io/bcichonski/bcexpiguard:latest
 ```
 
-Then open [http://localhost:5000](http://localhost:5000).
+Then open [http://localhost:5000](http://localhost:5000). The image enforces HTTPS by default (redirect + HSTS), so `FORCE_HTTPS=false` is needed only for this plain-HTTP local run. Never set it in production.
 
 To build the image locally and run it with Compose (serves on port 5000):
 

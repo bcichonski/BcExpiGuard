@@ -18,6 +18,8 @@ RUN npm run build
 # ---- Runtime stage: server + static build only ----
 FROM node:24-alpine AS runtime
 ENV NODE_ENV=production
+# HTTPS redirect + HSTS are on by default; set FORCE_HTTPS=false only for plain-HTTP local runs.
+ENV FORCE_HTTPS=true
 WORKDIR /app
 
 COPY --chmod=a+rX package.json package-lock.json ./
