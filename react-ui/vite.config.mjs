@@ -60,7 +60,7 @@ export default defineConfig({
     },
   },
   build: {
-    // server/index.js and Heroku serve react-ui/build
+    // server/index.js serves react-ui/build
     outDir: 'build',
   },
 });
