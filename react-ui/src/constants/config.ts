@@ -26,7 +26,7 @@ if (!auth0Audience) {
 /**
  * Normalize CouchDB URL to have exactly one trailing slash
  */
-function normalizeCouchUrl(url) {
+function normalizeCouchUrl(url: string | undefined): string | undefined {
   if (!url) return url;
   // Remove all trailing slashes, then add exactly one
   return url.replace(/\/+$/, '') + '/';

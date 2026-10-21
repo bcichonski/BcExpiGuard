@@ -2,6 +2,7 @@ import js from '@eslint/js';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
+import tseslint from 'typescript-eslint';
 
 export default [
   { ignores: ['build/**', 'node_modules/**', '.nm-trash-delete-me/**'] },
@@ -38,8 +39,17 @@ export default [
       'no-useless-escape': 'warn',
     },
   },
+  ...tseslint.configs.recommended.map((c) => ({ ...c, files: ['**/*.{ts,tsx}'] })),
   {
-    files: ['src/tests/**', 'src/setupTests.js'],
+    files: ['**/*.{ts,tsx}'],
+    languageOptions: { globals: { ...globals.browser } },
+  },
+  {
+    files: ['e2e/**'],
+    languageOptions: { globals: { ...globals.node } },
+  },
+  {
+    files: ['src/tests/**', 'src/setupTests.js', 'src/**/*.test.{ts,tsx}'],
     languageOptions: {
       globals: { ...globals.browser, ...globals.node, ...globals.vitest },
     },
