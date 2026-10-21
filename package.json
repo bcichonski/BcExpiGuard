@@ -1,7 +1,12 @@
 {
-  "name": "BcExpiGuard_backend",
+  "name": "bcexpiguard",
   "version": "1.0.1",
+  "private": true,
   "description": "Keep things from getting expired, learn React and stuff at the same time",
+  "homepage": "https://github.com/bcichonski/BcExpiGuard#readme",
+  "bugs": {
+    "url": "https://github.com/bcichonski/BcExpiGuard/issues"
+  },
   "engines": {
     "node": ">=24"
   },
@@ -17,7 +22,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/mars/heroku-cra-node.git"
+    "url": "https://github.com/bcichonski/BcExpiGuard.git"
   },
   "keywords": [
     "node",
