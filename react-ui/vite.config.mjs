@@ -50,7 +50,8 @@ export default defineConfig({
     // spinners-react is type:module but its "main" is a UMD file; let Vite resolve its ESM "module" entry.
     // MUI v7 is inlined so Vite (not Node) resolves its ESM imports.
     server: { deps: { inline: ['spinners-react', /@mui\//] } },
-    include: ['src/**/*.test.{js,jsx}'],
+    include: ['src/**/*.test.{js,jsx,ts,tsx}'],
+    exclude: ['e2e/**', 'node_modules/**'],
     // Test values so the suite never depends on .env.production / .env.local.
     env: {
       VITE_COUCH_URL: 'https://couch.test/db/',
