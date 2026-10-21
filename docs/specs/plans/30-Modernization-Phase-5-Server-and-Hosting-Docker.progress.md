@@ -1,8 +1,0 @@
-# Progress — 30 Modernization Phase 5: Server and Hosting (Docker)
-
-| Task | Title | Depends on | Complexity | Status | Notes |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| T1 | Modernize Express server + tests; drop Heroku manifest | — | Medium | Done | sonnet; started 16:57Z finished 16:59Z; server/app.js factory + config.js (util.parseEnv of .env.production, env wins) + thin index.js w/ graceful shutdown; express 5, helmet CSP, compression, /healthz, opt-in FORCE_HTTPS; app.json + Heroku keys removed; 12 node:test tests; verify.sh (root) PASS |
-| T2 | Multi-stage Dockerfile, .dockerignore, compose; un-ignore Docker files | T1 | Medium | Done | sonnet; started 17:05Z finished 17:08Z; Dockerfile (node:24-alpine multi-stage, COPY --chmod=a+rX needed: virtiofs file modes), .dockerignore, docker-compose.yml, .gitignore Docker entries removed; image 258MB; container smoke healthy, / /healthz /browse 200, CSP has Auth0+Couch origins, user node; no code changed -> smoke = wave verification PASS |
-| T3 | CI: server tests + image build/publish to GHCR | T2 | Medium | Done | sonnet; started 17:08Z finished 17:10Z; ci.yml server job + npm test; docker.yml image job (buildx, login/push only on master, metadata latest+sha-short, gha cache, packages:write job-scoped); YAML parsed via js-yaml; real check = PR CI run |
-| T4 | Docs: README + deployment guide | T3 | Low | Done | haiku; started 17:08Z finished 17:12Z; README (icon -> repo, Docker/GHCR hosting, npm start/build/test, Run with Docker), doc/deployment.md (TLS proxy, env vars build vs runtime, update/rollback, healthz, Auth0 + CouchDB CORS checklists, CSP); relative links checked |
