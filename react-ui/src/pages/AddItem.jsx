@@ -172,7 +172,7 @@ function AddItem(props) {
                 </Column>
                 {editOptions}
                 <Column sm={6}>
-                    <Grid container justifyContent="flex-end" direction='row'>
+                    <Grid container direction='row' sx={{ justifyContent: "flex-end" }}>
                         <Button variant='contained'
                             color='inherit'
                             sx={{ mt: 2 }}

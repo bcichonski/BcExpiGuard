@@ -1,5 +1,5 @@
 import { vi } from 'vitest';
-import { render, cleanup, fireEvent, within, waitFor } from '@testing-library/react';
+import { render, cleanup, fireEvent, within, waitFor, screen } from '@testing-library/react';
 import { ThemeProvider } from '@mui/material/styles';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -21,25 +21,48 @@ afterEach(cleanup);
 const future = addDays(new Date(), 10);
 const futureText = format(future, DATE_FORMAT);
 
+// v9 renders the field as a labelled group of spinbutton sections (Year, Month, Day)
+// plus a hidden input that carries the formatted value.
+const getField = () => screen.getByRole('group', { name: 'Expiration date' });
+const getHiddenInput = () => getField().querySelector('input');
+const getSectionsText = () => ['Year', 'Month', 'Day']
+  .map(name => within(getField()).getByRole('spinbutton', { name }).textContent)
+  .join('-');
+
+// sections are contenteditable: type into one the way the browser reports it (an input event)
+const typeIntoSection = (name, text) => {
+  const section = within(getField()).getByRole('spinbutton', { name });
+  fireEvent.focus(section);
+  section.textContent = text;
+  fireEvent.input(section, { inputType: 'insertText', data: text });
+};
+
 test('a yyyy-MM-dd string renders as that text (desktop)', () => {
-  const { getByLabelText } = renderPicker({ selectedDate: futureText });
-  expect(getByLabelText('Expiration date').value).toBe(futureText);
+  renderPicker({ selectedDate: futureText });
+  expect(getSectionsText()).toBe(futureText);
+  expect(getHiddenInput().value).toBe(futureText);
 });
 
 test('a yyyy-MM-dd string renders as that text (mobile)', () => {
-  const { getByLabelText } = renderPicker({ selectedDate: futureText, isMobile: true });
-  expect(getByLabelText('Expiration date').value).toBe(futureText);
+  renderPicker({ selectedDate: futureText, isMobile: true });
+  expect(getSectionsText()).toBe(futureText);
+  expect(getHiddenInput().value).toBe(futureText);
 });
 
 test('an empty value renders an empty field', () => {
-  const { getByLabelText } = renderPicker({ selectedDate: '' });
-  expect(getByLabelText('Expiration date').value).toBe('');
+  renderPicker({ selectedDate: '' });
+  expect(getHiddenInput().value).toBe('');
+  // empty sections show the format placeholders, not digits
+  expect(getSectionsText()).toBe('YYYY-MM-DD');
 });
 
 test('typing a date calls setDate with a Date that formats back to the same string', () => {
   const setDate = vi.fn();
-  const { getByLabelText } = renderPicker({ setDate });
-  fireEvent.change(getByLabelText('Expiration date'), { target: { value: futureText } });
+  renderPicker({ setDate });
+  const [year, month, day] = futureText.split('-');
+  typeIntoSection('Year', year);
+  typeIntoSection('Month', month);
+  typeIntoSection('Day', day);
   expect(setDate).toHaveBeenCalled();
   const emitted = setDate.mock.calls[setDate.mock.calls.length - 1][0];
   expect(emitted).toBeInstanceOf(Date);
@@ -72,9 +95,10 @@ test('dates before today are disabled in the picker', async () => {
 });
 
 test('the error state and helper text are shown', () => {
-  const { getByText, getByLabelText } = renderPicker({ error: true, helperText: 'Pick a valid date' });
+  const { getByText } = renderPicker({ error: true, helperText: 'Pick a valid date' });
   expect(getByText('Pick a valid date')).toBeTruthy();
-  expect(getByLabelText('Expiration date').getAttribute('aria-invalid')).toBe('true');
+  expect(getField().getAttribute('aria-invalid')).toBe('true');
+  expect(getField().getAttribute('aria-describedby')).toBe(getByText('Pick a valid date').id);
 });
 
 test('isMobile defaults to false: omitted renders the desktop picker (no Cancel/OK action bar), true the mobile one', async () => {

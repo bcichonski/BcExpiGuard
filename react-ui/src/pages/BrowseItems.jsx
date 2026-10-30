@@ -17,7 +17,7 @@ import { styled, useTheme } from '@mui/material/styles';
 import { DataGrid, QuickFilter, QuickFilterClear, QuickFilterControl } from '@mui/x-data-grid';
 import AssignmentTurnedInOutlinedIcon from '@mui/icons-material/AssignmentTurnedInOutlined';
 import ClearIcon from '@mui/icons-material/Clear';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import MoreVertOutlinedIcon from '@mui/icons-material/MoreVertOutlined';
 import SearchIcon from '@mui/icons-material/Search';
@@ -198,7 +198,7 @@ function BrowseItems(props) {
             <React.Fragment>
                 <Tooltip title="Delete">
                     <IconButton color="inherit" aria-label="Delete" onClick={() => rowAction('delete', row)}>
-                        <DeleteOutlineIcon />
+                        <DeleteOutlinedIcon />
                     </IconButton>
                 </Tooltip>
                 <Tooltip title="Edit">

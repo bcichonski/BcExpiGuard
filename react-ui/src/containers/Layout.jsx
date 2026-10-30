@@ -137,7 +137,7 @@ function Layout(props) {
         <AppBarSpacer />
         <Container maxWidth="xl" sx={{ pt: 4, pb: 4 }}>
           <RouterSwitch />
-          <Box pt={4}>
+          <Box sx={{ pt: 4 }}>
             <Copyright />
           </Box>
         </Container>
