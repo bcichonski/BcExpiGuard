@@ -51,8 +51,10 @@ test('picking a day in the mobile dialog calls setDate with that Date and closes
   const { getByRole, findByRole, queryByRole } = renderPicker({ setDate, isMobile: true, selectedDate: format(addDays(new Date(), 1), DATE_FORMAT) });
   fireEvent.click(getByRole('button', { name: /choose date/i }));
   const dialog = await findByRole('dialog');
-  // pick the last enabled day of the displayed month
-  const days = within(dialog).getAllByRole('gridcell').filter(c => !c.disabled && c.textContent);
+  // pick the last enabled day of the displayed month that is not already selected
+  // (re-picking the selected day is a no-op, which broke this test whenever tomorrow was the last of the month)
+  const days = within(dialog).getAllByRole('gridcell')
+    .filter(c => !c.disabled && c.textContent && c.getAttribute('aria-selected') !== 'true');
   fireEvent.click(days[days.length - 1]);
   expect(setDate).toHaveBeenCalled();
   expect(setDate.mock.calls[0][0]).toBeInstanceOf(Date);
