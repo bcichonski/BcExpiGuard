@@ -27,10 +27,14 @@ const theme = createTheme({
     },
     // v4 inputs defaulted to the standard (underline) variant; v5+ defaults to outlined.
     MuiTextField: { defaultProps: { variant: 'standard' } },
+    // the v9 date picker field is a PickersTextField, which ignores the MuiTextField default.
+    MuiPickersTextField: { defaultProps: { variant: 'standard' } },
     MuiSelect: { defaultProps: { variant: 'standard' } },
     MuiFormControl: { defaultProps: { variant: 'standard' } },
     // v4 links underlined on hover only; v5+ always underlines.
     MuiLink: { defaultProps: { underline: 'hover' } },
+    // v9 ListItemIcon defaults to a 36px min-width; v4-v7 used 56px.
+    MuiListItemIcon: { styleOverrides: { root: { minWidth: 56 } } },
     // v5+ menu items squeeze a ListItemIcon to 36px and drop the ListItemText margins; v4 kept the list defaults.
     MuiMenuItem: {
       styleOverrides: {

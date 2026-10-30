@@ -27,8 +27,6 @@ function Datepicker({ isMobile = false, ...rest }) {
             format={DATE_FORMAT}
             minDate={today}
             closeOnSelect
-            // plain <input> inside the regular TextField (theme's standard variant), like the v4 keyboard picker
-            enableAccessibleFieldDOMStructure={false}
             slotProps={{
                 textField: {
                     error: props.error,
